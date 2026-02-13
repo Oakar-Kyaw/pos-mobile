@@ -3,14 +3,18 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/models/product.dart';
+import 'package:pos/models/voucher-detail.dart';
+import 'package:pos/riverpod/voucher-detail.dart';
 import 'package:pos/utils/drawer.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/responsive.dart';
+import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
@@ -23,7 +27,6 @@ class MyHomePage extends ConsumerStatefulWidget {
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
   final String limit = "20";
-  final Set<String> _selectedProductIds = {};
 
   late final PagingController<int, Product> _pagingController =
       PagingController<int, Product>(
@@ -34,6 +37,24 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             .getProductByUserId(pageKey.toString(), limit),
       );
 
+  void setVoucher() {
+    VoucherDetailModel voucherDetailModel = VoucherDetailModel(
+      id: 0,
+      items: [],
+      total: 0,
+      type: "draft",
+    );
+    ref.read(voucherDetailProvider.notifier).setVoucher(voucherDetailModel);
+  }
+
+  void selectedItems(ItemModel item) {
+    ref.read(voucherDetailProvider.notifier).addItem(item);
+  }
+
+  void clearSelectedItem(int id) {
+    ref.read(voucherDetailProvider.notifier).removeItem(id);
+  }
+
   @override
   void dispose() {
     _pagingController.dispose();
@@ -42,6 +63,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // final voucher = ref.watch(voucherDetailProvider);
+    // print(
+    //   "selected voucher is 🥹: ${voucher?.items[0].name} ${voucher?.total}",
+    // );
     return Scaffold(
       drawer: CustomerDrawer().buildDrawer(context),
       appBar: CustomAppBar(
@@ -152,19 +177,22 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                     ),
 
                     const SizedBox(width: 5),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      alignment: Alignment.center,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        HomeScreenLocale.createVoucher.getString(context),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: FontSizeConfig.body(context),
+                    InkWell(
+                      onTap: () => context.pushNamed(AppRoute.createVoucher),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        alignment: Alignment.center,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          HomeScreenLocale.createVoucher.getString(context),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: FontSizeConfig.body(context),
+                          ),
                         ),
                       ),
                     ),
@@ -189,20 +217,38 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   Widget _selectCheckbox(Product item) {
+    final isSelected =
+        ref
+            .watch(voucherDetailProvider)
+            ?.items
+            .any((selectedItem) => selectedItem.id == item.id) ??
+        false;
     return Material(
-      elevation: 2,
+      elevation: 1,
       borderRadius: BorderRadius.circular(8),
-      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(2),
         child: ShadCheckbox(
-          value: _selectedProductIds.contains(item.id),
+          value: isSelected,
+          //value: checkSelectedItem(item.id),
           onChanged: (value) {
             setState(() {
               if (value == true) {
-                _selectedProductIds.add(item.id.toString());
+                // Initialize voucher only if it's null
+                if (ref.read(voucherDetailProvider) == null) {
+                  setVoucher();
+                }
+                selectedItems(
+                  ItemModel(
+                    id: item.id,
+                    name: item.name,
+                    quantity: 1,
+                    price: item.price,
+                    photoUrl: item.photoUrl,
+                  ),
+                );
               } else {
-                _selectedProductIds.remove(item.id.toString());
+                clearSelectedItem(item.id);
               }
             });
           },

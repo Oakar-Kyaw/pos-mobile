@@ -12,20 +12,36 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
     return await getProductByUserId("1", "20");
   }
 
-  Future<List<Product>> getProductByUserId(String page, String limit) async {
-    final url = "v1/products";
-    final response = await _dio.get(url, query: {"page": page, "limit": limit});
-    final Map<String, dynamic> data = response.data;
-    //print("data 👨‍🏭 $data");
-    if (data["success"] == true) {
-      final items = data["data"] as List;
-      List<Product> products = items
-          .map((e) => Product.fromJson(Map<String, dynamic>.from(e)))
-          .toList();
-      return products;
+  Future<List<Product>> getProductByUserId(
+    String page,
+    String limit, {
+    String? search,
+  }) async {
+    state = const AsyncLoading();
+    try {
+      final url = "v1/products";
+      final response = await _dio.get(
+        url,
+        query: {"page": page, "limit": limit, "search": search},
+      );
+      final Map<String, dynamic> data = response.data;
+      //print("data 👨‍🏭 $data");
+      if (data["success"] == true) {
+        final items = data["data"] as List;
+        List<Product> products = items
+            .map((e) => Product.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+        state = AsyncData(products);
+        return products;
+      } else {
+        state = AsyncError("Failed to fetch products", StackTrace.current);
+        throw Exception("Failed to fetch");
+      }
+    } catch (e, st) {
+      //print("FAi $e");
+      state = AsyncError(e, st);
+      throw Exception("Failed to fetch");
     }
-
-    throw Exception("Failed to fetch products");
   }
 
   Future<bool> postProduct(FormData json) async {
@@ -46,6 +62,6 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
 }
 
 final productProvider =
-    AsyncNotifierProvider.autoDispose<ProductAsyncNotifier, List<Product>>(
+    AsyncNotifierProvider<ProductAsyncNotifier, List<Product>>(
       () => ProductAsyncNotifier(),
     );

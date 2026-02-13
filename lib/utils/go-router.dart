@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pos/main.dart';
 import 'package:pos/src/category.dart';
 import 'package:pos/src/company-profile.dart';
+import 'package:pos/src/create-voucher.dart';
 import 'package:pos/src/home.dart';
 import 'package:pos/src/login.dart';
 import 'package:pos/src/product.dart';
@@ -40,6 +41,13 @@ final GoRouter goRouter = GoRouter(
       path: AppRoute.product,
       name: AppRoute.product,
       builder: (context, state) => ShadToaster(child: const ProductPage()),
+    ),
+    //create voucher
+    GoRoute(
+      path: AppRoute.createVoucher,
+      name: AppRoute.createVoucher,
+      builder: (context, state) =>
+          ShadToaster(child: const CreateVoucherPage()),
     ),
     GoRoute(
       path: AppRoute.login,

@@ -6,4 +6,5 @@ class AppRoute {
   static const String product = '/product';
   static const String companyProfile = "/company-profile";
   static const String login = "/login";
+  static const String createVoucher = "/create-voucher";
 }

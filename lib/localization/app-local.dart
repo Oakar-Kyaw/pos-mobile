@@ -5,6 +5,7 @@ import 'package:pos/localization/error-local.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/localization/login-local.dart';
 import 'package:pos/localization/product-local.dart';
+import 'package:pos/localization/voucher-local.dart';
 
 mixin AppLocale {
   static const Map<String, dynamic> EN = {
@@ -15,6 +16,7 @@ mixin AppLocale {
     ...LoginScreenLocale.EN,
     ...ProductScreenLocale.EN,
     ...ErrorScreenLocale.EN,
+    ...VoucherScreenLocale.EN,
   };
 
   static const Map<String, dynamic> MM = {
@@ -25,5 +27,6 @@ mixin AppLocale {
     ...LoginScreenLocale.MM,
     ...ProductScreenLocale.MM,
     ...ErrorScreenLocale.MM,
+    ...VoucherScreenLocale.MM,
   };
 }
