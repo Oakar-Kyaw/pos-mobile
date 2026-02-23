@@ -6,11 +6,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:pos/api/category.api.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/bar-code.dart';
 import 'package:pos/models/category.dart';
+import 'package:pos/utils/app-theme.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/localization/product-local.dart';
@@ -44,9 +44,8 @@ class _ProductFormState extends ConsumerState<ProductForm> {
 
   void uploadPhoto() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.image, // simplest option
+      type: FileType.image,
     );
-
     if (result != null && result.files.single.path != null) {
       setState(() {
         imageFile = File(result.files.single.path!);
@@ -59,7 +58,6 @@ class _ProductFormState extends ConsumerState<ProductForm> {
       context,
       MaterialPageRoute(builder: (_) => const BarcodeScannerPage()),
     );
-
     if (result != null) {
       setState(() {
         barCodeString = result;
@@ -68,264 +66,6 @@ class _ProductFormState extends ConsumerState<ProductForm> {
     }
   }
 
-  @override
-  void dispose() {
-    nameCtrl.dispose();
-    codeCtrl.dispose();
-    barcodeCtrl.dispose();
-    descriptionCtrl.dispose();
-    photoUrlCtrl.dispose();
-    priceCtrl.dispose();
-    costPriceCtrl.dispose();
-    stockCtrl.dispose();
-    minStockCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final cateAsync = ref.watch(categoryProvider);
-    print("barcode is 😁 $barCodeString");
-    return ShadForm(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// Product Name
-          _input(
-            context,
-            label: ProductScreenLocale.productName,
-            placeholder: ProductScreenLocale.productNamePlaceholder,
-            controller: nameCtrl,
-          ),
-
-          _gap(),
-
-          Padding(
-            padding: const EdgeInsets.only(left: 10, bottom: 5),
-            child: _label(context, CategoryScreenLocale.categoryName),
-          ),
-          Padding(
-            padding: EdgeInsetsGeometry.symmetric(horizontal: 10, vertical: 5),
-            child: cateAsync.when(
-              data: (data) => ShadSelect<Category>(
-                placeholder: Text(
-                  CategoryScreenLocale.selectCategory.getString(context),
-                ),
-                options: data
-                    .map((e) => ShadOption(value: e, child: Text(e.title)))
-                    .toList(),
-                selectedOptionBuilder: (context, value) => Text(value.title),
-                onChanged: (value) {
-                  setState(() {
-                    categoryId = value?.id; // store selected id
-                  });
-                },
-              ),
-              error: (error, stackTrace) => Container(),
-              loading: () => Center(
-                child: SizedBox(
-                  height: 8,
-                  width: 8,
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-            ),
-          ),
-          _gap(),
-          //Product Code
-          _input(
-            context,
-            label: ProductScreenLocale.productCode,
-            placeholder: ProductScreenLocale.productCodePlaceholder,
-            controller: codeCtrl,
-          ),
-
-          _gap(),
-
-          /// Barcode
-          Padding(
-            padding: const EdgeInsets.only(left: 10, bottom: 5),
-            child: _label(context, ProductScreenLocale.barcode),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () => scanBarCode(),
-                  icon: Icon(
-                    LucideIcons.scanBarcode,
-                    size: 50,
-                    color: const Color.fromARGB(255, 192, 191, 191),
-                  ),
-                ),
-                SizedBox(width: 10),
-                Text(
-                  barcodeCtrl.text ?? "",
-                  style: TextStyle(fontSize: FontSizeConfig.body(context)),
-                ),
-              ],
-            ),
-          ),
-          _gap(),
-
-          /// Description
-          _input(
-            context,
-            label: ProductScreenLocale.description,
-            placeholder: ProductScreenLocale.descriptionPlaceholder,
-            controller: descriptionCtrl,
-            maxLines: 3,
-          ),
-
-          _gap(),
-
-          Padding(
-            padding: const EdgeInsets.only(left: 10, bottom: 5),
-            child: _label(context, ProductScreenLocale.photoUrl),
-          ),
-
-          /// Photo URL
-          imageFile != null
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          imageFile!,
-                          width: 150,
-                          height: 150,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-
-                      /// Clear button (X)
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              imageFile = null; // clear the photo
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
-                            ),
-                            padding: const EdgeInsets.all(4),
-                            child: const Icon(
-                              Icons.close,
-                              size: 18,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: DottedBorder(
-                    options: RectDottedBorderOptions(
-                      dashPattern: [5, 5],
-                      strokeWidth: 0.5,
-                      padding: EdgeInsets.all(16),
-                    ),
-                    child: IconButton(
-                      onPressed: () => uploadPhoto(),
-                      icon: Icon(
-                        LucideIcons.plus,
-                        size: 30,
-                        color: const Color.fromARGB(255, 192, 191, 191),
-                      ),
-                    ),
-                  ),
-                ),
-
-          _gap(),
-
-          /// Price
-          _input(
-            context,
-            label: ProductScreenLocale.productPrice,
-            placeholder: ProductScreenLocale.productPricePlaceholder,
-            controller: priceCtrl,
-            keyboardType: TextInputType.number,
-          ),
-
-          _gap(),
-
-          /// Cost Price
-          _input(
-            context,
-            label: ProductScreenLocale.productCostPrice,
-            placeholder: ProductScreenLocale.productCostPricePlaceholder,
-            controller: costPriceCtrl,
-            keyboardType: TextInputType.number,
-          ),
-
-          _gap(),
-
-          /// Stock
-          _input(
-            context,
-            label: ProductScreenLocale.productStock,
-            placeholder: ProductScreenLocale.productStockPlaceholder,
-            controller: stockCtrl,
-            keyboardType: TextInputType.number,
-          ),
-
-          _gap(),
-
-          /// Min Stock
-          _input(
-            context,
-            label: ProductScreenLocale.minStock,
-            placeholder: ProductScreenLocale.minStockPlaceholder,
-            controller: minStockCtrl,
-            keyboardType: TextInputType.number,
-          ),
-
-          _gap(),
-
-          /// Active Switch
-          Padding(
-            padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-            child: ShadSwitchFormField(
-              label: Text(
-                ProductScreenLocale.isActive.getString(context),
-                style: TextStyle(
-                  fontSize: FontSizeConfig.body(context),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              initialValue: true,
-              onChanged: (value) => isActive = value,
-            ),
-          ),
-
-          _gap(),
-
-          /// Submit Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: ShadButton(
-              onPressed: _submit,
-              child: Text(ProductScreenLocale.addProduct.getString(context)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Submit
   void _submit() async {
     final productPayload = {
       "name": nameCtrl.text,
@@ -364,10 +104,351 @@ class _ProductFormState extends ConsumerState<ProductForm> {
         .postProduct(formData);
   }
 
-  /// UI Helpers
+  @override
+  void dispose() {
+    nameCtrl.dispose();
+    codeCtrl.dispose();
+    barcodeCtrl.dispose();
+    descriptionCtrl.dispose();
+    photoUrlCtrl.dispose();
+    priceCtrl.dispose();
+    costPriceCtrl.dispose();
+    stockCtrl.dispose();
+    minStockCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cateAsync = ref.watch(categoryProvider);
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+    final labelColor = isDark ? kTextDark : kTextLight;
+    final subColor = isDark ? kTextSubDark : kTextSubLight;
+    final barcodeBg = isDark
+        ? Colors.white.withOpacity(0.06)
+        : const Color(0xFFF3F4F6);
+    final scanIconColor = kPrimary;
+
+    print("barcode is 😁 $barCodeString");
+
+    return ShadForm(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// Product Name
+          _input(
+            context,
+            label: ProductScreenLocale.productName,
+            placeholder: ProductScreenLocale.productNamePlaceholder,
+            controller: nameCtrl,
+            labelColor: labelColor,
+          ),
+
+          _gap(),
+
+          /// Category
+          Padding(
+            padding: const EdgeInsets.only(left: 10, bottom: 5),
+            child: _label(
+              context,
+              CategoryScreenLocale.categoryName,
+              labelColor,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: cateAsync.when(
+              data: (data) => ShadSelect<Category>(
+                placeholder: Text(
+                  CategoryScreenLocale.selectCategory.getString(context),
+                ),
+                options: data
+                    .map((e) => ShadOption(value: e, child: Text(e.title)))
+                    .toList(),
+                selectedOptionBuilder: (context, value) => Text(value.title),
+                onChanged: (value) {
+                  setState(() => categoryId = value?.id);
+                },
+              ),
+              error: (error, stackTrace) => const SizedBox(),
+              loading: () => const Center(
+                child: SizedBox(
+                  height: 8,
+                  width: 8,
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ),
+          ),
+
+          _gap(),
+
+          /// Product Code
+          _input(
+            context,
+            label: ProductScreenLocale.productCode,
+            placeholder: ProductScreenLocale.productCodePlaceholder,
+            controller: codeCtrl,
+            labelColor: labelColor,
+          ),
+
+          _gap(),
+
+          /// Barcode
+          Padding(
+            padding: const EdgeInsets.only(left: 10, bottom: 5),
+            child: _label(context, ProductScreenLocale.barcode, labelColor),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: barcodeBg,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: kPrimary.withOpacity(0.2), width: 1),
+              ),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => scanBarCode(),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [kPrimary, kSecondary],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        LucideIcons.scanBarcode,
+                        size: 22,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      barcodeCtrl.text.isEmpty
+                          ? 'Tap to scan barcode'
+                          : barcodeCtrl.text,
+                      style: TextStyle(
+                        fontSize: FontSizeConfig.body(context),
+                        color: barcodeCtrl.text.isEmpty ? subColor : labelColor,
+                        fontWeight: barcodeCtrl.text.isEmpty
+                            ? FontWeight.normal
+                            : FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          _gap(),
+
+          /// Description
+          _input(
+            context,
+            label: ProductScreenLocale.description,
+            placeholder: ProductScreenLocale.descriptionPlaceholder,
+            controller: descriptionCtrl,
+            maxLines: 3,
+            labelColor: labelColor,
+          ),
+
+          _gap(),
+
+          /// Photo
+          Padding(
+            padding: const EdgeInsets.only(left: 10, bottom: 5),
+            child: _label(context, ProductScreenLocale.photoUrl, labelColor),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: imageFile != null
+                ? Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(
+                          imageFile!,
+                          width: 150,
+                          height: 150,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: GestureDetector(
+                          onTap: () => setState(() => imageFile = null),
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.black54,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: const EdgeInsets.all(4),
+                            child: const Icon(
+                              Icons.close,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : GestureDetector(
+                    onTap: () => uploadPhoto(),
+                    child: DottedBorder(
+                      options: RectDottedBorderOptions(
+                        color: kPrimary.withOpacity(0.4),
+                        dashPattern: const [6, 4],
+                        strokeWidth: 1.5,
+                        padding: const EdgeInsets.all(16),
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: kPrimary.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                LucideIcons.imagePlus,
+                                size: 26,
+                                color: kPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Tap to upload photo',
+                              style: TextStyle(
+                                color: subColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+
+          _gap(),
+
+          /// Price
+          _input(
+            context,
+            label: ProductScreenLocale.productPrice,
+            placeholder: ProductScreenLocale.productPricePlaceholder,
+            controller: priceCtrl,
+            keyboardType: TextInputType.number,
+            labelColor: labelColor,
+          ),
+
+          _gap(),
+
+          /// Cost Price
+          _input(
+            context,
+            label: ProductScreenLocale.productCostPrice,
+            placeholder: ProductScreenLocale.productCostPricePlaceholder,
+            controller: costPriceCtrl,
+            keyboardType: TextInputType.number,
+            labelColor: labelColor,
+          ),
+
+          _gap(),
+
+          /// Stock
+          _input(
+            context,
+            label: ProductScreenLocale.productStock,
+            placeholder: ProductScreenLocale.productStockPlaceholder,
+            controller: stockCtrl,
+            keyboardType: TextInputType.number,
+            labelColor: labelColor,
+          ),
+
+          _gap(),
+
+          /// Min Stock
+          _input(
+            context,
+            label: ProductScreenLocale.minStock,
+            placeholder: ProductScreenLocale.minStockPlaceholder,
+            controller: minStockCtrl,
+            keyboardType: TextInputType.number,
+            labelColor: labelColor,
+          ),
+
+          _gap(),
+
+          /// Active Switch
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: ShadSwitchFormField(
+              label: Text(
+                ProductScreenLocale.isActive.getString(context),
+                style: TextStyle(
+                  fontSize: FontSizeConfig.body(context),
+                  fontWeight: FontWeight.bold,
+                  color: labelColor,
+                ),
+              ),
+              initialValue: true,
+              onChanged: (value) => isActive = value,
+            ),
+          ),
+
+          _gap(),
+
+          /// Submit Button
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: SizedBox(
+              width: double.infinity,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [kPrimary, kSecondary],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ShadButton(
+                  backgroundColor: Colors.transparent,
+                  onPressed: _submit,
+                  child: Text(
+                    ProductScreenLocale.addProduct.getString(context),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _gap({double height = 20}) => SizedBox(height: height);
 
-  Widget _label(BuildContext context, String key) {
+  Widget _label(BuildContext context, String key, Color color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 5),
       child: Text(
@@ -375,6 +456,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
         style: TextStyle(
           fontSize: FontSizeConfig.body(context),
           fontWeight: FontWeight.bold,
+          color: color,
         ),
       ),
     );
@@ -385,6 +467,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
     required dynamic label,
     required String placeholder,
     required TextEditingController controller,
+    required Color labelColor,
     int maxLines = 1,
     TextInputType keyboardType = TextInputType.text,
   }) {
@@ -392,7 +475,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: ShadInputFormField(
         controller: controller,
-        label: _label(context, label),
+        label: _label(context, label, labelColor),
         maxLines: maxLines,
         keyboardType: keyboardType,
         placeholder: Text(

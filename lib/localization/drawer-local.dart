@@ -12,6 +12,8 @@ mixin DrawerScreenLocale {
   static const drawerSelectLanguage = 'drawer_select_language';
   static const drawerEnglish = 'drawer_english';
   static const drawerMyanmar = 'drawer_myanmar';
+  // ✅ Added Sale Report
+  static const drawerSaleReport = 'drawer_sale_report';
 
   // 🇺🇸 English
   static const EN = {
@@ -28,6 +30,7 @@ mixin DrawerScreenLocale {
     drawerSelectLanguage: 'Select Language',
     drawerEnglish: 'English',
     drawerMyanmar: 'Myanmar',
+    drawerSaleReport: 'Sale Report', // ✅ Added
   };
 
   // 🇲🇲 Burmese
@@ -45,5 +48,6 @@ mixin DrawerScreenLocale {
     drawerSelectLanguage: 'ဘာသာစကားရွေးချယ်ရန်',
     drawerEnglish: 'အင်္ဂလိပ်',
     drawerMyanmar: 'မြန်မာ',
+    drawerSaleReport: 'ရောင်းအားအစီရင်ခံစာ', // ✅ Added
   };
 }

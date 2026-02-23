@@ -103,7 +103,7 @@ mixin ProductScreenLocale {
 
   // ===== Burmese (Myanmar) =====
   static const MM = {
-    productTitle: 'ကုန်ပစ္စည်းများ',
+    productTitle: 'ကုန်ပစ္စည်း',
     productDescription: 'ကုန်ပစ္စည်းများကို ဒီနေရာတွင် စီမံခန့်ခွဲနိုင်ပါသည်',
 
     productListEmpty: 'ကုန်ပစ္စည်း မတွေ့ပါ',

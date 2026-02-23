@@ -7,6 +7,7 @@ import 'package:pos/component/app-bar.dart';
 import 'package:pos/localization/app-local.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/localization/localization.dart';
+import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/drawer.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/go-router.dart';
@@ -20,18 +21,17 @@ void main() async {
   runApp(ProviderScope(child: const MyApp()));
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     super.initState();
-
     localization.onTranslatedLanguage = (_) {
       setState(() {});
     };
@@ -39,8 +39,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = ref.watch(themeModeProvider); // 👈 watch the provider
+
     return ShadApp.custom(
-      themeMode: ThemeMode.light,
+      themeMode: themeMode, // 👈 was hardcoded ThemeMode.light, now dynamic
       darkTheme: ShadThemeData(
         brightness: Brightness.dark,
         colorScheme: const ShadSlateColorScheme.dark(),
@@ -51,11 +53,22 @@ class _MyAppState extends State<MyApp> {
           supportedLocales: localization.supportedLocales,
           localizationsDelegates: localization.localizationsDelegates,
           theme: Theme.of(context).copyWith(
+            scaffoldBackgroundColor: kBgLight, // 👈 add this
             textTheme: Theme.of(context).textTheme.apply(
               fontFamily: GoogleFonts.merriweather().fontFamily,
             ),
           ),
+          darkTheme: ThemeData.dark().copyWith(
+            scaffoldBackgroundColor: kBgDark, // 👈 add this
+            textTheme: ThemeData.dark().textTheme.apply(
+              fontFamily: GoogleFonts.merriweather().fontFamily,
+            ),
+          ),
+          themeMode: themeMode, // 👈 add this
           routerConfig: goRouter,
+          builder: (context, child) {
+            return ShadToaster(child: child!);
+          },
         );
       },
     );

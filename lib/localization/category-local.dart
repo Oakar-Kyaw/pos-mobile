@@ -34,7 +34,7 @@ mixin CategoryScreenLocale {
     categoryTitle: 'အမျိုးအစားများ',
     categoryDescription:
         'ပစ္စည်းများကို စနစ်တကျ စီမံနိုင်ရန် အမျိုးအစားများကို ဖန်တီးပြီး စီမံခန့်ခွဲပါ။',
-    categoryName: 'အမျိုးအစား အမည်',
+    categoryName: 'အမျိုးအစား အမည်များ',
     categoryDescriptionPlaceholder:
         'ဥပမာ၊ အီလက်ထရောနစ်၊ အဝတ်အစား၊ အိမ်သုံးပစ္စည်းများ',
     categoryButton: 'ထည့်ရန်',

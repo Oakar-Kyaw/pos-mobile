@@ -56,13 +56,21 @@ class CustomerDrawer {
                   _drawerItem(
                     context,
                     title: DrawerScreenLocale.drawerVoucher.getString(context),
-                    route: AppRoute.companyProfile,
+                    route: AppRoute.vouchers,
                   ),
                   const Divider(height: 1),
                   _drawerItem(
                     context,
                     title: DrawerScreenLocale.drawerIncome.getString(context),
-                    route: AppRoute.companyProfile,
+                    route: AppRoute.income,
+                  ),
+                  const Divider(height: 1),
+                  _drawerItem(
+                    context,
+                    title: DrawerScreenLocale.drawerSaleReport.getString(
+                      context,
+                    ),
+                    route: AppRoute.saleReports,
                   ),
                   const Divider(height: 1),
                   _drawerItem(

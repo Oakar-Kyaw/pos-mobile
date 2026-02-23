@@ -4,7 +4,9 @@ import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/error-local.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/localization/login-local.dart';
+import 'package:pos/localization/payment-local.dart';
 import 'package:pos/localization/product-local.dart';
+import 'package:pos/localization/sale-report-local.dart';
 import 'package:pos/localization/voucher-local.dart';
 
 mixin AppLocale {
@@ -17,6 +19,8 @@ mixin AppLocale {
     ...ProductScreenLocale.EN,
     ...ErrorScreenLocale.EN,
     ...VoucherScreenLocale.EN,
+    ...PaymentScreenLocale.EN,
+    ...SaleReportLocale.EN,
   };
 
   static const Map<String, dynamic> MM = {
@@ -28,5 +32,7 @@ mixin AppLocale {
     ...ProductScreenLocale.MM,
     ...ErrorScreenLocale.MM,
     ...VoucherScreenLocale.MM,
+    ...PaymentScreenLocale.MM,
+    ...SaleReportLocale.MM,
   };
 }

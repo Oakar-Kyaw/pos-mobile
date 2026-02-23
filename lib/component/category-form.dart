@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/category.api.dart';
 import 'package:pos/localization/category-local.dart';
 import 'package:pos/localization/error-local.dart';
+import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -41,14 +42,13 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
     if (categoryApi == true) {
       ShowToast(
         context,
-        action: Icon(LucideIcons.circleCheck, color: Colors.green),
-        borderColor: const Color.fromARGB(255, 82, 244, 54),
+        action: Icon(LucideIcons.circleCheck, color: kGreen),
+        borderColor: kGreen,
         description: Text(
           CategoryScreenLocale.categoryCreateSuccess.getString(context),
         ),
       );
       title.clear();
-      // ✅ RESET FORM VALIDATION STATE
       _formKey.currentState?.reset();
       ref.invalidate(categoryProvider);
     }
@@ -56,6 +56,9 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+    final labelColor = isDark ? kTextDark : kTextLight;
+
     return Container(
       child: ShadForm(
         key: _formKey,
@@ -67,12 +70,13 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
                   ? CategoryScreenLocale.categoryTitleError.getString(context)
                   : null,
               label: Padding(
-                padding: const EdgeInsets.only(bottom: 5), // 👈 space here
+                padding: const EdgeInsets.only(bottom: 5),
                 child: Text(
                   CategoryScreenLocale.categoryName.getString(context),
                   style: TextStyle(
                     fontSize: FontSizeConfig.body(context),
                     fontWeight: FontWeight.bold,
+                    color: labelColor,
                   ),
                 ),
               ),
@@ -85,15 +89,31 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
             ),
 
             SizedBox(height: 20),
-            ShadButton(
-              onPressed: () {
-                if (_formKey.currentState!.saveAndValidate()) {
-                  final data = _formKey.currentState!.value;
-                  submit();
-                }
-              },
-              child: Text(
-                CategoryScreenLocale.categoryButton.getString(context),
+
+            // ── Submit button with indigo gradient ──
+            SizedBox(
+              width: double.infinity,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [kPrimary, kSecondary],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ShadButton(
+                  backgroundColor: Colors.transparent,
+                  onPressed: () {
+                    if (_formKey.currentState!.saveAndValidate()) {
+                      submit();
+                    }
+                  },
+                  child: Text(
+                    CategoryScreenLocale.categoryButton.getString(context),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
               ),
             ),
           ],

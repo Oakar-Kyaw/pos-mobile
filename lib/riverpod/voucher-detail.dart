@@ -14,6 +14,9 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
 
   void updateVoucher({
     List<ItemModel>? items,
+    List<VoucherPayment>? payments,
+    double? totalPaymentAmount,
+    double? deliveryFee,
     double? total,
     double? subTotal,
     double? tax,
@@ -28,6 +31,9 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
         tax: tax,
         note: note,
         type: type,
+        payments: payments,
+        totalPaymentAmount: totalPaymentAmount,
+        deliveryFee: deliveryFee,
       );
     }
   }
@@ -48,19 +54,59 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
     }
   }
 
+  void addPayment(VoucherPayment payment) {
+    // print("payment 🥶 ${payment.paymentDataId}");
+    if (state != null) {
+      List<VoucherPayment> payments = [...state!.payments, payment];
+      state = state!.copyWith(payments: payments);
+      calculate();
+    }
+  }
+
+  void removePaymentByid(String id) {
+    if (state != null) {
+      List<VoucherPayment> items = state!.payments
+          .where((e) => e.id != id)
+          .toList();
+      state = state!.copyWith(payments: items);
+      calculate();
+    }
+  }
+
+  // void removePayment(int id) {
+  //   if (state != null) {
+  //     List<VoucherPayment> items = state!.payments
+  //         .where((e) => e.id != id)
+  //         .toList();
+  //     state = state!.copyWith(items: items);
+  //     calculate();
+  //   }
+  // }
+
   //calculate total
   void calculate() {
     if (state != null) {
       double itemsTotal = 0;
+      double paymentTotal = 0;
 
       for (var item in state!.items) {
         itemsTotal += (item.quantity * item.price);
       }
 
-      double totalWithTax = itemsTotal + state!.tax;
+      for (var payment in state!.payments) {
+        paymentTotal += payment.amount;
+      }
 
+      double totalWithTax = itemsTotal + state!.tax + state!.deliveryFee;
+      double remainingPaymentAmounts = totalWithTax - paymentTotal;
+      //print("remain $remainingPaymentAmounts $paymentTotal ");
       // Update state immutably
-      state = state!.copyWith(total: totalWithTax, subTotal: itemsTotal);
+      state = state!.copyWith(
+        total: totalWithTax,
+        subTotal: itemsTotal,
+        totalPaymentAmount: paymentTotal,
+        remainingPaymentAmount: remainingPaymentAmounts,
+      );
     }
   }
 
@@ -71,6 +117,6 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
 }
 
 final voucherDetailProvider =
-    NotifierProvider.autoDispose<VoucherDetailNotifier, VoucherDetailModel?>(
+    NotifierProvider<VoucherDetailNotifier, VoucherDetailModel?>(
       VoucherDetailNotifier.new,
     );

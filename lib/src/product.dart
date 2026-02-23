@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/component/product-form.dart';
 import 'package:pos/localization/product-local.dart';
+import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -13,35 +14,124 @@ class ProductPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+
+    final bgColor = isDark ? kBgDark : kBgLight;
+    final subTextColor = isDark ? kTextSubDark : kTextSubLight;
+    final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
+
     return Scaffold(
+      backgroundColor: bgColor,
       appBar: CustomAppBar(
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: Icon(LucideIcons.arrowLeft),
+          icon: const Icon(LucideIcons.arrowLeft),
         ),
         title: ProductScreenLocale.productTitle.getString(context),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           children: [
-            Center(
-              child: Text(
-                ProductScreenLocale.productDescription.getString(context),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: FontSizeConfig.body(context),
-                  height: 2,
+            // ── Description banner ──────────────────────
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: kPrimary.withOpacity(isDark ? 0.15 : 0.07),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: kPrimary.withOpacity(isDark ? 0.3 : 0.15),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(7),
+                    decoration: BoxDecoration(
+                      color: kPrimary.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      LucideIcons.packageOpen,
+                      color: kPrimary,
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      ProductScreenLocale.productDescription.getString(context),
+                      style: TextStyle(
+                        fontSize: FontSizeConfig.body(context),
+                        color: subTextColor,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // ── Section label ────────────────────────────
+            Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [kPrimary, kSecondary],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  ProductScreenLocale.productTitle.getString(context),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? kTextDark : kTextLight,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // ── Product Form Card ────────────────────────
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: surfaceColor,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark
+                          ? kPrimary.withOpacity(0.1)
+                          : Colors.black.withOpacity(0.06),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: const ProductForm(),
                 ),
               ),
             ),
-            SizedBox(height: 5),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.only(top: 10, bottom: 20),
-                child: ProductForm(),
-              ),
-            ),
+
+            const SizedBox(height: 16),
           ],
         ),
       ),
