@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pos/api/company.api.dart';
 import 'package:pos/localization/company-local.dart';
 import 'package:pos/models/company.dart';
+import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/shad-toaster.dart';
@@ -19,16 +20,15 @@ class CompanyForm extends ConsumerStatefulWidget {
 
 class _CompanyFormState extends ConsumerState<CompanyForm> {
   final _formKey = GlobalKey<ShadFormState>();
-  final TextEditingController name = TextEditingController();
-  final TextEditingController password = TextEditingController();
-  final TextEditingController email = TextEditingController();
-  final TextEditingController address = TextEditingController();
-  final TextEditingController phone = TextEditingController();
-  final TextEditingController code = TextEditingController();
+  final name = TextEditingController();
+  final password = TextEditingController();
+  final email = TextEditingController();
+  final address = TextEditingController();
+  final phone = TextEditingController();
+  final code = TextEditingController();
 
   Future<void> submit() async {
     final notifier = ref.read(companyProvider.notifier);
-
     final json = Company(
       id: 0,
       email: email.text.trim(),
@@ -59,7 +59,7 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
         ),
         description: Text(
           CompanyRegisterScreenLocal.createFailed.getString(context),
-          style: TextStyle(color: Colors.red),
+          style: const TextStyle(color: Colors.red),
         ),
       );
     }
@@ -73,12 +73,9 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
   }
 
   String? emailValidator(String? value, BuildContext context) {
-    if (requiredValidator(value, context) != null) {
+    if (requiredValidator(value, context) != null)
       return requiredValidator(value, context);
-    }
-    // Email regex (simple & safe)
     final emailRegex = RegExp(r'^[\w\.-]+@([\w-]+\.)+[\w-]{2,4}$');
-
     if (!emailRegex.hasMatch(value!.trim())) {
       return CompanyRegisterScreenLocal.emailInvalidError.getString(context);
     }
@@ -87,175 +84,157 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+    final textColor = isDark ? kTextDark : kTextLight;
+    final subColor = isDark ? kTextSubDark : kTextSubLight;
+
+    // Helper to build a label widget
+    Widget label(String text) => Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: FontSizeConfig.body(context),
+          fontWeight: FontWeight.w600,
+          color: textColor,
+        ),
+      ),
+    );
+
+    // Helper to build a placeholder widget
+    Widget placeholder(String text) =>
+        Text(text, style: TextStyle(fontSize: FontSizeConfig.body(context)));
+
     return ShadForm(
       key: _formKey,
       child: Column(
         children: [
-          // ShadButton(
-          //   onPressed: () {
-          //     ShowToast(
-          //       context,
-          //       color: Colors.red,
-          //       action: Icon(
-          //         LucideIcons.x,
-          //         color: Colors.red,
-          //         size: FontSizeConfig.iconSize(context),
-          //       ),
-          //       description: Text(
-          //         CompanyRegisterScreenLocal.createFailed.getString(context),
-          //         style: TextStyle(color: Colors.red),
-          //       ),
-          //     );
-          //   },
-          //   child: Text("test"),
-          // ),
-          // // Company Name
+          // ── Company Name ─────────────────────────
           ShadInputFormField(
             controller: name,
-            validator: (value) => requiredValidator(value, context),
-            label: Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Text(
-                CompanyRegisterScreenLocal.companyName.getString(context),
-                style: TextStyle(
-                  fontSize: FontSizeConfig.body(context),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            validator: (v) => requiredValidator(v, context),
+            label: label(
+              CompanyRegisterScreenLocal.companyName.getString(context),
             ),
-            placeholder: Text(
+            placeholder: placeholder(
               CompanyRegisterScreenLocal.companyNamePlaceholder.getString(
                 context,
               ),
-              style: TextStyle(fontSize: FontSizeConfig.body(context)),
             ),
           ),
           const SizedBox(height: 15),
-          // Company Code
+
+          // ── Company Code ─────────────────────────
           ShadInputFormField(
             controller: code,
-            validator: (value) => requiredValidator(value, context),
-            label: Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Text(
-                CompanyRegisterScreenLocal.companyCode.getString(context),
-                style: TextStyle(
-                  fontSize: FontSizeConfig.body(context),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            validator: (v) => requiredValidator(v, context),
+            label: label(
+              CompanyRegisterScreenLocal.companyCode.getString(context),
             ),
-            placeholder: Text(
+            placeholder: placeholder(
               CompanyRegisterScreenLocal.companyCodePlaceholder.getString(
                 context,
               ),
-              style: TextStyle(fontSize: FontSizeConfig.body(context)),
             ),
           ),
           const SizedBox(height: 15),
 
-          // Company Email
+          // ── Company Email ────────────────────────
           ShadInputFormField(
             controller: email,
-            validator: (value) => emailValidator(value, context),
-            label: Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Text(
-                CompanyRegisterScreenLocal.companyEmail.getString(context),
-                style: TextStyle(
-                  fontSize: FontSizeConfig.body(context),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            validator: (v) => emailValidator(v, context),
+            keyboardType: TextInputType.emailAddress,
+            label: label(
+              CompanyRegisterScreenLocal.companyEmail.getString(context),
             ),
-            placeholder: Text(
+            placeholder: placeholder(
               CompanyRegisterScreenLocal.companyEmailPlaceholder.getString(
                 context,
               ),
-              style: TextStyle(fontSize: FontSizeConfig.body(context)),
             ),
           ),
           const SizedBox(height: 15),
 
-          // Company Password
+          // ── Company Password ─────────────────────
           ShadInputFormField(
             controller: password,
-            validator: (value) => requiredValidator(value, context),
+            validator: (v) => requiredValidator(v, context),
             obscureText: true,
-            label: Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Text(
-                CompanyRegisterScreenLocal.companyPassword.getString(context),
-                style: TextStyle(
-                  fontSize: FontSizeConfig.body(context),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            label: label(
+              CompanyRegisterScreenLocal.companyPassword.getString(context),
             ),
-            placeholder: Text(
+            placeholder: placeholder(
               CompanyRegisterScreenLocal.companyPasswordPlaceholder.getString(
                 context,
               ),
-              style: TextStyle(fontSize: FontSizeConfig.body(context)),
             ),
           ),
           const SizedBox(height: 15),
 
-          // Company Phone
+          // ── Company Phone ────────────────────────
           ShadInputFormField(
             controller: phone,
-            validator: (value) => requiredValidator(value, context),
-            label: Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Text(
-                CompanyRegisterScreenLocal.companyPhone.getString(context),
-                style: TextStyle(
-                  fontSize: FontSizeConfig.body(context),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            validator: (v) => requiredValidator(v, context),
+            keyboardType: TextInputType.phone,
+            label: label(
+              CompanyRegisterScreenLocal.companyPhone.getString(context),
             ),
-            placeholder: Text(
+            placeholder: placeholder(
               CompanyRegisterScreenLocal.companyPhonePlaceholder.getString(
                 context,
               ),
-              style: TextStyle(fontSize: FontSizeConfig.body(context)),
             ),
           ),
-          const SizedBox(height: 20),
-          // Company Address
+          const SizedBox(height: 15),
+
+          // ── Company Address ──────────────────────
           ShadInputFormField(
             controller: address,
-            validator: (value) => requiredValidator(value, context),
-            label: Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Text(
-                CompanyRegisterScreenLocal.companyAddress.getString(context),
-                style: TextStyle(
-                  fontSize: FontSizeConfig.body(context),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            validator: (v) => requiredValidator(v, context),
+            maxLines: 2,
+            label: label(
+              CompanyRegisterScreenLocal.companyAddress.getString(context),
             ),
-            placeholder: Text(
+            placeholder: placeholder(
               CompanyRegisterScreenLocal.companyAddressPlaceholder.getString(
                 context,
               ),
-              style: TextStyle(fontSize: FontSizeConfig.body(context)),
             ),
           ),
-          const SizedBox(height: 20),
-          // Add Company Button
-          ShadButton(
+          const SizedBox(height: 24),
+
+          // ── Submit Button ────────────────────────
+          SizedBox(
             width: double.infinity,
-            onPressed: () {
-              print("what is ");
-              if (_formKey.currentState!.validate()) {
-                submit();
-              }
-            },
-            child: Text(
-              CompanyRegisterScreenLocal.companyButton.getString(context),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [kPrimary, kSecondary],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: kPrimary.withOpacity(0.35),
+                    blurRadius: 14,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: ShadButton(
+                backgroundColor: Colors.transparent,
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) submit();
+                },
+                child: Text(
+                  CompanyRegisterScreenLocal.companyButton.getString(context),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
             ),
           ),
         ],

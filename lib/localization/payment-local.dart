@@ -79,7 +79,7 @@ mixin PaymentScreenLocale {
     paymentError: 'ငွေပေးချေမှု မအောင်မြင်ပါ။ ထပ်မံကြိုးစားပါ။',
     paymentAmountError: 'မှန်ကန်သော ငွေပမာဏ ထည့်ပါ',
     selectPaymentMethod: 'ငွေပေးချေနည်းလမ်း ရွေးပါ',
-    selectPaymentAccount: 'ငွေပေးချေ အကောင့် ရွေးချယ်ပါ',
+    selectPaymentAccount: 'အကောင့် ရွေးချယ်ပါ',
     paymentAmountExceedError: 'ပေးရန် ငွေပမာဏသည် စုစုပေါင်းကိုကျော်၍မရပါ',
     noPayment: 'ငွေပေးချေမှု မရှိပါ',
     paidAmount: 'ပေးချေထားသည့် ပမာဏ',

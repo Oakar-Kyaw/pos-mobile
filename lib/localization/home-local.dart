@@ -10,7 +10,7 @@ mixin HomeScreenLocale {
   };
 
   static const MM = {
-    homeTitle: 'ကုန်သွယ်မှု ဆော့ဖ်ဝဲ',
+    homeTitle: 'အရောင်း ဆော့ဖ်ဝဲ',
     save: 'သိမ်းမည်',
     createVoucher: 'ဘောက်ချာ ဖန်တီးမည်',
   };

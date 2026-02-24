@@ -159,7 +159,7 @@ class _PaymentVoucherWidgetState extends ConsumerState<PaymentVoucherWidget> {
 
               // ── Account select + Amount row ─────────
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   // Account dropdown
                   Expanded(
@@ -177,7 +177,7 @@ class _PaymentVoucherWidgetState extends ConsumerState<PaymentVoucherWidget> {
                             letterSpacing: 0.3,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 10),
                         paymentDataAsync.when(
                           data: (data) {
                             final filteredAccounts = data
@@ -259,22 +259,27 @@ class _PaymentVoucherWidgetState extends ConsumerState<PaymentVoucherWidget> {
                   // Amount input
                   if (showInputAmount) ...[
                     const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          PaymentScreenLocale.paymentAmount.getString(context),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: subColor,
-                            letterSpacing: 0.3,
+
+                    // ✅ Wrap second column with Expanded too
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            PaymentScreenLocale.paymentAmount.getString(
+                              context,
+                            ),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: subColor,
+                              letterSpacing: 0.3,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 6),
-                        SizedBox(
-                          width: 120,
-                          child: ShadInputFormField(
+                          const SizedBox(height: 10),
+
+                          // ✅ Remove fixed width
+                          ShadInputFormField(
                             alignment: Alignment.centerRight,
                             initialValue: widget.payment.amount == 0
                                 ? "0"
@@ -287,8 +292,8 @@ class _PaymentVoucherWidgetState extends ConsumerState<PaymentVoucherWidget> {
                               secondaryFocusedBorder: ShadBorder.none,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ],
@@ -298,8 +303,8 @@ class _PaymentVoucherWidgetState extends ConsumerState<PaymentVoucherWidget> {
 
           // ── Remove button ───────────────────────────
           Positioned(
-            top: -4,
-            right: -4,
+            top: 0,
+            right: 0,
             child: GestureDetector(
               onTap: () => ref
                   .read(voucherDetailProvider.notifier)

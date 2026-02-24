@@ -130,8 +130,8 @@ class _DateSelectorCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Report Date',
+                Text(
+                  SaleReportLocale.saleReportDate.getString(context),
                   style: TextStyle(
                     fontSize: 11,
                     color: Color(0xFF9CA3AF),
@@ -157,8 +157,8 @@ class _DateSelectorCard extends StatelessWidget {
                 color: const Color(0xFF6366F1).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
-                'Change',
+              child: Text(
+                SaleReportLocale.saleReportChange.getString(context),
                 style: TextStyle(
                   color: Color(0xFF6366F1),
                   fontSize: 12,
@@ -225,11 +225,13 @@ class _ClosingReportCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 14),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Closing Report',
+                        SaleReportLocale.saleReportClosingReport.getString(
+                          context,
+                        ),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -239,7 +241,9 @@ class _ClosingReportCard extends StatelessWidget {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Daily summary',
+                        SaleReportLocale.saleReportDailySummary.getString(
+                          context,
+                        ),
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
@@ -282,7 +286,9 @@ class _ClosingReportCard extends StatelessWidget {
                     data: (income) => _ReportRow(
                       icon: LucideIcons.trendingUp,
                       iconColor: const Color(0xFF6366F1),
-                      label: "Today's Sales",
+                      label: SaleReportLocale.saleReportTodaySales.getString(
+                        context,
+                      ),
                       amount: income.getTodaySale.total.toString(),
                       isPositive: true,
                       highlight: true,

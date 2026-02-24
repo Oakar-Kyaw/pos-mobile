@@ -30,6 +30,7 @@ class PaymentDialog {
       isDismissible: false,
       enableDrag: false,
       isScrollControlled: true,
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
       backgroundColor: Colors.transparent,
       builder: (context) {
         final paymentMethodCollections = {
@@ -116,13 +117,18 @@ class PaymentDialog {
                                       ),
                                     ),
                                     const SizedBox(width: 10),
-                                    Text(
-                                      PaymentScreenLocale.paymentDescription
-                                          .getString(context),
-                                      style: TextStyle(
-                                        fontSize: FontSizeConfig.title(context),
-                                        fontWeight: FontWeight.w700,
-                                        color: textColor,
+                                    SizedBox(
+                                      width: 200,
+                                      child: Text(
+                                        PaymentScreenLocale.paymentDescription
+                                            .getString(context),
+                                        style: TextStyle(
+                                          fontSize: FontSizeConfig.title(
+                                            context,
+                                          ),
+                                          fontWeight: FontWeight.w700,
+                                          color: textColor,
+                                        ),
                                       ),
                                     ),
                                   ],

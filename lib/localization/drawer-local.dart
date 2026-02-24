@@ -14,7 +14,10 @@ mixin DrawerScreenLocale {
   static const drawerMyanmar = 'drawer_myanmar';
   // ✅ Added Sale Report
   static const drawerSaleReport = 'drawer_sale_report';
-
+  static const drawerLight = 'drawer_light';
+  static const drawerDark = 'drawer_dark';
+  static const drawerPosSystem = 'drawer_pos_system';
+  static const drawerPosManagement = 'drawer_pos_management';
   // 🇺🇸 English
   static const EN = {
     drawerHome: 'Home',
@@ -31,6 +34,10 @@ mixin DrawerScreenLocale {
     drawerEnglish: 'English',
     drawerMyanmar: 'Myanmar',
     drawerSaleReport: 'Sale Report', // ✅ Added
+    drawerLight: "Light",
+    drawerDark: "Dark",
+    drawerPosSystem: 'POS System',
+    drawerPosManagement: 'Management Dashboard',
   };
 
   // 🇲🇲 Burmese
@@ -49,5 +56,9 @@ mixin DrawerScreenLocale {
     drawerEnglish: 'အင်္ဂလိပ်',
     drawerMyanmar: 'မြန်မာ',
     drawerSaleReport: 'ရောင်းအားအစီရင်ခံစာ', // ✅ Added
+    drawerLight: "အလင်း",
+    drawerDark: "အမှောင်",
+    drawerPosSystem: 'အရောင်းစနစ်',
+    drawerPosManagement: 'စီမံဒက်စ်ဘုတ်',
   };
 }

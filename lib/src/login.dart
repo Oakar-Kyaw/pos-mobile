@@ -3,6 +3,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/login.dart';
+import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/shad-toaster.dart';
@@ -35,11 +36,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   void initState() {
     super.initState();
-
     if (widget.showToast == true) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showToastWidget();
-      });
+      WidgetsBinding.instance.addPostFrameCallback((_) => showToastWidget());
     }
   }
 
@@ -52,12 +50,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void submit() async {
-    final email = emailController.text;
-    final password = passwordController.text;
-
     final loginApi = await ref
         .read(loginProvider.notifier)
-        .login(email: email, password: password)
+        .login(email: emailController.text, password: passwordController.text)
         .catchError((error) {
           String message;
           if (error.message == LoginScreenLocale.emailNotFound) {
@@ -67,15 +62,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           } else {
             message = error.toString();
           }
-
           ShowToast(
             context,
-            action: Icon(LucideIcons.x, color: Colors.red),
+            action: const Icon(LucideIcons.x, color: Colors.red),
             borderColor: Colors.red,
-            description: Text(message, style: TextStyle(color: Colors.red)),
+            description: Text(
+              message,
+              style: const TextStyle(color: Colors.red),
+            ),
           );
         });
-    print("login api is ${loginApi}");
+
     if (loginApi["success"]) {
       context.pushReplacement(AppRoute.home);
     }
@@ -83,147 +80,235 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ShadTheme.of(context);
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+    final bgColor = isDark ? kBgDark : kBgLight;
+    final textColor = isDark ? kTextDark : kTextLight;
+    final subColor = isDark ? kTextSubDark : kTextSubLight;
 
     return Scaffold(
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: ShadForm(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // ===== TITLE =====
-                    Text(
-                      LoginScreenLocale.loginTitle.getString(context),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: FontSizeConfig.title(context),
-                        fontWeight: FontWeight.bold,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                children: [
+                  // ── Logo / Icon ──────────────────────
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [kPrimary, kSecondary],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: kPrimary.withOpacity(0.35),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      LoginScreenLocale.loginDescription.getString(context),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: FontSizeConfig.body(context)),
+                    child: const Icon(
+                      LucideIcons.shoppingCart,
+                      color: Colors.white,
+                      size: 34,
                     ),
+                  ),
 
-                    const SizedBox(height: 32),
+                  const SizedBox(height: 24),
 
-                    // ===== EMAIL =====
-                    ShadInputFormField(
-                      controller: emailController,
-                      label: Text(
-                        LoginScreenLocale.email.getString(context),
-                        style: TextStyle(
-                          fontSize: FontSizeConfig.body(context),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      placeholder: Text(
-                        LoginScreenLocale.emailPlaceholder.getString(context),
-                        style: TextStyle(
-                          fontSize: FontSizeConfig.body(context),
-                        ),
-                      ),
-                      validator: (v) => (v == null || v.isEmpty)
-                          ? LoginScreenLocale.emailError.getString(context)
-                          : null,
-                      keyboardType: TextInputType.emailAddress,
+                  // ── Title ────────────────────────────
+                  Text(
+                    LoginScreenLocale.loginTitle.getString(context),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: FontSizeConfig.title(context),
+                      fontWeight: FontWeight.w800,
+                      color: textColor,
+                      letterSpacing: -0.5,
                     ),
-
-                    const SizedBox(height: 16),
-
-                    // ===== PASSWORD =====
-                    ShadInputFormField(
-                      controller: passwordController,
-                      label: Text(
-                        LoginScreenLocale.password.getString(context),
-                        style: TextStyle(
-                          fontSize: FontSizeConfig.body(context),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      placeholder: Text(
-                        LoginScreenLocale.passwordPlaceholder.getString(
-                          context,
-                        ),
-                      ),
-                      obscureText: _obscurePassword,
-                      validator: (v) => (v == null || v.isEmpty)
-                          ? LoginScreenLocale.passwordError.getString(context)
-                          : null,
-                      trailing: GestureDetector(
-                        onTap: () => setState(
-                          () => _obscurePassword = !_obscurePassword,
-                        ),
-                        child: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          size: FontSizeConfig.iconSize(context),
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 10,
-                      ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    LoginScreenLocale.loginDescription.getString(context),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: FontSizeConfig.body(context),
+                      color: subColor,
                     ),
+                  ),
 
-                    const SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
-                    // ===== SIGN IN BUTTON =====
-                    ShadButton(
-                      size: ShadButtonSize.lg,
-                      onPressed: () {
-                        if (_formKey.currentState!.saveAndValidate()) {
-                          final data = _formKey.currentState!.value;
-                          debugPrint('Login Form Data 👉 $data');
-                          submit();
-                        }
-                      },
-                      child: Text(LoginScreenLocale.signIn.getString(context)),
+                  // ── Form Card ────────────────────────
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: isDark ? kSurfaceDark : kSurfaceLight,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDark
+                              ? kPrimary.withOpacity(0.12)
+                              : Colors.black.withOpacity(0.07),
+                          blurRadius: 20,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
                     ),
-
-                    SizedBox(height: 25),
-                    Center(
-                      child: GestureDetector(
-                        onTap: () => context.pushNamed(AppRoute.companyProfile),
-                        child: RichText(
-                          text: TextSpan(
-                            style: TextStyle(
-                              color:
-                                  theme.colorScheme.foreground, // 👈 IMPORTANT
-                              fontSize: FontSizeConfig.body(context),
+                    child: ShadForm(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // ── Email ──────────────────
+                          ShadInputFormField(
+                            controller: emailController,
+                            label: Text(
+                              LoginScreenLocale.email.getString(context),
+                              style: TextStyle(
+                                fontSize: FontSizeConfig.body(context),
+                                fontWeight: FontWeight.w600,
+                                color: textColor,
+                              ),
                             ),
-                            children: [
-                              TextSpan(
-                                text: LoginScreenLocale.newToPos.getString(
-                                  context,
-                                ),
+                            placeholder: Text(
+                              LoginScreenLocale.emailPlaceholder.getString(
+                                context,
                               ),
-                              TextSpan(text: "? "),
-                              TextSpan(
-                                text: LoginScreenLocale.register.getString(
-                                  context,
-                                ),
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.primary,
-                                ),
+                              style: TextStyle(
+                                fontSize: FontSizeConfig.body(context),
                               ),
-                            ],
+                            ),
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? LoginScreenLocale.emailError.getString(
+                                    context,
+                                  )
+                                : null,
+                            keyboardType: TextInputType.emailAddress,
                           ),
-                        ),
+
+                          const SizedBox(height: 16),
+
+                          // ── Password ───────────────
+                          ShadInputFormField(
+                            controller: passwordController,
+                            label: Text(
+                              LoginScreenLocale.password.getString(context),
+                              style: TextStyle(
+                                fontSize: FontSizeConfig.body(context),
+                                fontWeight: FontWeight.w600,
+                                color: textColor,
+                              ),
+                            ),
+                            placeholder: Text(
+                              LoginScreenLocale.passwordPlaceholder.getString(
+                                context,
+                              ),
+                            ),
+                            obscureText: _obscurePassword,
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? LoginScreenLocale.passwordError.getString(
+                                    context,
+                                  )
+                                : null,
+                            trailing: GestureDetector(
+                              onTap: () => setState(
+                                () => _obscurePassword = !_obscurePassword,
+                              ),
+                              child: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                size: FontSizeConfig.iconSize(context),
+                                color: subColor,
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 10,
+                            ),
+                          ),
+
+                          const SizedBox(height: 28),
+
+                          // ── Sign in button ─────────
+                          SizedBox(
+                            width: double.infinity,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [kPrimary, kSecondary],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: kPrimary.withOpacity(0.35),
+                                    blurRadius: 14,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: ShadButton(
+                                size: ShadButtonSize.lg,
+                                backgroundColor: Colors.transparent,
+                                onPressed: () {
+                                  if (_formKey.currentState!
+                                      .saveAndValidate()) {
+                                    submit();
+                                  }
+                                },
+                                child: Text(
+                                  LoginScreenLocale.signIn.getString(context),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // ── Register link ────────────────────
+                  GestureDetector(
+                    onTap: () => context.pushNamed(AppRoute.companyProfile),
+                    child: RichText(
+                      text: TextSpan(
+                        style: TextStyle(
+                          color: subColor,
+                          fontSize: FontSizeConfig.body(context),
+                        ),
+                        children: [
+                          TextSpan(
+                            text: LoginScreenLocale.newToPos.getString(context),
+                          ),
+                          const TextSpan(text: "? "),
+                          TextSpan(
+                            text: LoginScreenLocale.register.getString(context),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: kPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

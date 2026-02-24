@@ -609,6 +609,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pos/api/income-dashboard.api.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/localization/drawer-local.dart';
+import 'package:pos/localization/income-local.dart';
 import 'package:pos/models/dashboard-stats.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -664,8 +665,8 @@ class IncomePage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'OVERVIEW',
+          Text(
+            IncomeScreenLocale.incomeOverview.getString(context),
             style: TextStyle(
               color: Color(0xFF9CA3AF),
               fontSize: 11,
@@ -679,10 +680,10 @@ class IncomePage extends ConsumerWidget {
             children: [
               Expanded(
                 child: _StatCard(
-                  label: 'This Year',
+                  label: IncomeScreenLocale.incomeThisYear.getString(context),
                   value: _formatNumber(data.yearlySale.total),
                   sub:
-                      'Tax ${_formatNumber(data.yearlySale.tax)}  •  Fee ${_formatNumber(data.yearlySale.deliveryFee)}',
+                      '${IncomeScreenLocale.incomeTax.getString(context)} ${_formatNumber(data.yearlySale.tax)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${_formatNumber(data.yearlySale.deliveryFee)}',
                   dark: true,
                   icon: Icons.trending_up_rounded,
                 ),
@@ -690,10 +691,10 @@ class IncomePage extends ConsumerWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: _StatCard(
-                  label: 'This Month',
+                  label: IncomeScreenLocale.incomeThisMonth.getString(context),
                   value: _formatNumber(data.monthlySale.total),
                   sub:
-                      'Tax ${_formatNumber(data.monthlySale.tax)}  •  Fee ${_formatNumber(data.monthlySale.deliveryFee)}',
+                      '${IncomeScreenLocale.incomeTax.getString(context)}  ${_formatNumber(data.monthlySale.tax)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${_formatNumber(data.monthlySale.deliveryFee)}',
                   dark: false,
                   icon: Icons.calendar_today_rounded,
                 ),
@@ -704,10 +705,10 @@ class IncomePage extends ConsumerWidget {
           const SizedBox(height: 20),
 
           _StatCard(
-            label: 'Today',
+            label: IncomeScreenLocale.incomeToday.getString(context),
             value: _formatNumber(data.getTodaySale.total),
             sub:
-                'Tax ${_formatNumber(data.getTodaySale.tax)}  •  Fee ${_formatNumber(data.getTodaySale.deliveryFee)}',
+                '${IncomeScreenLocale.incomeTax.getString(context)} ${_formatNumber(data.getTodaySale.tax)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${_formatNumber(data.getTodaySale.deliveryFee)}',
             dark: true,
             icon: Icons.trending_up_rounded,
             fullWidth: true,
@@ -719,7 +720,7 @@ class IncomePage extends ConsumerWidget {
             children: [
               Expanded(
                 child: _ItemRankCard(
-                  title: 'Top Seller',
+                  title: IncomeScreenLocale.incomeTopSeller.getString(context),
                   icon: Icons.local_fire_department_rounded,
                   dark: true,
                   items: data.mostSellingItem,
@@ -728,7 +729,7 @@ class IncomePage extends ConsumerWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: _ItemRankCard(
-                  title: 'Least Sold',
+                  title: IncomeScreenLocale.incomeLeastSold.getString(context),
                   icon: Icons.arrow_downward_rounded,
                   dark: false,
                   items: data.leastSellingItem,
@@ -738,12 +739,16 @@ class IncomePage extends ConsumerWidget {
           ),
 
           const SizedBox(height: 24),
-          const _SectionHeader(title: 'Monthly Revenue'),
+          _SectionHeader(
+            title: IncomeScreenLocale.incomeMonthlyRevenue.getString(context),
+          ),
           const SizedBox(height: 14),
           _MonthlyBarChart(monthlyData: data.getMonthByMonth),
 
           const SizedBox(height: 24),
-          const _SectionHeader(title: 'Top Sales Staff'),
+          _SectionHeader(
+            title: IncomeScreenLocale.incomeTopSalesStaff.getString(context),
+          ),
           const SizedBox(height: 12),
           ...data.getMonthlyTopSaleUser.map(
             (u) => _TopUserCard(user: u, formatNumber: _formatNumber),
@@ -829,7 +834,7 @@ class _StatCard extends StatelessWidget {
             value,
             style: TextStyle(
               color: dark ? Colors.white : const Color(0xFF111827),
-              fontSize: 28,
+              fontSize: 16,
               fontWeight: FontWeight.w800,
               letterSpacing: -1,
             ),
@@ -908,7 +913,7 @@ class _ItemRankCard extends StatelessWidget {
                 style: TextStyle(
                   color: fg,
                   fontWeight: FontWeight.w700,
-                  fontSize: 13,
+                  fontSize: 10,
                 ),
               ),
             ],
@@ -988,7 +993,7 @@ class _SectionHeader extends StatelessWidget {
           title,
           style: const TextStyle(
             color: Color(0xFF111827),
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.3,
           ),

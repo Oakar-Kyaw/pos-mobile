@@ -607,9 +607,13 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(fontWeight: FontWeight.w600, color: textColor),
+        SizedBox(
+          width: 200,
+          child: Text(
+            label,
+            maxLines: 2,
+            style: TextStyle(fontWeight: FontWeight.w600, color: textColor),
+          ),
         ),
         Text(
           value.toStringAsFixed(2),
