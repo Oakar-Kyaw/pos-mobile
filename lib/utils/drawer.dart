@@ -38,6 +38,11 @@ class CustomerDrawer {
             route: AppRoute.home,
           ),
           _MenuItem(
+            icon: LucideIcons.creditCard,
+            label: DrawerScreenLocale.drawerBankAccount.getString(context),
+            route: AppRoute.account,
+          ),
+          _MenuItem(
             icon: LucideIcons.tag,
             label: DrawerScreenLocale.drawerCategory.getString(context),
             route: AppRoute.category,
@@ -47,6 +52,8 @@ class CustomerDrawer {
             label: DrawerScreenLocale.drawerProduct.getString(context),
             route: AppRoute.product,
           ),
+
+          // ───────── SALES ─────────
           _MenuItem(
             icon: LucideIcons.ticket,
             label: DrawerScreenLocale.drawerVoucher.getString(context),
@@ -62,13 +69,72 @@ class CustomerDrawer {
             label: DrawerScreenLocale.drawerSaleReport.getString(context),
             route: AppRoute.saleReports,
           ),
+
+          // ───────── FINANCE ─────────
           _MenuItem(
             icon: LucideIcons.receipt,
             label: DrawerScreenLocale.drawerExpense.getString(context),
-            route: AppRoute.companyProfile,
+            route: AppRoute.generalExpense,
+          ),
+          _MenuItem(
+            icon: LucideIcons.rotateCcw,
+            label: DrawerScreenLocale.drawerRefund.getString(context),
+            route: AppRoute.home,
+          ),
+          _MenuItem(
+            icon: LucideIcons.wallet,
+            label: DrawerScreenLocale.drawerDebt.getString(context),
+            route: AppRoute.home,
+          ),
+          _MenuItem(
+            icon: LucideIcons.coins,
+            label: DrawerScreenLocale.drawerProfit.getString(context),
+            route: AppRoute.home,
+          ),
+
+          // ───────── HR ─────────
+          _MenuItem(
+            icon: LucideIcons.users,
+            label: DrawerScreenLocale.drawerEmployee.getString(context),
+            route: AppRoute.home,
+          ),
+          _MenuItem(
+            icon: LucideIcons.calendarCheck,
+            label: DrawerScreenLocale.drawerAttendance.getString(context),
+            route: AppRoute.home,
+          ),
+          _MenuItem(
+            icon: LucideIcons.banknote,
+            label: DrawerScreenLocale.drawerEmployeeSalary.getString(context),
+            route: AppRoute.home,
+          ),
+
+          // ───────── INVENTORY CONTROL ─────────
+          _MenuItem(
+            icon: LucideIcons.triangle,
+            label: DrawerScreenLocale.drawerExpireItems.getString(context),
+            route: AppRoute.home,
+          ),
+          _MenuItem(
+            icon: LucideIcons.clipboardPlus,
+            label: DrawerScreenLocale.drawerRequestItems.getString(context),
+            route: AppRoute.home,
+          ),
+
+          _MenuItem(
+            icon: LucideIcons.rocket,
+            label: DrawerScreenLocale.drawerUpgrade.getString(context),
+            route: AppRoute.home,
+          ),
+
+          _MenuItem(
+            icon: LucideIcons.rocket,
+            label: DrawerScreenLocale.drawerUpgradeSuggestion.getString(
+              context,
+            ),
+            route: AppRoute.home,
           ),
         ];
-
         return Drawer(
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           backgroundColor: bgColor,

@@ -10,7 +10,10 @@ void ShowToast(
   ShadToaster.of(context).show(
     ShadToast(
       alignment: Alignment.topCenter,
-      border: ShadBorder.all(width: 1, color: borderColor),
+      border: ShadBorder.all(
+        width: 1,
+        color: borderColor ?? Colors.greenAccent,
+      ),
       action:
           action ?? Icon(LucideIcons.circleCheck, color: Colors.greenAccent),
       description: description,

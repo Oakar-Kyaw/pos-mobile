@@ -1,55 +1,47 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:pos/api/voucher.api.dart';
+import 'package:pos/api/general-expense.api.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/component/table-cell.dart';
 import 'package:pos/component/table-header.dart';
 import 'package:pos/localization/drawer-local.dart';
-import 'package:pos/localization/voucher-local.dart';
-import 'package:pos/models/voucher-detail.dart';
+import 'package:pos/localization/general-expense-local.dart';
+import 'package:pos/models/general-expense.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/expense.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/formatAmount.dart';
-import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-class VoucherTablePage extends ConsumerStatefulWidget {
-  const VoucherTablePage({super.key});
+class GeneralExpensePage extends ConsumerStatefulWidget {
+  const GeneralExpensePage({super.key});
 
   @override
-  ConsumerState<VoucherTablePage> createState() => _VoucherTablePageState();
+  ConsumerState<GeneralExpensePage> createState() => _GeneralExpensePageState();
 }
 
-class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
+class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
   final int limit = 20;
-
-  late final PagingController<int, VoucherDetailModel> _pagingController =
-      PagingController<int, VoucherDetailModel>(
+  late final PagingController<int, GeneralExpense> _pagingController =
+      PagingController<int, GeneralExpense>(
         getNextPageKey: (state) =>
             state.lastPageIsEmpty ? null : state.nextIntPageKey,
         fetchPage: (pageKey) => ref
-            .read(voucherProvider.notifier)
-            .getVouchersByUserId(page: pageKey, limit: limit),
+            .read(generalExpenseProvider.notifier)
+            .fetchExpenses(page: pageKey, limit: limit),
       );
-
-  String searchQuery = "";
-
-  @override
-  void dispose() {
-    _pagingController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
-    final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
     final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
+    final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
     final dividerColor = isDark
         ? Colors.white.withOpacity(0.08)
         : const Color(0xFFE5E7EB);
@@ -61,17 +53,17 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
       backgroundColor: bgColor,
       appBar: CustomAppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
+          icon: const Icon(LucideIcons.arrowLeft),
         ),
-        title: DrawerScreenLocale.drawerVoucher.getString(context),
+        title: DrawerScreenLocale.drawerExpense.getString(context),
       ),
-      body: Column(
-        children: [
-          // ── Description banner ──────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-            child: Container(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Column(
+          children: [
+            // ── Description banner ──────────────────
+            Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
@@ -83,6 +75,7 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
                 ),
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     padding: const EdgeInsets.all(7),
@@ -91,7 +84,7 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
-                      LucideIcons.ticket,
+                      LucideIcons.dollarSign,
                       color: kPrimary,
                       size: 16,
                     ),
@@ -99,7 +92,7 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      VoucherScreenLocale.viewAllVouchers.getString(context),
+                      GeneralExpenseLocale.addExpense.getString(context),
                       style: TextStyle(
                         fontSize: FontSizeConfig.body(context),
                         color: subColor,
@@ -110,14 +103,11 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
                 ],
               ),
             ),
-          ),
 
-          const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-          // ── Section label ────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
+            // ── Section label ────────────────────────
+            Row(
               children: [
                 Container(
                   width: 4,
@@ -133,25 +123,49 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  DrawerScreenLocale.drawerVoucher.getString(context),
+                  GeneralExpenseLocale.expenseForm.getString(context),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: textColor,
+                    color: isDark ? kTextDark : kTextLight,
                     letterSpacing: -0.2,
                   ),
                 ),
               ],
             ),
-          ),
 
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // ── Table card ───────────────────────────────
-          Expanded(
-            child: Padding(
+            // ── Form Card ────────────────────────────
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: surfaceColor,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: isDark
+                        ? kPrimary.withOpacity(0.1)
+                        : Colors.black.withOpacity(0.06),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: GeneralExpenseForm(
+                onSaved: () {
+                  _pagingController.refresh(); // refresh table
+                },
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            // ── Table / List ─────────────────────────
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
+                height: 400,
                 decoration: BoxDecoration(
                   color: surfaceColor,
                   borderRadius: BorderRadius.circular(20),
@@ -187,32 +201,47 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
                       child: Table(
                         columnWidths: const {
                           0: FlexColumnWidth(1),
-                          1: FlexColumnWidth(4),
+                          1: FlexColumnWidth(2),
                           2: FlexColumnWidth(2),
                           3: FlexColumnWidth(2),
+                          4: FlexColumnWidth(3),
                         },
                         children: [
                           TableRow(
                             children: [
                               buildTableHeader(
-                                VoucherScreenLocale.no.getString(context),
-                                context,
-                                textColor,
-                              ),
-                              buildTableHeader(
-                                VoucherScreenLocale.voucherCode.getString(
+                                GeneralExpenseLocale.expenseNo.getString(
                                   context,
                                 ),
                                 context,
                                 textColor,
                               ),
                               buildTableHeader(
-                                VoucherScreenLocale.date.getString(context),
+                                GeneralExpenseLocale.expenseTitle.getString(
+                                  context,
+                                ),
                                 context,
                                 textColor,
                               ),
                               buildTableHeader(
-                                VoucherScreenLocale.total.getString(context),
+                                GeneralExpenseLocale.expenseDate.getString(
+                                  context,
+                                ),
+                                context,
+                                textColor,
+                              ),
+                              buildTableHeader(
+                                GeneralExpenseLocale.expenseAmount.getString(
+                                  context,
+                                ),
+                                context,
+                                textColor,
+                                alignRight: true,
+                              ),
+                              buildTableHeader(
+                                GeneralExpenseLocale.expenseReason.getString(
+                                  context,
+                                ),
                                 context,
                                 textColor,
                                 alignRight: true,
@@ -228,18 +257,18 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
                       child: PagingListener(
                         controller: _pagingController,
                         builder: (context, state, fetchNextPage) =>
-                            PagedListView<int, VoucherDetailModel>(
+                            PagedListView<int, GeneralExpense>(
                               state: state,
                               fetchNextPage: fetchNextPage,
                               builderDelegate:
-                                  PagedChildBuilderDelegate<VoucherDetailModel>(
-                                    itemBuilder: (context, voucher, index) {
+                                  PagedChildBuilderDelegate<GeneralExpense>(
+                                    itemBuilder: (context, expense, index) {
                                       final isEven = index % 2 == 0;
                                       return InkWell(
-                                        onTap: () => context.pushNamed(
-                                          AppRoute.receipt,
-                                          extra: voucher.id,
-                                        ),
+                                        // onTap: () => context.pushNamed(
+                                        //   AppRoute.receipt,
+                                        //   extra: voucher.id,
+                                        // ),
                                         splashColor: kPrimary.withOpacity(0.08),
                                         highlightColor: rowHoverColor,
                                         child: Container(
@@ -264,9 +293,10 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
                                           child: Table(
                                             columnWidths: const {
                                               0: FlexColumnWidth(1),
-                                              1: FlexColumnWidth(4),
+                                              1: FlexColumnWidth(2),
                                               2: FlexColumnWidth(2),
                                               3: FlexColumnWidth(2),
+                                              4: FlexColumnWidth(3),
                                             },
                                             children: [
                                               TableRow(
@@ -276,22 +306,25 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
                                                     subColor,
                                                   ),
                                                   buildTableCell(
-                                                    voucher.voucherCode ?? "-",
+                                                    expense.title,
                                                     textColor,
                                                     highlight: true,
                                                   ),
                                                   buildTableCell(
-                                                    voucher.createdAt != null
-                                                        ? DateFormat(
-                                                            'yyyy-MM-dd',
-                                                          ).format(
-                                                            voucher.createdAt!,
-                                                          )
-                                                        : "-",
+                                                    DateFormat(
+                                                      'yyyy-MM-dd',
+                                                    ).format(expense.date),
                                                     subColor,
                                                   ),
                                                   buildTableCell(
-                                                    formatAmount(voucher.total),
+                                                    formatAmount(
+                                                      expense.amount,
+                                                    ),
+                                                    textColor,
+                                                    alignRight: true,
+                                                  ),
+                                                  buildTableCell(
+                                                    expense.reason ?? '-',
                                                     textColor,
                                                     alignRight: true,
                                                   ),
@@ -337,7 +370,7 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
                                           ),
                                           const SizedBox(height: 12),
                                           Text(
-                                            VoucherScreenLocale.noItems
+                                            GeneralExpenseLocale.expenseNoItems
                                                 .getString(context),
                                             style: TextStyle(
                                               color: subColor,
@@ -355,10 +388,10 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
                 ),
               ),
             ),
-          ),
 
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

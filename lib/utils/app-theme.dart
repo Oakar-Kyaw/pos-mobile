@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 const kPrimary = Color(0xFF6366F1);
 const kSecondary = Color(0xFF8B5CF6);
 const kGreen = Color(0xFF10B981);
+const kGreenSecondary = Color(0xFF34D399);
 const kAmber = Color(0xFFF59E0B);
 
 // ── Backgrounds ───────────────────────────────

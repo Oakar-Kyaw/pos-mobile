@@ -31,6 +31,27 @@ class SaleReportAsyncNotifier extends AsyncNotifier<SaleReport> {
     throw Exception("Failed to fetch sale report");
   }
 
+  Future<bool> postOpeningAndClosingBalance({
+    required String date,
+    required double total,
+    String description = "",
+  }) async {
+    // Use today as default
+    final url = "v1/sale-reports";
+
+    final response = await _dio.post(
+      url,
+      data: {"date": date, "amount": total, "description": description},
+    );
+    final Map<String, dynamic> data = response.data;
+    print("Response from posting sale report: $data");
+    if (data["success"] == true) {
+      return data["success"];
+    }
+
+    throw Exception("Failed to post sale report");
+  }
+
   Future<void> getOpenClosing({DateTime? date}) async {
     state = const AsyncLoading();
 

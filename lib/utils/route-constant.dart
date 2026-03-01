@@ -11,4 +11,6 @@ class AppRoute {
   static const String income = "/income";
   static const String vouchers = "/vouchers";
   static const String saleReports = "/sale-reports";
+  static const String generalExpense = "/general-expenses";
+  static const String account = "/bank-account";
 }

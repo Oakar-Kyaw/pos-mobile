@@ -95,7 +95,7 @@ class CompanyProfilePage extends ConsumerWidget {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  'Company Details',
+                  CompanyRegisterScreenLocal.companyTitle.getString(context),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,

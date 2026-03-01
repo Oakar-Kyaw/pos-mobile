@@ -9,12 +9,17 @@ mixin SaleReportLocale {
 
   static const saleReportOpeningAmount = 'sale_report_opening_amount';
   static const saleReportClosingAmount = 'sale_report_closing_amount';
+  static const saleReportSave = 'sale_report_save';
+  static const saleReportTransfer = 'sale_report_transfer';
+  static const saleReportSaveFailed = 'sale_report_save_failed';
+  static const saleReportSaved = 'sale_report_saved';
 
   // 🇺🇸 English
   static const EN = {
     saleReportTitle: 'Sale Report',
-    saleReportDate: 'Report Date',
+    saleReportDate: 'Date',
     saleReportChange: 'Change',
+
     saleReportClosingReport: 'Closing Report',
     saleReportDailySummary: 'Daily Summary',
     saleReportTodaySales: "Today's Sales",
@@ -22,12 +27,18 @@ mixin SaleReportLocale {
 
     saleReportOpeningAmount: 'Opening Amount',
     saleReportClosingAmount: 'Closing Amount',
+
+    saleReportSave: "Save",
+    saleReportTransfer: "Transfer",
+
+    saleReportSaveFailed: 'Failed to save report',
+    saleReportSaved: 'Report saved successfully',
   };
 
   // 🇲🇲 Burmese
   static const MM = {
     saleReportTitle: 'ရောင်းအားအစီရင်ခံစာ',
-    saleReportDate: 'အစီရင်ခံနေ့စွဲ',
+    saleReportDate: 'နေ့စွဲ',
     saleReportChange: 'ပြောင်းလဲရန်',
     saleReportClosingReport: 'နေ့စဉ်ပိတ်သိမ်းအစီရင်ခံစာ',
     saleReportDailySummary: 'နေ့စဉ်အကျဉ်းချုပ်',
@@ -36,5 +47,11 @@ mixin SaleReportLocale {
 
     saleReportOpeningAmount: 'အစပိုငွေ',
     saleReportClosingAmount: 'အဆုံးပိုငွေ',
+
+    saleReportSave: "သိမ်းဆည်းပါ",
+    saleReportTransfer: "ငွေလွှဲမည်",
+
+    saleReportSaveFailed: 'အစီရင်ခံစာ သိမ်းဆည်းမှု မအောင်မြင်ပါ',
+    saleReportSaved: 'အစီရင်ခံစာကို အောင်မြင်စွာသိမ်းဆည်းပြီးပါပြီ',
   };
 }

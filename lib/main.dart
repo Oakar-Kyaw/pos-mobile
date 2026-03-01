@@ -7,10 +7,12 @@ import 'package:pos/component/app-bar.dart';
 import 'package:pos/localization/app-local.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/localization/localization.dart';
+import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/drawer.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/go-router.dart';
+import 'package:pos/utils/secure-storage.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 void main() async {
@@ -29,17 +31,34 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
+  final _secureStorage = SecureStorage();
+
   @override
   void initState() {
     super.initState();
     localization.onTranslatedLanguage = (_) {
       setState(() {});
     };
+    //add login status in this
+    _checkLogin();
+  }
+
+  Future<void> _checkLogin() async {
+    final isLogin = await _secureStorage.getLogin();
+
+    if (!mounted) return; // VERY IMPORTANT
+
+    if (isLogin) {
+      ref.read(checkLoginProvider.notifier).login();
+    } else {
+      ref.read(checkLoginProvider.notifier).logout();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = ref.watch(themeModeProvider); // 👈 watch the provider
+    final themeMode = ref.watch(themeModeProvider);
+    final router = ref.watch(routeProvider);
 
     return ShadApp.custom(
       themeMode: themeMode, // 👈 was hardcoded ThemeMode.light, now dynamic
@@ -65,7 +84,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             ),
           ),
           themeMode: themeMode, // 👈 add this
-          routerConfig: goRouter,
+          routerConfig: router,
           builder: (context, child) {
             return ShadToaster(child: child!);
           },

@@ -183,7 +183,7 @@ class _PaymentVoucherWidgetState extends ConsumerState<PaymentVoucherWidget> {
                             final filteredAccounts = data
                                 .where(
                                   (e) =>
-                                      e.accountType.toUpperCase() ==
+                                      e.accountType.toString().toUpperCase() ==
                                       widget.payment.type.toUpperCase(),
                                 )
                                 .toList();

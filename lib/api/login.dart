@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/utils/secure-storage.dart';
 
 class LoginAsyncNotifier extends AsyncNotifier<Map<String, dynamic>?> {
@@ -29,6 +30,8 @@ class LoginAsyncNotifier extends AsyncNotifier<Map<String, dynamic>?> {
         accessToken: accessTokenData,
         refreshToken: refreshTokenData,
       );
+      await _secureStorage.saveLogin(true);
+      ref.read(checkLoginProvider.notifier).login();
       return {"success": true};
     }
 
