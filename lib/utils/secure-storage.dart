@@ -40,6 +40,43 @@ class SecureStorage {
     return false;
   }
 
+  ///save dark and light theme
+  Future<void> saveTheme(bool isDarkTheme) async {
+    // Convert map to JSON string
+    String jsonString = jsonEncode(isDarkTheme);
+    //print("save login data: $jsonString");
+    await storage.write(key: "isDarkTheme", value: jsonString);
+  }
+
+  Future<bool> getTheme() async {
+    // Convert map to JSON string
+    String? jsonString = await storage.read(key: "isDarkTheme");
+    // print("getLogin data is: $jsonString");
+    if (jsonString != null) {
+      final isDarkTheme = jsonDecode(jsonString);
+      return isDarkTheme;
+    }
+    return false;
+  }
+
+  Future<void> saveLanguageSetting(String languageCode) async {
+    // Convert map to JSON string
+    String jsonString = jsonEncode(languageCode);
+    //print("save login data: $jsonString");
+    await storage.write(key: "isLanguageSetting", value: jsonString);
+  }
+
+  Future<String> getLanguageSetting() async {
+    // Convert map to JSON string
+    String? jsonString = await storage.read(key: "isLanguageSetting");
+    // print("getLogin data is: $jsonString");
+    if (jsonString != null) {
+      final isLanguageSetting = jsonDecode(jsonString);
+      return isLanguageSetting;
+    }
+    return "en"; // Default language if not set
+  }
+
   Future<void> saveLoginData(data) async {
     // Convert map to JSON string
     String jsonString = jsonEncode(data);

@@ -41,6 +41,15 @@ class _MyAppState extends ConsumerState<MyApp> {
     };
     //add login status in this
     _checkLogin();
+    _checkTheme();
+    _checkLanguage();
+  }
+
+  Future<void> _checkTheme() async {
+    final isDark = await _secureStorage.getTheme();
+    ref
+        .read(themeModeProvider.notifier)
+        .setTheme(isDark ? ThemeMode.dark : ThemeMode.light);
   }
 
   Future<void> _checkLogin() async {
@@ -55,13 +64,18 @@ class _MyAppState extends ConsumerState<MyApp> {
     }
   }
 
+  Future<void> _checkLanguage() async {
+    final languageCode = await _secureStorage.getLanguageSetting();
+    localization.translate(languageCode);
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
     final router = ref.watch(routeProvider);
 
     return ShadApp.custom(
-      themeMode: themeMode, // 👈 was hardcoded ThemeMode.light, now dynamic
+      themeMode: themeMode,
       darkTheme: ShadThemeData(
         brightness: Brightness.dark,
         colorScheme: const ShadSlateColorScheme.dark(),

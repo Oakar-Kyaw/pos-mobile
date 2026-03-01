@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pos/localization/localization.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
+import 'package:pos/utils/secure-storage.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/utils/route-constant.dart';
@@ -15,11 +16,25 @@ class CustomerDrawer {
 
   Widget buildDrawer(BuildContext context) {
     // Read theme from a ProviderScope consumer
+    Future<void> toggleTheme(WidgetRef ref) async {
+      SecureStorage _storage = SecureStorage();
+      await _storage.saveTheme(
+        ref.read(themeModeProvider) == ThemeMode.dark ? false : true,
+      );
+      ref.read(themeModeProvider.notifier).toggleTheme();
+    }
+
+    //make localization available in the drawer
+    Future<void> changeLanguage(String langCode) async {
+      localization.translate(langCode);
+      SecureStorage _storage = SecureStorage();
+      await _storage.saveLanguageSetting(langCode);
+    }
+
     return Consumer(
       builder: (context, ref, _) {
         final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
         final bgColor = isDark ? kBgDark : kBgLight;
-        final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
         final textColor = isDark ? kTextDark : kTextLight;
         final subColor = isDark ? kTextSubDark : kTextSubLight;
         final dividerColor = isDark
@@ -255,9 +270,7 @@ class CustomerDrawer {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          onTap: () => ref
-                              .read(themeModeProvider.notifier)
-                              .toggleTheme(),
+                          onTap: () => toggleTheme(ref),
                         ),
                       ),
 
@@ -309,8 +322,7 @@ class CustomerDrawer {
                                   style: TextStyle(color: textColor),
                                 ),
                                 onChanged: (value) {
-                                  if (value != null)
-                                    localization.translate(value);
+                                  if (value != null) changeLanguage(value);
                                 },
                                 options: languages.entries
                                     .map(
