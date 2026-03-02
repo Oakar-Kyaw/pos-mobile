@@ -8,7 +8,7 @@ Widget buildTableHeader(
   bool alignRight = false,
 }) {
   return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 10),
+    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
     child: Align(
       alignment: alignRight ? Alignment.centerRight : Alignment.centerLeft,
       child: Text(

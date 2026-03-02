@@ -19,7 +19,8 @@ mixin VoucherScreenLocale {
   static const viewAllVouchers = 'voucher_view_all_vouchers';
   static const voucherCode = 'voucher_code';
   static const no = 'voucher_no';
-  static const date = 'voucher_date'; // ✅ NEW
+  static const date = 'voucher_date';
+  static const searchVoucherPlaceholder = 'voucher_search_placeholder';
 
   // ===== English =====
   static const EN = {
@@ -46,6 +47,7 @@ mixin VoucherScreenLocale {
     // Marketing Style Message
     thankYouMessage:
         'Thank you for shopping with us ❤️\nWe truly appreciate your support!\nWe look forward to serving you again. Shop more & save more!',
+    searchVoucherPlaceholder: 'Search by voucher code or its date',
   };
 
   // ===== Myanmar =====
@@ -73,5 +75,6 @@ mixin VoucherScreenLocale {
     // Marketing Style Message
     thankYouMessage:
         'ဝယ်ယူအားပေးမှုအတွက် ကျေးဇူးအထူးတင်ရှိပါသည် ❤️\nသင့်ရဲ့ အားပေးမှုကို တန်ဖိုးထားပါသည်။\nနောက်တစ်ကြိမ် ထပ်မံ ဝယ်ယူအားပေးရန် မျှော်လင့်ပါသည် !',
+    searchVoucherPlaceholder: 'ဘောက်ချာကုဒ် သို့မဟုတ် ရက်စွဲ ဖြင့် ရှာဖွေပါ',
   };
 }

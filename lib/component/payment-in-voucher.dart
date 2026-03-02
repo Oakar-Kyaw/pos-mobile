@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pos/api/account.api.dart';
 import 'package:pos/localization/payment-local.dart';
+import 'package:pos/models/payment-data.dart';
 import 'package:pos/riverpod/payment-list.dart';
 import 'package:pos/riverpod/voucher-detail.dart';
 import 'package:pos/utils/app-theme.dart';
@@ -14,10 +16,15 @@ class PaymentInVoucherWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final voucher = ref.watch(voucherDetailProvider);
-    final paymentList = ref.read(paymentListProvider.notifier).getPaymentList();
+    // final paymentList = ref.read(paymentListProvider.notifier).getPaymentList();
+    final paymentList = ref.watch(paymentDataProvider);
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
+    final data = paymentList.maybeWhen(
+      data: (data) => data,
+      orElse: () => <PaymentData>[],
+    );
 
     // ── Empty state ──────────────────────────────
     if (voucher == null || voucher.payments.isEmpty) {
@@ -87,9 +94,7 @@ class PaymentInVoucherWidget extends ConsumerWidget {
           );
         }
 
-        final selected = paymentList.firstWhere(
-          (e) => e.id == payment.paymentDataId,
-        );
+        final selected = data.firstWhere((e) => e.id == payment.paymentDataId);
 
         // ── Payment row ──────────────────────────
         return Container(

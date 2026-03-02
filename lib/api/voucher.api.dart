@@ -9,16 +9,20 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
 
   @override
   Future<List<VoucherDetailModel>> build() async {
-    return await getVouchersByUserId(page: 0, limit: 20);
+    return await getVouchersByUserId(page: 0, limit: 10);
   }
 
   /// -------- GET ALL VOUCHERS --------
   Future<List<VoucherDetailModel>> getVouchersByUserId({
     required int page,
     required int limit,
+    String? search,
   }) async {
     final url = "v1/vouchers";
-    final response = await _dio.get(url, query: {"page": page, "limit": limit});
+    final response = await _dio.get(
+      url,
+      query: {"page": page, "limit": limit, "search": search},
+    );
     final Map<String, dynamic> data = response.data;
 
     if (data["success"] == true) {
@@ -99,6 +103,32 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
     }
 
     throw Exception("Failed to create voucher");
+  }
+
+  Future<void> searchVoucher({required String search}) async {
+    state = const AsyncLoading();
+
+    try {
+      final voucher = await getVouchersByUserId(
+        page: 0,
+        limit: 20,
+        search: search,
+      );
+      state = AsyncData(voucher);
+    } catch (e, s) {
+      state = AsyncError(e, s);
+    }
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+
+    try {
+      final voucher = await getVouchersByUserId(page: 0, limit: 20);
+      state = AsyncData(voucher);
+    } catch (e, s) {
+      state = AsyncError(e, s);
+    }
   }
 }
 

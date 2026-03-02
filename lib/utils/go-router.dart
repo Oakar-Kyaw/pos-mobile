@@ -12,6 +12,7 @@ import 'package:pos/src/income.dart';
 import 'package:pos/src/login.dart';
 import 'package:pos/src/product.dart';
 import 'package:pos/src/receipt.dart';
+import 'package:pos/src/refund.dart';
 import 'package:pos/src/sale-report.dart';
 import 'package:pos/src/setting.dart';
 import 'package:pos/src/voucher.dart';
@@ -115,6 +116,11 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.generalExpense,
         name: AppRoute.generalExpense,
         builder: (context, state) => GeneralExpensePage(),
+      ),
+      GoRoute(
+        path: AppRoute.refund,
+        name: AppRoute.refund,
+        builder: (context, state) => const RefundPage(),
       ),
       GoRoute(
         path: AppRoute.login,

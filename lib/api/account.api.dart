@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
 import 'package:pos/models/account.dart';
 import 'package:pos/models/payment-data.dart';
+import 'package:pos/riverpod/payment-list.dart';
 
 class PaymentDataAsyncNotifier extends AsyncNotifier<List<PaymentData>> {
   final DioService _dio = DioService();
@@ -23,9 +25,10 @@ class PaymentDataAsyncNotifier extends AsyncNotifier<List<PaymentData>> {
 
     if (data["success"] == true) {
       final items = data["data"] as List<dynamic>;
-      return items
+      final paymentData = items
           .map((e) => PaymentData.fromJson(e as Map<String, dynamic>))
           .toList();
+      return paymentData;
     }
 
     throw Exception("Failed to fetch accounts");

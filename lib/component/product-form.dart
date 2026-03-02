@@ -127,7 +127,6 @@ class _ProductFormState extends ConsumerState<ProductForm> {
     final barcodeBg = isDark
         ? Colors.white.withOpacity(0.06)
         : const Color(0xFFF3F4F6);
-    final scanIconColor = kPrimary;
 
     print("barcode is 😁 $barCodeString");
 

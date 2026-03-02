@@ -59,6 +59,28 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
 
     throw Exception("Failed to post product");
   }
+
+  Future<void> searchProducts({required String search}) async {
+    state = const AsyncLoading();
+
+    try {
+      final proudct = await getProductByUserId("1", "20", search: search);
+      state = AsyncData(proudct);
+    } catch (e, s) {
+      state = AsyncError(e, s);
+    }
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+
+    try {
+      final products = await getProductByUserId("1", "20");
+      state = AsyncData(products);
+    } catch (e, s) {
+      state = AsyncError(e, s);
+    }
+  }
 }
 
 final productProvider =

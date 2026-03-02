@@ -5,6 +5,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:pos/api/account.api.dart';
 import 'package:pos/api/payment-data.api.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
@@ -69,12 +70,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
-    final textColor = isDark ? kTextDark : kTextLight;
 
-    final paymentDataAsync = ref.watch(paymentDataProvider);
-    paymentDataAsync.whenData(
-      (value) => ref.read(paymentListProvider.notifier).setPaymentList(value),
-    );
+    ref.watch(paymentDataProvider);
 
     return Scaffold(
       backgroundColor: bgColor,

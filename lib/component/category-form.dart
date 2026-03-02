@@ -66,7 +66,7 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
           children: [
             ShadInputFormField(
               controller: title,
-              validator: (v) => (v == null || v.isEmpty)
+              validator: (v) => (v.isEmpty)
                   ? CategoryScreenLocale.categoryTitleError.getString(context)
                   : null,
               label: Padding(

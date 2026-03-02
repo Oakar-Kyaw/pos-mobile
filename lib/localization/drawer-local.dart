@@ -88,7 +88,7 @@ mixin DrawerScreenLocale {
     // ✅ Added
     drawerEmployee: 'ဝန်ထမ်းများ',
     drawerAttendance: 'တက်ရောက်မှု',
-    drawerRefund: 'ပြန်လည်အမ်းငွေ',
+    drawerRefund: 'ပြန်အမ်းပေးမှု',
     drawerDebt: 'ကြွေးမြီ',
     drawerExpireItems: 'သက်တမ်းကုန်ပစ္စည်းများ',
     drawerRequestItems: 'ပစ္စည်းတောင်းခံမှု',

@@ -21,7 +21,9 @@ class PaymentData {
       accountNumber: json['accountNumber'],
       accountName: json['accountName'],
       accountType: json['accountType'],
-      balance: double.parse(json["balance"].toString()),
+      balance: json['balance'] != null
+          ? double.parse(json["balance"].toString())
+          : 0.0,
     );
   }
 

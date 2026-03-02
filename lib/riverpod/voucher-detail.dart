@@ -73,16 +73,6 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
     }
   }
 
-  // void removePayment(int id) {
-  //   if (state != null) {
-  //     List<VoucherPayment> items = state!.payments
-  //         .where((e) => e.id != id)
-  //         .toList();
-  //     state = state!.copyWith(items: items);
-  //     calculate();
-  //   }
-  // }
-
   //calculate total
   void calculate() {
     if (state != null) {

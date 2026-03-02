@@ -130,7 +130,7 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
         children: [
           // ── Item List ────────────────────────────────
           Expanded(
-            flex: 5,
+            flex: 2,
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               itemCount: voucher.items.length,
@@ -293,7 +293,7 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
 
           // ── Calculation Panel ────────────────────────
           Expanded(
-            flex: 3,
+            flex: 5,
             child: SingleChildScrollView(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom + 20,

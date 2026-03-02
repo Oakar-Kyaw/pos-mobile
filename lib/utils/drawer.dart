@@ -94,7 +94,7 @@ class CustomerDrawer {
           _MenuItem(
             icon: LucideIcons.rotateCcw,
             label: DrawerScreenLocale.drawerRefund.getString(context),
-            route: AppRoute.home,
+            route: AppRoute.refund,
           ),
           _MenuItem(
             icon: LucideIcons.wallet,

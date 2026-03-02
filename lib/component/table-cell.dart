@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/font-size.dart';
 
 Widget buildTableCell(
   String text,
@@ -9,9 +8,9 @@ Widget buildTableCell(
   bool highlight = false,
 }) {
   return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 10),
+    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
     child: Align(
-      alignment: alignRight ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: !alignRight ? Alignment.centerLeft : Alignment.centerRight,
       child: Text(
         text,
         overflow: TextOverflow.ellipsis,
