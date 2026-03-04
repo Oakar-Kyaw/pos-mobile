@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/product.api.dart';
-import 'package:pos/models/refund-item.dart';
+import 'package:pos/component/loading-component.dart';
+import 'package:pos/models/product.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-class ProductItemSearchField extends ConsumerStatefulWidget {
+class ProductItemSearchField<T> extends ConsumerStatefulWidget {
   final Function(String) onSearchChanged;
-  final Function(RefundItem) onProductSelected;
+  final Function(dynamic) onProductSelected;
+  final T Function(Product item) itemBuilder;
 
   const ProductItemSearchField({
     super.key,
     required this.onSearchChanged,
     required this.onProductSelected,
+    required this.itemBuilder,
   });
 
   @override
@@ -43,7 +46,6 @@ class _ProductItemSearchFieldState
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
-    final progressColor = isDark ? kPrimary : kPrimary.withOpacity(0.8);
 
     final productsAsync = ref.watch(productProvider);
 
@@ -103,18 +105,16 @@ class _ProductItemSearchFieldState
                       ),
                       onTap: () {
                         searchController.text = product.name;
-
-                        widget.onProductSelected.call(
-                          RefundItem(
-                            id: 0,
-                            product: product,
-                            productId: product.id,
-                            quantity: 1,
-                            price: product.price,
-                            createdAt: DateTime.now(),
-                          ),
-                        );
-
+                        final item = widget.itemBuilder(product);
+                        widget.onProductSelected(item);
+                        // RefundItem(
+                        //     id: 0,
+                        //     product: product,
+                        //     productId: product.id,
+                        //     quantity: 1,
+                        //     price: product.price,
+                        //     createdAt: DateTime.now(),
+                        //   ),
                         setState(() {
                           showSuggestions = false;
                           searchController.clear();
@@ -125,13 +125,7 @@ class _ProductItemSearchFieldState
                 ),
               );
             },
-            loading: () => Center(
-              child: SizedBox(
-                height: 30,
-                width: 30,
-                child: CircularProgressIndicator(color: progressColor),
-              ),
-            ),
+            loading: () => LoadingWidget(),
             error: (_, __) => const SizedBox(),
           ),
       ],

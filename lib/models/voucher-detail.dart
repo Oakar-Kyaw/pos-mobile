@@ -122,7 +122,8 @@ class VoucherDetailModel {
   double remainingPaymentAmount;
   double total;
   double tax;
-
+  bool? existDebt;
+  bool? isRefund;
   final String? note;
   final String type;
 
@@ -140,6 +141,8 @@ class VoucherDetailModel {
     this.subTotal = 0,
     this.tax = 0,
     this.note,
+    this.existDebt,
+    this.isRefund,
     required this.type,
   });
 
@@ -156,6 +159,8 @@ class VoucherDetailModel {
     double? tax,
     String? note,
     String? type,
+    bool? existDebt,
+    bool? isRefund,
   }) {
     return VoucherDetailModel(
       id: id ?? this.id,
@@ -170,6 +175,8 @@ class VoucherDetailModel {
       tax: tax ?? this.tax,
       note: note ?? this.note,
       type: type ?? this.type,
+      existDebt: existDebt ?? this.existDebt,
+      isRefund: isRefund ?? this.isRefund,
       company: company,
     );
   }
@@ -197,6 +204,8 @@ class VoucherDetailModel {
       ),
       note: json['note'],
       type: json['type'],
+      existDebt: json["existDebt"],
+      isRefund: json["isRefund"],
 
       payments: (json['payments'] as List<dynamic>)
           .map((item) => VoucherPayment.fromJson(item))

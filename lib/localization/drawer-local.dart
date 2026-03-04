@@ -17,6 +17,7 @@ mixin DrawerScreenLocale {
   static const drawerDark = 'drawer_dark';
   static const drawerPosSystem = 'drawer_pos_system';
   static const drawerPosManagement = 'drawer_pos_management';
+  static const drawerRepay = 'drawer_repay';
 
   // ✅ NEW ITEMS
   static const drawerEmployee = 'drawer_employee';
@@ -62,6 +63,7 @@ mixin DrawerScreenLocale {
     drawerRequestItems: 'Request Items',
     drawerEmployeeSalary: 'Employee Salary',
     drawerBankAccount: 'Payment Account',
+    drawerRepay: 'Repayment',
   };
 
   // 🇲🇲 Burmese
@@ -96,5 +98,6 @@ mixin DrawerScreenLocale {
     drawerUpgrade: 'ပလန် အဆင့်မြှင့်ရန်',
     drawerUpgradeSuggestion: 'စီးပွားရေး အဆင့်မြှင့် အကြံပြုချက်',
     drawerBankAccount: 'အကောင့်',
+    drawerRepay: 'အကြွေးပေးချေမှု',
   };
 }

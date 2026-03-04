@@ -21,7 +21,8 @@ mixin PaymentScreenLocale {
   static const paymentAmountExceedError = 'payment_amount_exceed_error';
   static const noPayment = 'no_payment';
   static const paidAmount = 'paid_amount';
-  static const deliveryFee = 'delivery_fee'; // ✅ NEW
+  static const deliveryFee = 'delivery_fee';
+  static const cancel = 'cancel_payment';
 
   // ✅ NEW PHOTO KEYS
   static const paymentPhoto = 'payment_photo';
@@ -39,8 +40,8 @@ mixin PaymentScreenLocale {
     paymentCash: "Cash",
     paymentMethod: 'Payment Method',
     paymentAmount: 'Amount',
-    paymentTotalAmount: 'Total Payment Amount',
-    paymentRemainingAmount: 'Remaining Payment Amount',
+    paymentTotalAmount: 'Payment Amount',
+    paymentRemainingAmount: 'Remaining Amount',
     paymentAmountPlaceholder: 'Enter payment amount',
     paymentButton: 'Save',
     paymentCancel: 'Cancel',
@@ -52,7 +53,8 @@ mixin PaymentScreenLocale {
     paymentAmountExceedError: "Pay Amount can't exceed total Amount",
     noPayment: 'No payment',
     paidAmount: 'Paid Amount',
-    deliveryFee: 'Delivery Fee', // ✅ NEW
+    deliveryFee: 'Delivery Fee',
+    cancel: "Cancel",
 
     paymentPhoto: 'Payment Photo (Optional)',
     uploadPhoto: 'Upload Photo',
@@ -67,7 +69,7 @@ mixin PaymentScreenLocale {
     paymentMethod: 'ငွေပေးချေနည်းလမ်း',
     paymentAmount: 'ငွေပမာဏ',
     paymentTotalAmount: 'ပေးချေရမည့် ငွေပမာဏ',
-    paymentRemainingAmount: 'ပေးချေရန် ကျန်ရှိသည့် ပမာဏ',
+    paymentRemainingAmount: 'ကျန်ရှိသည့် ပမာဏ',
     paymentCard: "ခရက်ဒစ်ကတ်",
     paymentEWallet: "ဒစ်ဂျစ်တယ် ပိုက်ဆံအိတ် (Pay)",
     paymentBank: "ဘဏ်အကောင့်",
@@ -83,7 +85,8 @@ mixin PaymentScreenLocale {
     paymentAmountExceedError: 'ပေးရန် ငွေပမာဏသည် စုစုပေါင်းကိုကျော်၍မရပါ',
     noPayment: 'ငွေပေးချေမှု မရှိပါ',
     paidAmount: 'ပေးချေထားသည့် ပမာဏ',
-    deliveryFee: 'ပို့ဆောင်ခ', // ✅ NEW
+    deliveryFee: 'ပို့ဆောင်ခ',
+    cancel: "ပယ်ဖျက်သည်",
 
     paymentPhoto: 'ငွေပေးချေမှု ဓာတ်ပုံ (မတင်လည်း ရ)',
     uploadPhoto: 'ဓာတ်ပုံ တင်ရန်',

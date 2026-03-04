@@ -15,4 +15,10 @@ class AppRoute {
   static const String account = "/bank-account";
   static const String refund = "/refund";
   static const String debt = "/debt";
+  static const String repay = "/repay";
+  static const String expireItem = "/expire-items";
+  static const String expireItemCreate = "/expire-items/create";
+  static const String requestItem = "/request-items";
+  static const String requestItemCreate = "/request-items/create";
+  static const String inventoryItem = '/inventory-items';
 }

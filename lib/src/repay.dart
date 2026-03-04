@@ -3,20 +3,22 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/ui/debt-list.dart';
-import 'package:pos/localization/debt-local.dart';
+import 'package:pos/localization/repay-local.dart';
+import 'package:pos/ui/repay-list.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-class DebtVoucherPage extends ConsumerStatefulWidget {
-  const DebtVoucherPage({super.key});
+class RepaymentHistoryPage extends ConsumerStatefulWidget {
+  const RepaymentHistoryPage({super.key});
 
   @override
-  ConsumerState<DebtVoucherPage> createState() => _DebtVoucherPageState();
+  ConsumerState<RepaymentHistoryPage> createState() =>
+      _RepaymentHistoryPageState();
 }
 
-class _DebtVoucherPageState extends ConsumerState<DebtVoucherPage> {
+class _RepaymentHistoryPageState extends ConsumerState<RepaymentHistoryPage> {
   final int limit = 20;
+
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
@@ -30,7 +32,7 @@ class _DebtVoucherPageState extends ConsumerState<DebtVoucherPage> {
           onPressed: () => context.pop(),
           icon: const Icon(LucideIcons.arrowLeft),
         ),
-        title: DebtLocaleScreenLocale.debtTitle.getString(context),
+        title: RepayLocaleScreen.repayHistoryTable.getString(context),
       ),
       body: Padding(
         padding: const EdgeInsets.all(5),
@@ -57,11 +59,11 @@ class _DebtVoucherPageState extends ConsumerState<DebtVoucherPage> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(LucideIcons.fileText, color: kPrimary),
+                        const Icon(LucideIcons.wallet, color: kPrimary),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            DebtLocaleScreenLocale.debtDescription.getString(
+                            RepayLocaleScreen.repayDescription.getString(
                               context,
                             ),
                             style: TextStyle(color: subColor),
@@ -72,20 +74,20 @@ class _DebtVoucherPageState extends ConsumerState<DebtVoucherPage> {
                   ),
 
                   const SizedBox(height: 10),
+
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      DebtLocaleScreenLocale.debtTable.getString(context),
+                      RepayLocaleScreen.repayHistoryTable.getString(context),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-
-                  //const SizedBox(height: 16),
                 ],
               ),
             ),
-            SizedBox(height: 5),
-            Expanded(child: DebtListTile()),
+
+            const SizedBox(height: 5),
+            Expanded(child: RepaymentList()),
           ],
         ),
       ),

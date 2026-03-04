@@ -6,11 +6,13 @@ import 'package:pos/localization/error-local.dart';
 import 'package:pos/localization/general-expense-local.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/localization/income-local.dart';
+import 'package:pos/localization/inventory-management-local.dart';
 import 'package:pos/localization/login-local.dart';
 import 'package:pos/localization/payment-data-local.dart';
 import 'package:pos/localization/payment-local.dart';
 import 'package:pos/localization/product-local.dart';
 import 'package:pos/localization/refund-local.dart';
+import 'package:pos/localization/repay-local.dart';
 import 'package:pos/localization/sale-report-local.dart';
 import 'package:pos/localization/voucher-local.dart';
 
@@ -30,7 +32,9 @@ mixin AppLocale {
     ...GeneralExpenseLocale.EN,
     ...PaymentDataLocale.EN,
     ...RefundLocale.EN,
-    ...DebtLocale.EN,
+    ...DebtLocaleScreenLocale.EN,
+    ...RepayLocaleScreen.EN,
+    ...InventoryManagementLocale.EN,
   };
 
   static const Map<String, dynamic> MM = {
@@ -48,6 +52,8 @@ mixin AppLocale {
     ...GeneralExpenseLocale.MM,
     ...PaymentDataLocale.MM,
     ...RefundLocale.MM,
-    ...DebtLocale.MM,
+    ...DebtLocaleScreenLocale.MM,
+    ...RepayLocaleScreen.MM,
+    ...InventoryManagementLocale.MM,
   };
 }

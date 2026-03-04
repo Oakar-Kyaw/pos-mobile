@@ -99,7 +99,12 @@ class CustomerDrawer {
           _MenuItem(
             icon: LucideIcons.wallet,
             label: DrawerScreenLocale.drawerDebt.getString(context),
-            route: AppRoute.home,
+            route: AppRoute.debt,
+          ),
+          _MenuItem(
+            icon: LucideIcons.handCoins,
+            label: DrawerScreenLocale.drawerRepay.getString(context),
+            route: AppRoute.repay,
           ),
           _MenuItem(
             icon: LucideIcons.coins,
@@ -128,7 +133,7 @@ class CustomerDrawer {
           _MenuItem(
             icon: LucideIcons.triangle,
             label: DrawerScreenLocale.drawerExpireItems.getString(context),
-            route: AppRoute.home,
+            route: AppRoute.expireItem,
           ),
           _MenuItem(
             icon: LucideIcons.clipboardPlus,

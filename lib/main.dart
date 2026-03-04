@@ -20,6 +20,8 @@ void main() async {
   await FlutterLocalization.instance.ensureInitialized();
   initLocalization();
   await dotenv.load(fileName: ".env");
+  //Pre-load font so it's ready before any theme build
+  await GoogleFonts.pendingFonts([GoogleFonts.merriweather()]);
   runApp(ProviderScope(child: const MyApp()));
 }
 
@@ -29,6 +31,8 @@ class MyApp extends ConsumerStatefulWidget {
   @override
   ConsumerState<MyApp> createState() => _MyAppState();
 }
+
+final _merriweather = GoogleFonts.merriweather().fontFamily;
 
 class _MyAppState extends ConsumerState<MyApp> {
   final _secureStorage = SecureStorage();
@@ -86,18 +90,19 @@ class _MyAppState extends ConsumerState<MyApp> {
           supportedLocales: localization.supportedLocales,
           localizationsDelegates: localization.localizationsDelegates,
           theme: Theme.of(context).copyWith(
-            scaffoldBackgroundColor: kBgLight, // 👈 add this
-            textTheme: Theme.of(context).textTheme.apply(
-              fontFamily: GoogleFonts.merriweather().fontFamily,
-            ),
+            scaffoldBackgroundColor: kBgLight,
+            textTheme: Theme.of(
+              context,
+            ).textTheme.apply(fontFamily: _merriweather),
           ),
           darkTheme: ThemeData.dark().copyWith(
             scaffoldBackgroundColor: kBgDark, // 👈 add this
             textTheme: ThemeData.dark().textTheme.apply(
-              fontFamily: GoogleFonts.merriweather().fontFamily,
+              fontFamily: _merriweather,
             ),
           ),
-          themeMode: themeMode, // 👈 add this
+          themeMode: themeMode,
+          themeAnimationDuration: Duration.zero,
           routerConfig: router,
           builder: (context, child) {
             return ShadToaster(child: child!);

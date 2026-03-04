@@ -1,4 +1,4 @@
-mixin DebtLocale {
+mixin DebtLocaleScreenLocale {
   static const debtTitle = 'debt_title';
   static const debtDescription = 'debt_description';
   static const debtAdd = 'debt_add';
@@ -17,10 +17,10 @@ mixin DebtLocale {
 
   // 🇺🇸 English
   static const EN = {
-    debtTitle: 'Debt Voucher',
-    debtDescription: 'Create and manage customer debt vouchers.',
+    debtTitle: 'Debt Vouchers',
+    debtDescription: 'Manage customer debt vouchers.',
     debtAdd: 'Add Debt Voucher',
-    debtTable: 'Debt Voucher List',
+    debtTable: 'Debt Voucher Lists',
     debtCustomer: 'Customer',
     debtAmount: 'Total Amount',
     debtRemaining: 'Remaining Amount',
@@ -36,11 +36,10 @@ mixin DebtLocale {
 
   // 🇲🇲 Burmese
   static const MM = {
-    debtTitle: 'ကြွေးမြီ ဘောက်ချာ',
-    debtDescription:
-        'ဖောက်သည်ကြွေးမြီ ဘောက်ချာများကို ဖန်တီးပြီး စီမံခန့်ခွဲနိုင်ပါသည်။',
+    debtTitle: 'ကြွေးမြီ ဘောက်ချာများ',
+    debtDescription: 'ဖောက်သည်ကြွေးမြီ ဘောက်ချာများကို စီမံခန့်ခွဲနိုင်ပါသည်။',
     debtAdd: 'ကြွေးမြီ ဘောက်ချာ ထည့်ရန်',
-    debtTable: 'ကြွေးမြီ ဘောက်ချာ စာရင်း',
+    debtTable: 'ကြွေးမြီ ဘောက်ချာ စာရင်းများ',
     debtCustomer: 'ဖောက်သည်',
     debtAmount: 'စုစုပေါင်း ငွေပမာဏ',
     debtRemaining: 'ကျန်ရှိငွေ',

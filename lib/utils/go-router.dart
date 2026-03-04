@@ -6,17 +6,22 @@ import 'package:pos/src/account.dart';
 import 'package:pos/src/category.dart';
 import 'package:pos/src/company-profile.dart';
 import 'package:pos/src/create-voucher.dart';
+import 'package:pos/src/debt-voucher.dart';
+import 'package:pos/src/expire-item-list.dart';
 import 'package:pos/src/general-expense.dart';
 import 'package:pos/src/home.dart';
 import 'package:pos/src/income.dart';
+import 'package:pos/src/inventory-items.dart';
 import 'package:pos/src/login.dart';
 import 'package:pos/src/product.dart';
 import 'package:pos/src/receipt.dart';
 import 'package:pos/src/refund.dart';
+import 'package:pos/src/repay.dart';
 import 'package:pos/src/sale-report.dart';
 import 'package:pos/src/setting.dart';
 import 'package:pos/src/voucher.dart';
 import 'package:pos/utils/font-size.dart';
+import 'package:pos/utils/inventory-configuration.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -121,6 +126,30 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.refund,
         name: AppRoute.refund,
         builder: (context, state) => const RefundPage(),
+      ),
+      GoRoute(
+        path: AppRoute.debt,
+        name: AppRoute.debt,
+        builder: (context, state) => const DebtVoucherPage(),
+      ),
+      GoRoute(
+        path: AppRoute.repay,
+        name: AppRoute.repay,
+        builder: (context, state) => const RepaymentHistoryPage(),
+      ),
+      GoRoute(
+        path: AppRoute.inventoryItem,
+        name: AppRoute.inventoryItem,
+        builder: (context, state) {
+          InventoryActionType inventoryType =
+              state.extra as InventoryActionType;
+          return InventoryItemPage(type: inventoryType);
+        },
+      ),
+      GoRoute(
+        path: AppRoute.expireItem,
+        name: AppRoute.expireItem,
+        builder: (context, state) => ExpireItemsPage(),
       ),
       GoRoute(
         path: AppRoute.login,

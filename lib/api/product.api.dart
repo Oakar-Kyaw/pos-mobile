@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/models/inventory-management.dart';
 import 'package:pos/models/product.dart';
 
 class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
@@ -80,6 +81,47 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
     } catch (e, s) {
       state = AsyncError(e, s);
     }
+  }
+
+  /// -------- CREATE expire/damage and request --------
+  Future<Map<String, dynamic>> createInventory({
+    required Map<String, dynamic> body,
+  }) async {
+    final url = "v1/products/expire-items";
+
+    final response = await _dio.post(url, data: body);
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      // Refresh the list automatically
+      // state = const AsyncLoading();
+      // state = AsyncData(await getVouchers());
+      return {"success": true, "id": data["data"]["id"]};
+    }
+
+    throw Exception("Failed to create repayment");
+  }
+
+  /// -------- Get Expire / Damage / Request List --------
+  Future<List<InventoryManagement>> getExpireDamageRequestList({
+    required int page,
+    required int limit,
+    required String type,
+  }) async {
+    final url = "v1/products/inventory/list";
+
+    final response = await _dio.get(
+      url,
+      query: {"page": page, "limit": limit, "type": type},
+    );
+    final data = response.data;
+
+    if (data["success"] == true) {
+      // Refresh the list automatically
+      return InventoryManagement.listFromJson(data["data"]);
+    }
+
+    throw Exception("Failed to get inventory item");
   }
 }
 

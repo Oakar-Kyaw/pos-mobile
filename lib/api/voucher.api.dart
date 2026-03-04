@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/models/repayment.dart';
 import 'package:pos/models/voucher-detail.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
@@ -17,11 +18,17 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
     required int page,
     required int limit,
     String? search,
+    bool? existDebt,
   }) async {
     final url = "v1/vouchers";
     final response = await _dio.get(
       url,
-      query: {"page": page, "limit": limit, "search": search},
+      query: {
+        "page": page,
+        "limit": limit,
+        "search": search,
+        "existDebt": existDebt,
+      },
     );
     final Map<String, dynamic> data = response.data;
 
@@ -129,6 +136,53 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
     } catch (e, s) {
       state = AsyncError(e, s);
     }
+  }
+
+  /// -------- CREATE Repayment WITH FILES --------
+  Future<Map<String, dynamic>> createRepayment({
+    required int paymentDataId,
+    required int voucherId,
+    required double amount,
+    File? file,
+  }) async {
+    final url = "v1/vouchers/repay";
+
+    FormData formData = FormData.fromMap({
+      'paymentDataId': paymentDataId,
+      'amount': amount,
+      'voucherId': voucherId,
+      if (file != null) 'file': await MultipartFile.fromFile(file.path),
+    });
+
+    final response = await _dio.post(url, data: formData);
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      // Refresh the list automatically
+      // state = const AsyncLoading();
+      // state = AsyncData(await getVouchers());
+      return {"success": true, "id": data["data"]["id"]};
+    }
+
+    throw Exception("Failed to create repayment");
+  }
+
+  /// -------- Get repayment --------
+  Future<List<Repay>> getRepayment({
+    required int page,
+    required int limit,
+  }) async {
+    final url = "v1/vouchers/repay/datas";
+
+    final response = await _dio.get(url, query: {"page": page, "limit": limit});
+    final data = response.data;
+
+    if (data["success"] == true) {
+      // Refresh the list automatically
+      return Repay.listFromJson(data["data"]);
+    }
+
+    throw Exception("Failed to get repayment");
   }
 }
 

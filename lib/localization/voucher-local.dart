@@ -21,10 +21,18 @@ mixin VoucherScreenLocale {
   static const no = 'voucher_no';
   static const date = 'voucher_date';
   static const searchVoucherPlaceholder = 'voucher_search_placeholder';
+  static const existDebt = 'voucher_exist_debt';
+  static const isRefund = 'voucher_is_refund';
+  static const trueKeyboard = 'is_true';
+  static const falseKeyboard = 'is_false';
+  static const voucher = 'voucher';
+  static const hasDebt = 'has_debt';
+  static const repay = 'repayment';
 
   // ===== English =====
   static const EN = {
     title: 'Create Voucher',
+    voucher: 'Voucher',
     noItems: 'No items selected',
     subtotal: 'Subtotal',
     tax: 'Tax',
@@ -43,16 +51,25 @@ mixin VoucherScreenLocale {
         'You can see all your vouchers on this page. Tap on any voucher to view its full details.',
     voucherCode: 'Voucher Code',
     no: 'No',
-    date: 'Date', // ✅ NEW
+    date: 'Date',
+    searchVoucherPlaceholder: 'Search by voucher code or its date',
+
+    // ✅ Added
+    existDebt: 'Remaining Debt',
+    isRefund: 'Refund Voucher',
+    trueKeyboard: 'true',
+    falseKeyboard: 'false',
+    hasDebt: 'HAS DEBT',
+
     // Marketing Style Message
     thankYouMessage:
         'Thank you for shopping with us ❤️\nWe truly appreciate your support!\nWe look forward to serving you again. Shop more & save more!',
-    searchVoucherPlaceholder: 'Search by voucher code or its date',
   };
 
   // ===== Myanmar =====
   static const MM = {
     title: 'ဘောက်ချာ ဖန်တီးခြင်း',
+    voucher: 'ဘောက်ချာ',
     noItems: 'ပစ္စည်း မရွေးချယ်ရသေးပါ',
     subtotal: 'စုစုပေါင်း (ပစ္စည်းစုစုပေါင်းစျေးနှုန်း)',
     tax: 'အခွန်',
@@ -71,10 +88,18 @@ mixin VoucherScreenLocale {
         'ဤစာမျက်နှာတွင် သင့်၏ ဘောက်ချာအားလုံးကို ကြည့်ရှုနိုင်ပါသည်။ ဘောက်ချာတစ်ခုချင်းစီကို နှိပ်၍ အသေးစိတ် အချက်အလက်များကို ကြည့်ရှုနိုင်ပါသည်။',
     voucherCode: 'ဘောက်ချာကုဒ်',
     no: 'စဉ်',
-    date: 'ရက်စွဲ', // ✅ NEW
+    date: 'ရက်စွဲ',
+    searchVoucherPlaceholder: 'ဘောက်ချာကုဒ် သို့မဟုတ် ရက်စွဲ ဖြင့် ရှာဖွေပါ',
+
+    // ✅ Added
+    existDebt: 'ပေးချေရန် ငွေရှိသည်',
+    isRefund: 'ပြန်လည်ငွေပေးချေ ဘောက်ချာ',
+    trueKeyboard: 'ရှိ',
+    falseKeyboard: 'မရှိ',
+    hasDebt: 'ကြွေးမြီ ရှိ',
+
     // Marketing Style Message
     thankYouMessage:
         'ဝယ်ယူအားပေးမှုအတွက် ကျေးဇူးအထူးတင်ရှိပါသည် ❤️\nသင့်ရဲ့ အားပေးမှုကို တန်ဖိုးထားပါသည်။\nနောက်တစ်ကြိမ် ထပ်မံ ဝယ်ယူအားပေးရန် မျှော်လင့်ပါသည် !',
-    searchVoucherPlaceholder: 'ဘောက်ချာကုဒ် သို့မဟုတ် ရက်စွဲ ဖြင့် ရှာဖွေပါ',
   };
 }

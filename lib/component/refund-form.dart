@@ -9,13 +9,12 @@ import 'package:pos/api/product.api.dart';
 import 'package:pos/api/refund.api.dart';
 import 'package:pos/api/voucher.api.dart';
 import 'package:pos/localization/payment-data-local.dart';
-import 'package:pos/localization/payment-local.dart';
 import 'package:pos/localization/refund-local.dart';
 import 'package:pos/models/payment-data.dart';
 import 'package:pos/models/refund-item.dart';
-import 'package:pos/riverpod/payment-list.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
+import 'package:pos/utils/payment-icon.dart';
 import 'package:pos/utils/product-search-field.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:pos/utils/voucher-search-field.dart';
@@ -44,21 +43,6 @@ class _RefundFormState extends ConsumerState<RefundForm> {
   String refundType = "FULL";
 
   List<RefundItem> refundItems = [];
-
-  IconData _paymentIcon(String type) {
-    switch (type) {
-      case 'CASH':
-        return LucideIcons.banknote;
-      case 'BANK':
-        return LucideIcons.landmark;
-      case 'CARD':
-        return LucideIcons.creditCard;
-      case 'EWALLET':
-        return LucideIcons.wallet;
-      default:
-        return LucideIcons.circleDollarSign;
-    }
-  }
 
   void _onVoucherSearchChanged(String value) {
     //print("Voucer search: $value");
@@ -190,8 +174,16 @@ class _RefundFormState extends ConsumerState<RefundForm> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: ProductItemSearchField(
+            child: ProductItemSearchField<RefundItem>(
               onSearchChanged: _onProductSearchChanged,
+              itemBuilder: (product) => RefundItem(
+                id: 0,
+                product: product,
+                productId: product.id,
+                quantity: 1,
+                price: product.price,
+                createdAt: DateTime.now(),
+              ),
               onProductSelected: (refund) =>
                   setState(() => refundItems.add(refund)),
             ),
@@ -269,6 +261,7 @@ class _RefundFormState extends ConsumerState<RefundForm> {
               spacing: 5,
               items: [
                 ShadRadio(label: Text('Full'), value: 'FULL'),
+                SizedBox(height: 10),
                 ShadRadio(label: Text('Partial'), value: 'PARTIAL'),
               ],
             ),
@@ -335,7 +328,7 @@ class _RefundFormState extends ConsumerState<RefundForm> {
                           Row(
                             children: [
                               Icon(
-                                _paymentIcon(e.accountName),
+                                paymentIcon(e.accountName),
                                 size: 16,
                                 color: kPrimary,
                               ),

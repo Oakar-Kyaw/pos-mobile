@@ -7,6 +7,7 @@ const kSecondary = Color(0xFF8B5CF6);
 const kGreen = Color(0xFF10B981);
 const kGreenSecondary = Color(0xFF34D399);
 const kAmber = Color(0xFFF59E0B);
+const kRed = Color.fromARGB(255, 234, 0, 0);
 
 // ── Backgrounds ───────────────────────────────
 const kBgDark = Color(0xFF1A1A2E);
