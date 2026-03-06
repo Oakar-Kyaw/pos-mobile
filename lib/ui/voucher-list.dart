@@ -5,17 +5,18 @@ import 'package:pos/api/voucher.api.dart';
 import 'package:pos/component/debt-repay-voucher-component.dart';
 import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/no-item-found-widget.dart';
+import 'package:pos/component/voucher-list-component.dart';
 import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/utils/app-theme.dart';
 
-class DebtListTile extends ConsumerStatefulWidget {
-  const DebtListTile({super.key});
+class VoucherList extends ConsumerStatefulWidget {
+  const VoucherList({super.key});
 
   @override
-  ConsumerState<DebtListTile> createState() => _DebtListTileState();
+  ConsumerState<VoucherList> createState() => _VoucherListState();
 }
 
-class _DebtListTileState extends ConsumerState<DebtListTile> {
+class _VoucherListState extends ConsumerState<VoucherList> {
   late final PagingController<int, VoucherDetailModel> _pagingController;
   final int limit = 20;
 
@@ -27,7 +28,7 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
           state.lastPageIsEmpty ? null : state.nextIntPageKey,
       fetchPage: (pageKey) => ref
           .read(voucherProvider.notifier)
-          .getVouchersByUserId(page: pageKey, limit: limit, existDebt: true),
+          .getVouchersByUserId(page: pageKey, limit: limit),
     );
   }
 
@@ -86,7 +87,7 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     decoration: containerDecoration,
-                    child: DebtAndRepayVoucherListComponent(
+                    child: VoucherComponent(
                       textColor: textColor,
                       subColor: subColor,
                       voucher: voucher,

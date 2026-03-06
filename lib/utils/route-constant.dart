@@ -23,4 +23,6 @@ class AppRoute {
   static const String inventoryItem = '/inventory-items';
   static const String employee = '/employee';
   static const String employeeCreate = '/employee-create';
+  static const String attendance = '/attendance';
+  static const String attendanceCreate = '/attendance-create';
 }

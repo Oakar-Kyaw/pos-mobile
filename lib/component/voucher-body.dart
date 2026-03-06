@@ -21,11 +21,13 @@ class AmountSection extends ConsumerStatefulWidget {
     required this.voucher,
     required this.hasDebt,
     required this.pagingController,
+    this.showButton = false,
     super.key,
   });
 
   final VoucherDetailModel voucher;
   final bool hasDebt;
+  final bool showButton;
   PagingController<int, VoucherDetailModel> pagingController;
 
   @override
@@ -114,9 +116,7 @@ class _AmountSectionState extends ConsumerState<AmountSection> {
           children: [
             Expanded(
               child: _AmountChip(
-                label: PaymentScreenLocale.paymentTotalAmount.getString(
-                  context,
-                ),
+                label: PaymentScreenLocale.paidAmount.getString(context),
                 value: formatAmount(widget.voucher.totalPaymentAmount),
                 color: Colors.green,
               ),
@@ -134,35 +134,38 @@ class _AmountSectionState extends ConsumerState<AmountSection> {
           ],
         ),
         const SizedBox(height: 10),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () => showPaymentDialog(
-              context,
-              isDark: isDark,
-              paymentLists: paymentLists,
-              amountController: amountController,
-              remainingPaymentAmount: widget.voucher.remainingPaymentAmount,
-              total: widget.voucher.total,
-              changeAccountType: _changeAccountType,
-              paymentDataId: paymentDataId,
-              submit: _submit,
-            ),
-            icon: const Icon(Icons.payments_rounded, size: 18),
-            label: Text(
-              PaymentScreenLocale.paymentTitle.getString(context),
-              style: const TextStyle(fontWeight: FontWeight.w700),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ),
+        widget.showButton
+            ? SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => showPaymentDialog(
+                    context,
+                    isDark: isDark,
+                    paymentLists: paymentLists,
+                    amountController: amountController,
+                    remainingPaymentAmount:
+                        widget.voucher.remainingPaymentAmount,
+                    total: widget.voucher.total,
+                    changeAccountType: _changeAccountType,
+                    paymentDataId: paymentDataId,
+                    submit: _submit,
+                  ),
+                  icon: const Icon(Icons.payments_rounded, size: 18),
+                  label: Text(
+                    PaymentScreenLocale.paymentTitle.getString(context),
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kPrimary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              )
+            : SizedBox(),
       ],
     );
   }

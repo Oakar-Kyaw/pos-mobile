@@ -33,7 +33,7 @@ mixin VoucherScreenLocale {
   static const EN = {
     title: 'Create Voucher',
     voucher: 'Voucher',
-    noItems: 'No items selected',
+    noItems: 'No Data',
     subtotal: 'Subtotal',
     tax: 'Tax',
     total: 'Total',
@@ -70,7 +70,7 @@ mixin VoucherScreenLocale {
   static const MM = {
     title: 'ဘောက်ချာ ဖန်တီးခြင်း',
     voucher: 'ဘောက်ချာ',
-    noItems: 'ပစ္စည်း မရွေးချယ်ရသေးပါ',
+    noItems: 'ဒေတာ မရှိပါ',
     subtotal: 'စုစုပေါင်း (ပစ္စည်းစုစုပေါင်းစျေးနှုန်း)',
     tax: 'အခွန်',
     total: 'စုစုပေါင်း',

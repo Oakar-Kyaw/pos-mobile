@@ -121,7 +121,7 @@ class CustomerDrawer {
           _MenuItem(
             icon: LucideIcons.calendarCheck,
             label: DrawerScreenLocale.drawerAttendance.getString(context),
-            route: AppRoute.home,
+            route: AppRoute.attendance,
           ),
           _MenuItem(
             icon: LucideIcons.banknote,

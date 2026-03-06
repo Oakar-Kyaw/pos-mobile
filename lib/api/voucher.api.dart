@@ -21,6 +21,7 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
     bool? existDebt,
   }) async {
     final url = "v1/vouchers";
+    //print("exit $existDebt");
     final response = await _dio.get(
       url,
       query: {

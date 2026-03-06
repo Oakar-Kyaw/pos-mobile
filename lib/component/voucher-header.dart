@@ -63,7 +63,7 @@ class HeaderSection extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     DateFormat(
-                      'dd MMM yyyy',
+                      'dd MMM yyyy EEEE',
                     ).format(voucher.createdAt ?? DateTime.now()),
                     style: TextStyle(
                       fontSize: FontSizeConfig.body(context),

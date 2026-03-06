@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:pos/api/voucher.api.dart';
-import 'package:pos/component/debt-repay-voucher-component.dart';
+import 'package:pos/api/attendance.api.dart';
+import 'package:pos/component/attendance-card.dart';
 import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/no-item-found-widget.dart';
-import 'package:pos/models/voucher-detail.dart';
+import 'package:pos/models/attendance.dart';
 import 'package:pos/utils/app-theme.dart';
 
-class DebtListTile extends ConsumerStatefulWidget {
-  const DebtListTile({super.key});
+class AttendanceList extends ConsumerStatefulWidget {
+  const AttendanceList({super.key});
 
   @override
-  ConsumerState<DebtListTile> createState() => _DebtListTileState();
+  ConsumerState<AttendanceList> createState() => _AttendanceListState();
 }
 
-class _DebtListTileState extends ConsumerState<DebtListTile> {
-  late final PagingController<int, VoucherDetailModel> _pagingController;
-  final int limit = 20;
+class _AttendanceListState extends ConsumerState<AttendanceList> {
+  late final PagingController<int, Attendance> _pagingController;
+  final int limit = 31;
 
   @override
   void initState() {
     super.initState();
-    _pagingController = PagingController<int, VoucherDetailModel>(
+    _pagingController = PagingController<int, Attendance>(
       getNextPageKey: (state) =>
           state.lastPageIsEmpty ? null : state.nextIntPageKey,
       fetchPage: (pageKey) => ref
-          .read(voucherProvider.notifier)
-          .getVouchersByUserId(page: pageKey, limit: limit, existDebt: true),
+          .read(attendanceProvider.notifier)
+          .getAttendances(page: pageKey, limit: limit),
     );
+    // ref.listenManual(provider, listener)
   }
 
   @override
@@ -61,9 +62,6 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
-    final dividerColor = isDark
-        ? Colors.white.withOpacity(0.08)
-        : const Color(0xFFE5E7EB);
     final rowHoverColor = isDark
         ? kPrimary.withOpacity(0.06)
         : kPrimary.withOpacity(0.04);
@@ -71,27 +69,20 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
     return PagingListener(
       controller: _pagingController,
       builder: (context, state, fetchNextPage) =>
-          PagedListView<int, VoucherDetailModel>(
+          PagedListView<int, Attendance>(
             state: state,
             fetchNextPage: fetchNextPage,
-            builderDelegate: PagedChildBuilderDelegate<VoucherDetailModel>(
-              itemBuilder: (context, voucher, index) {
-                final isEven = index % 2 == 0;
-                BoxDecoration containerDecoration = isEven
-                    ? getContainerBoxDecorationByEven(dividerColor)
-                    : getContainerBoxDecorationByOdd(isDark, dividerColor);
+            builderDelegate: PagedChildBuilderDelegate<Attendance>(
+              itemBuilder: (context, attendance, index) {
+                //print("attendance is 😇 ${attendance.date}");
                 return InkWell(
                   splashColor: kPrimary.withOpacity(0.08),
                   highlightColor: rowHoverColor,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    decoration: containerDecoration,
-                    child: DebtAndRepayVoucherListComponent(
-                      textColor: textColor,
-                      subColor: subColor,
-                      voucher: voucher,
-                      pagingController: _pagingController,
-                    ),
+                  child: AttendanceCard(
+                    textColor: textColor,
+                    subColor: subColor,
+                    pagingController: _pagingController,
+                    attendance: attendance,
                   ),
                 );
               },

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/src/account.dart';
+import 'package:pos/src/attendance.dart';
 import 'package:pos/src/category.dart';
 import 'package:pos/src/company-profile.dart';
 import 'package:pos/src/create-voucher.dart';
@@ -168,6 +169,11 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.requestItem,
         name: AppRoute.requestItem,
         builder: (context, state) => RequestItemPage(),
+      ),
+      GoRoute(
+        path: AppRoute.attendance,
+        name: AppRoute.attendance,
+        builder: (context, state) => AttendancePage(),
       ),
       GoRoute(
         path: AppRoute.login,

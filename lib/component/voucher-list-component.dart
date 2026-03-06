@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/component/accent-bar.dart';
 import 'package:pos/component/voucher-body.dart';
 import 'package:pos/component/voucher-header.dart';
+import 'package:pos/localization/payment-data-local.dart';
+import 'package:pos/localization/payment-local.dart';
+import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/badge.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
-class VoucherListComponent extends StatelessWidget {
-  VoucherListComponent({
+class VoucherComponent extends StatelessWidget {
+  VoucherComponent({
     super.key,
     required this.textColor,
     required this.subColor,
@@ -61,7 +67,29 @@ class VoucherListComponent extends StatelessWidget {
                     voucher: voucher,
                     hasDebt: hasDebt,
                     pagingController: pagingController,
+                    showButton: voucher.existDebt ?? false,
                   ),
+                  const SizedBox(height: 12),
+                  const Divider(height: 1),
+                  const SizedBox(height: 12),
+                  Text(PaymentScreenLocale.paymentTitle.getString(context)),
+                  if (voucher.payments.isNotEmpty)
+                    ...voucher.payments.map(
+                      (e) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Text(e.paymentData!.accountName),
+                            Spacer(),
+                            BadgeWidget(
+                              icon: Icons.credit_card,
+                              label: e.amount.toString(),
+                              color: kGreen,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
