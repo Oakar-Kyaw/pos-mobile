@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/ui/inventory-form.dart';
+import 'package:pos/localization/employee-local.dart';
+import 'package:pos/ui/employee-form.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/description-widget.dart';
-import 'package:pos/utils/inventory-configuration.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-class InventoryItemPage extends ConsumerWidget {
-  final String type;
-
-  const InventoryItemPage({super.key, required this.type});
+class EmployeeCreatePage extends ConsumerWidget {
+  const EmployeeCreatePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final config = InventoryActionConfig(type, context);
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
@@ -28,7 +26,7 @@ class InventoryItemPage extends ConsumerWidget {
           onPressed: () => context.pop(),
           icon: const Icon(LucideIcons.arrowLeft),
         ),
-        title: config.title,
+        title: EmployeeLocaleScreenLocale.employeeTitle.getString(context),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -37,8 +35,9 @@ class InventoryItemPage extends ConsumerWidget {
             // ── Description Banner ──────────────────
             DescriptionWidget(
               isDark: isDark,
-              description: config.description,
-              icon: config.icon,
+              description: EmployeeLocaleScreenLocale.employeeDescription
+                  .getString(context),
+              icon: Icons.person,
               subColor: subColor,
             ),
 
@@ -50,7 +49,7 @@ class InventoryItemPage extends ConsumerWidget {
                 color: surfaceColor,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: InventoryManagementForm(inventoryType: type),
+              child: EmployeeManagementForm(),
             ),
 
             const SizedBox(height: 25),

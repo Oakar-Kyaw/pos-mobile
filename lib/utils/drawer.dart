@@ -116,7 +116,7 @@ class CustomerDrawer {
           _MenuItem(
             icon: LucideIcons.users,
             label: DrawerScreenLocale.drawerEmployee.getString(context),
-            route: AppRoute.home,
+            route: AppRoute.employee,
           ),
           _MenuItem(
             icon: LucideIcons.calendarCheck,
@@ -138,7 +138,7 @@ class CustomerDrawer {
           _MenuItem(
             icon: LucideIcons.clipboardPlus,
             label: DrawerScreenLocale.drawerRequestItems.getString(context),
-            route: AppRoute.home,
+            route: AppRoute.requestItem,
           ),
 
           _MenuItem(

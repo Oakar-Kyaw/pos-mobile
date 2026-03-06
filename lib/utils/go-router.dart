@@ -7,6 +7,7 @@ import 'package:pos/src/category.dart';
 import 'package:pos/src/company-profile.dart';
 import 'package:pos/src/create-voucher.dart';
 import 'package:pos/src/debt-voucher.dart';
+import 'package:pos/src/employee.dart';
 import 'package:pos/src/expire-item-list.dart';
 import 'package:pos/src/general-expense.dart';
 import 'package:pos/src/home.dart';
@@ -17,11 +18,13 @@ import 'package:pos/src/product.dart';
 import 'package:pos/src/receipt.dart';
 import 'package:pos/src/refund.dart';
 import 'package:pos/src/repay.dart';
+import 'package:pos/src/request-item.dart';
 import 'package:pos/src/sale-report.dart';
 import 'package:pos/src/setting.dart';
 import 'package:pos/src/voucher.dart';
+import 'package:pos/ui/employee-create.dart';
+import 'package:pos/ui/employee-form.dart';
 import 'package:pos/utils/font-size.dart';
-import 'package:pos/utils/inventory-configuration.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -141,8 +144,8 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.inventoryItem,
         name: AppRoute.inventoryItem,
         builder: (context, state) {
-          InventoryActionType inventoryType =
-              state.extra as InventoryActionType;
+          //print("${state.extra} 🥸");
+          String inventoryType = state.extra as String;
           return InventoryItemPage(type: inventoryType);
         },
       ),
@@ -150,6 +153,21 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.expireItem,
         name: AppRoute.expireItem,
         builder: (context, state) => ExpireItemsPage(),
+      ),
+      GoRoute(
+        path: AppRoute.employee,
+        name: AppRoute.employee,
+        builder: (context, state) => EmployeePage(),
+      ),
+      GoRoute(
+        path: AppRoute.employeeCreate,
+        name: AppRoute.employeeCreate,
+        builder: (context, state) => EmployeeCreatePage(),
+      ),
+      GoRoute(
+        path: AppRoute.requestItem,
+        name: AppRoute.requestItem,
+        builder: (context, state) => RequestItemPage(),
       ),
       GoRoute(
         path: AppRoute.login,

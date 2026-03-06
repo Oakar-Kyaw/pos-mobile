@@ -30,6 +30,7 @@ mixin DrawerScreenLocale {
   static const drawerUpgrade = 'drawer_upgrade';
   static const drawerUpgradeSuggestion = 'drawer_upgrade_suggestion';
   static const drawerBankAccount = 'drawer_account';
+  static const drawerCreate = 'drawer_create';
 
   // 🇺🇸 English
   static const EN = {
@@ -64,6 +65,7 @@ mixin DrawerScreenLocale {
     drawerEmployeeSalary: 'Employee Salary',
     drawerBankAccount: 'Payment Account',
     drawerRepay: 'Repayment',
+    drawerCreate: 'Create',
   };
 
   // 🇲🇲 Burmese
@@ -99,5 +101,6 @@ mixin DrawerScreenLocale {
     drawerUpgradeSuggestion: 'စီးပွားရေး အဆင့်မြှင့် အကြံပြုချက်',
     drawerBankAccount: 'အကောင့်',
     drawerRepay: 'အကြွေးပေးချေမှု',
+    drawerCreate: 'ဖန်တီးမည်',
   };
 }

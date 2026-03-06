@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/login.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/register-button-widget.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/shad-toaster.dart';
@@ -284,28 +285,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 24),
 
                   // ── Register link ────────────────────
-                  GestureDetector(
+                  RegisterButton(
+                    title: LoginScreenLocale.loginTitle.getString(context),
                     onTap: () => context.pushNamed(AppRoute.companyProfile),
-                    child: RichText(
-                      text: TextSpan(
-                        style: TextStyle(
-                          color: subColor,
-                          fontSize: FontSizeConfig.body(context),
-                        ),
-                        children: [
-                          TextSpan(
-                            text: LoginScreenLocale.newToPos.getString(context),
-                          ),
-                          const TextSpan(text: "? "),
-                          TextSpan(
-                            text: LoginScreenLocale.register.getString(context),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: kPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
+                    subColor: subColor,
+                    newToPos: true,
+                    newToPosString: LoginScreenLocale.newToPos.getString(
+                      context,
                     ),
                   ),
                 ],

@@ -3,44 +3,62 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:pos/localization/inventory-management-local.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-enum InventoryActionType { damaged, requested }
-
 class InventoryActionConfig {
-  final InventoryActionType type;
-  BuildContext context;
+  final String type;
+  final BuildContext context;
 
   InventoryActionConfig(this.type, this.context);
 
   String get title {
     switch (type) {
-      case InventoryActionType.damaged:
+      case 'Damage':
         return InventoryManagementLocale.inventoryExpiredDamaged.getString(
           context,
         );
-      case InventoryActionType.requested:
+
+      case 'Request':
         return InventoryManagementLocale.inventoryRequested.getString(context);
-        ;
+
+      default:
+        return '';
     }
   }
 
   String get description {
     switch (type) {
-      case InventoryActionType.damaged:
+      case 'Damage':
         return InventoryManagementLocale.inventoryExpiredDamagedDescription
             .getString(context);
 
-      case InventoryActionType.requested:
+      case 'Request':
         return InventoryManagementLocale.inventoryRequestedDescription
             .getString(context);
+
+      default:
+        return '';
     }
   }
 
   IconData get icon {
     switch (type) {
-      case InventoryActionType.damaged:
+      case 'Damage':
         return LucideIcons.triangle;
-      case InventoryActionType.requested:
+
+      case 'Request':
         return LucideIcons.clipboardList;
+
+      default:
+        return LucideIcons.box;
+    }
+  }
+
+  static String getTypeValue(String val) {
+    if (val == 'Damage') {
+      return 'DAMAGED';
+    } else if (val == 'Expire') {
+      return 'EXPIRED';
+    } else {
+      return 'REQUESTED';
     }
   }
 }

@@ -21,4 +21,6 @@ class AppRoute {
   static const String requestItem = "/request-items";
   static const String requestItemCreate = "/request-items/create";
   static const String inventoryItem = '/inventory-items';
+  static const String employee = '/employee';
+  static const String employeeCreate = '/employee-create';
 }

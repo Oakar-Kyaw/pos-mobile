@@ -5,6 +5,7 @@ import 'package:pos/api/category.api.dart';
 import 'package:pos/localization/category-local.dart';
 import 'package:pos/localization/error-local.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/button.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -21,6 +22,9 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
   TextEditingController title = TextEditingController();
 
   void submit() async {
+    if (_formKey.currentState!.saveAndValidate()) {
+      submit();
+    }
     final categoryApi = await ref
         .read(categoryProvider.notifier)
         .postCategory({"title": title.text})
@@ -91,30 +95,10 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
             SizedBox(height: 20),
 
             // ── Submit button with indigo gradient ──
-            SizedBox(
+            GradientSubmitButton(
+              onPressed: submit,
+              text: CategoryScreenLocale.categoryButton.getString(context),
               width: double.infinity,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [kPrimary, kSecondary],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: ShadButton(
-                  backgroundColor: Colors.transparent,
-                  onPressed: () {
-                    if (_formKey.currentState!.saveAndValidate()) {
-                      submit();
-                    }
-                  },
-                  child: Text(
-                    CategoryScreenLocale.categoryButton.getString(context),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
             ),
           ],
         ),

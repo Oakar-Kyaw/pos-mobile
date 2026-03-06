@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:pos/api/product.api.dart';
-import 'package:pos/api/voucher.api.dart';
 import 'package:pos/component/input.dart';
 import 'package:pos/models/inventory-item.dart';
 import 'package:pos/utils/font-size.dart';
@@ -16,9 +15,9 @@ import 'package:pos/localization/inventory-management-local.dart';
 import 'package:pos/utils/app-theme.dart';
 
 class InventoryManagementForm extends ConsumerStatefulWidget {
-  final InventoryActionType type;
+  final String inventoryType;
 
-  const InventoryManagementForm({super.key, required this.type});
+  const InventoryManagementForm({super.key, required this.inventoryType});
 
   @override
   ConsumerState<InventoryManagementForm> createState() =>
@@ -93,6 +92,14 @@ class _InventoryManagementFormState
   }
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(
+      () => type = InventoryActionConfig.getTypeValue(widget.inventoryType),
+    );
+  }
+
+  @override
   void dispose() {
     _debounce?.cancel();
     reasonCtrl.dispose();
@@ -109,6 +116,7 @@ class _InventoryManagementFormState
       0.0,
       (sum, item) => sum + (item.price * item.quantity),
     );
+    //print("type is $");
     return ShadForm(
       key: _formKey,
       child: Column(
@@ -122,6 +130,7 @@ class _InventoryManagementFormState
               style: TextStyle(fontWeight: FontWeight.bold, color: labelColor),
             ),
           ),
+
           SizedBox(height: 15),
 
           Padding(
@@ -191,16 +200,21 @@ class _InventoryManagementFormState
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: ShadRadioGroup<String>(
-              initialValue: widget.type.toString(),
+              initialValue: InventoryActionConfig.getTypeValue(
+                widget.inventoryType,
+              ),
               alignment: WrapAlignment.center,
               onChanged: (value) => setState(() => type = value!),
               spacing: 5,
               items: [
-                ShadRadio(label: Text('Expire'), value: 'EXPIRED'),
-                SizedBox(height: 10),
-                ShadRadio(label: Text('Damage'), value: 'DAMAGED'),
-                SizedBox(height: 10),
-                ShadRadio(label: Text('Request'), value: 'REQUESTED'),
+                if (widget.inventoryType == 'Damage') ...[
+                  ShadRadio(label: Text('Expire'), value: 'EXPIRED'),
+                  SizedBox(height: 10),
+                  ShadRadio(label: Text('Damage'), value: 'DAMAGED'),
+                ] else ...[
+                  SizedBox(height: 10),
+                  ShadRadio(label: Text('Request'), value: 'REQUESTED'),
+                ],
               ],
             ),
           ),

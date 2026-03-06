@@ -3,6 +3,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/badge.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/formatAmount.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -31,15 +32,17 @@ class HeaderSection extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _Badge(
+                  BadgeWidget(
                     label: VoucherScreenLocale.voucher.getString(context),
                     color: kPrimary,
+                    icon: LucideIcons.ticket,
                   ),
                   if (hasDebt) ...[
                     const SizedBox(width: 6),
-                    _Badge(
+                    BadgeWidget(
                       label: VoucherScreenLocale.hasDebt.getString(context),
                       color: Colors.red,
+                      icon: LucideIcons.wallet,
                     ),
                   ],
                 ],
@@ -74,33 +77,6 @@ class HeaderSection extends StatelessWidget {
         ),
         _TotalAmount(voucher: voucher),
       ],
-    );
-  }
-}
-
-class _Badge extends StatelessWidget {
-  const _Badge({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 9,
-          fontWeight: FontWeight.w700,
-          color: color,
-          letterSpacing: 1.1,
-        ),
-      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:pos/component/accent-bar.dart';
 import 'package:pos/component/voucher-body.dart';
 import 'package:pos/component/voucher-header.dart';
 import 'package:pos/models/voucher-detail.dart';
@@ -40,7 +41,7 @@ class VoucherListComponent extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _AccentBar(hasDebt: hasDebt),
+          AccentBar(hasDebt: hasDebt),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -70,37 +71,3 @@ class VoucherListComponent extends StatelessWidget {
     );
   }
 }
-
-////////////////////////////////////////////////////////////////
-/// Accent Bar
-////////////////////////////////////////////////////////////////
-
-class _AccentBar extends StatelessWidget {
-  const _AccentBar({required this.hasDebt});
-
-  final bool hasDebt;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 4,
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16),
-          bottomLeft: Radius.circular(16),
-        ),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: hasDebt
-              ? [Colors.red, Colors.red.withOpacity(0.4)]
-              : [kPrimary, kPrimary.withOpacity(0.4)],
-        ),
-      ),
-    );
-  }
-}
-
-////////////////////////////////////////////////////////////////
-/// Dialog Amount Row
-////////////////////////////////////////////////////////////////

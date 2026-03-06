@@ -8,14 +8,14 @@ import 'package:pos/component/no-item-found-widget.dart';
 import 'package:pos/models/inventory-management.dart';
 import 'package:pos/utils/app-theme.dart';
 
-class ExpireDamageLists extends ConsumerStatefulWidget {
-  const ExpireDamageLists({super.key});
+class RequestItemLists extends ConsumerStatefulWidget {
+  const RequestItemLists({super.key});
 
   @override
-  ConsumerState<ExpireDamageLists> createState() => _ExpireDamageListsState();
+  ConsumerState<RequestItemLists> createState() => _ExpireDamageListsState();
 }
 
-class _ExpireDamageListsState extends ConsumerState<ExpireDamageLists> {
+class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
   late final PagingController<int, InventoryManagement> _pagingController;
   final int limit = 20;
 
@@ -30,7 +30,7 @@ class _ExpireDamageListsState extends ConsumerState<ExpireDamageLists> {
           .getExpireDamageRequestList(
             page: pageKey,
             limit: limit,
-            type: "EXPIRED",
+            type: "REQUESTED",
           ),
     );
   }
