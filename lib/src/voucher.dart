@@ -2,44 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:pos/api/voucher.api.dart';
 import 'package:pos/component/app-bar.dart';
+import 'package:pos/component/date-select.dart';
+import 'package:pos/component/user-select.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/voucher-local.dart';
-import 'package:pos/models/voucher-detail.dart';
+import 'package:pos/riverpod/selected-user.riverpod.dart';
+import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/ui/voucher-list.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/font-size.dart';
+import 'package:pos/utils/check-role.dart';
+import 'package:pos/utils/description-widget.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
-class VoucherTablePage extends ConsumerStatefulWidget {
-  const VoucherTablePage({super.key});
+class VoucherCardPage extends ConsumerStatefulWidget {
+  const VoucherCardPage({super.key});
 
   @override
-  ConsumerState<VoucherTablePage> createState() => _VoucherTablePageState();
+  ConsumerState<VoucherCardPage> createState() => _VoucherCardPageState();
 }
 
-class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
+class _VoucherCardPageState extends ConsumerState<VoucherCardPage> {
   String searchQuery = "";
-  late final PagingController<int, VoucherDetailModel> _pagingController;
   final int limit = 20;
 
   @override
-  void initState() {
-    super.initState();
-    _pagingController = PagingController<int, VoucherDetailModel>(
-      getNextPageKey: (state) =>
-          state.lastPageIsEmpty ? null : state.nextIntPageKey,
-      fetchPage: (pageKey) => ref
-          .read(voucherProvider.notifier)
-          .getVouchersByUserId(page: pageKey, limit: limit, existDebt: true),
-    );
+  void dispose() {
+    super.dispose();
+    _clearSelectedData();
   }
 
-  @override
-  void dispose() {
-    _pagingController.dispose();
-    super.dispose();
+  void _clearSelectedData() {
+    ref.read(selectedDataStateProvider.notifier).clear();
   }
 
   @override
@@ -48,7 +42,9 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
     final bgColor = isDark ? kBgDark : kBgLight;
     final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
-
+    final user = ref.watch(userStateProvider);
+    final selectedData = ref.watch(selectedDataStateProvider);
+    //print("user dAta🤬: ${selectedData?.userId}");
     return Scaffold(
       backgroundColor: bgColor,
       appBar: CustomAppBar(
@@ -60,86 +56,86 @@ class _VoucherTablePageState extends ConsumerState<VoucherTablePage> {
       ),
       body: Column(
         children: [
-          // ── Description banner ──────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: kPrimary.withOpacity(isDark ? 0.15 : 0.07),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: kPrimary.withOpacity(isDark ? 0.3 : 0.15),
-                  width: 1,
+          // Description banner
+          if (user != null && (isAdmin(user.role) || isManager(user.role)))
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: DescriptionWidget(
+                isDark: isDark,
+                description: VoucherScreenLocale.viewAllVouchers.getString(
+                  context,
                 ),
-              ),
-              child: Row(
-                children: [
-                  // Container(
-                  //   padding: const EdgeInsets.all(7),
-                  //   decoration: BoxDecoration(
-                  //     color: kPrimary.withOpacity(0.12),
-                  //     borderRadius: BorderRadius.circular(8),
-                  //   ),
-                  //   child: const Icon(
-                  //     LucideIcons.ticket,
-                  //     color: kPrimary,
-                  //     size: 16,
-                  //   ),
-                  // ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      VoucherScreenLocale.viewAllVouchers.getString(context),
-                      style: TextStyle(
-                        fontSize: FontSizeConfig.body(context),
-                        color: subColor,
-                        height: 1.5,
-                      ),
-                    ),
-                  ),
-                ],
+                icon: LucideIcons.ticket,
+                subColor: subColor,
               ),
             ),
-          ),
-
           const SizedBox(height: 16),
 
-          // ── Section label ────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                Container(
-                  width: 4,
-                  height: 18,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [kPrimary, kSecondary],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  DrawerScreenLocale.drawerVoucher.getString(context),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: textColor,
-                    letterSpacing: -0.2,
-                  ),
-                ),
-              ],
+          // Section label
+          VoucherLabel(textColor: textColor),
+
+          if (isAdmin(user!.role) || isManager(user.role))
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Expanded(child: DateSelect()),
+            ),
+
+          const SizedBox(height: 12),
+          // Voucher list
+          Expanded(
+            child: VoucherList(
+              userId: selectedData?.userId,
+              startDate: selectedData?.startDate,
+              endDate: selectedData?.endDate,
             ),
           ),
 
-          const SizedBox(height: 12),
-          Expanded(child: VoucherList()),
           const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
+// Fixed VoucherLabel
+class VoucherLabel extends ConsumerWidget {
+  const VoucherLabel({super.key, required this.textColor});
+
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userStateProvider);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 18,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [kPrimary, kSecondary],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            DrawerScreenLocale.drawerVoucher.getString(context),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+              letterSpacing: -0.2,
+            ),
+          ),
+          if (isAdmin(user!.role) || isManager(user.role)) ...[
+            Spacer(),
+            UserSelect(),
+          ],
         ],
       ),
     );

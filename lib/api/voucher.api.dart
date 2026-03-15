@@ -10,13 +10,16 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
 
   @override
   Future<List<VoucherDetailModel>> build() async {
-    return await getVouchersByUserId(page: 0, limit: 10);
+    return await getVouchers(page: 0, limit: 10);
   }
 
   /// -------- GET ALL VOUCHERS --------
-  Future<List<VoucherDetailModel>> getVouchersByUserId({
+  Future<List<VoucherDetailModel>> getVouchers({
     required int page,
     required int limit,
+    int? userId,
+    DateTime? startDate,
+    DateTime? endDate,
     String? search,
     bool? existDebt,
   }) async {
@@ -29,6 +32,9 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
         "limit": limit,
         "search": search,
         "existDebt": existDebt,
+        if (userId != null) "filterUserId": userId,
+        if (startDate != null) "startDate": startDate,
+        if (endDate != null) "endDate": endDate,
       },
     );
     final Map<String, dynamic> data = response.data;
@@ -60,6 +66,19 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
     }
 
     throw Exception("Failed to fetch voucher by id");
+  }
+
+  /// -------- DELETE VOUCHER --------
+  Future<bool> deleteVoucher(int id) async {
+    final url = "v1/vouchers/$id";
+    final response = await _dio.delete(url);
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      return true;
+    }
+
+    throw Exception(data["message"] ?? "Failed to delete voucher");
   }
 
   /// -------- CREATE VOUCHER WITH FILES --------
@@ -117,11 +136,7 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
     state = const AsyncLoading();
 
     try {
-      final voucher = await getVouchersByUserId(
-        page: 0,
-        limit: 20,
-        search: search,
-      );
+      final voucher = await getVouchers(page: 0, limit: 20, search: search);
       state = AsyncData(voucher);
     } catch (e, s) {
       state = AsyncError(e, s);
@@ -132,7 +147,7 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
     state = const AsyncLoading();
 
     try {
-      final voucher = await getVouchersByUserId(page: 0, limit: 20);
+      final voucher = await getVouchers(page: 0, limit: 20);
       state = AsyncData(voucher);
     } catch (e, s) {
       state = AsyncError(e, s);

@@ -18,6 +18,7 @@ mixin DrawerScreenLocale {
   static const drawerPosSystem = 'drawer_pos_system';
   static const drawerPosManagement = 'drawer_pos_management';
   static const drawerRepay = 'drawer_repay';
+  static const drawerHrRule = 'drawer_hr_rule';
 
   // ✅ NEW ITEMS
   static const drawerEmployee = 'drawer_employee';
@@ -31,6 +32,7 @@ mixin DrawerScreenLocale {
   static const drawerUpgradeSuggestion = 'drawer_upgrade_suggestion';
   static const drawerBankAccount = 'drawer_account';
   static const drawerCreate = 'drawer_create';
+  static const drawerLogout = 'drawer_logout';
 
   // 🇺🇸 English
   static const EN = {
@@ -58,6 +60,7 @@ mixin DrawerScreenLocale {
     // ✅ Added
     drawerEmployee: 'Employees',
     drawerAttendance: 'Attendance',
+    drawerHrRule: 'HR Rules',
     drawerRefund: 'Refund',
     drawerDebt: 'Debt',
     drawerExpireItems: 'Expire Items',
@@ -66,12 +69,14 @@ mixin DrawerScreenLocale {
     drawerBankAccount: 'Payment Account',
     drawerRepay: 'Repayment',
     drawerCreate: 'Create',
+    drawerLogout: 'Logout',
   };
 
   // 🇲🇲 Burmese
   static const MM = {
     drawerHome: 'ပင်မ',
     drawerCategory: 'အမျိုးအစားများ',
+    drawerHrRule: 'HR စည်းမျဉ်းများ',
     drawerCompany: 'ကုမ္ပဏီမှတ်ပုံတင်ခြင်း',
     drawerProduct: 'ကုန်ပစ္စည်းများ',
     drawerIncome: 'ဝင်ငွေ',
@@ -102,5 +107,6 @@ mixin DrawerScreenLocale {
     drawerBankAccount: 'အကောင့်',
     drawerRepay: 'အကြွေးပေးချေမှု',
     drawerCreate: 'ဖန်တီးမည်',
+    drawerLogout: 'ထွက်ရန်',
   };
 }

@@ -107,10 +107,10 @@ void showPaymentDialog(
               // Amount label
               Text(
                 PaymentScreenLocale.paymentAmount.getString(context),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
               const SizedBox(height: 8),
@@ -150,7 +150,7 @@ void showPaymentDialog(
                   minWidth: double.infinity,
                   placeholder: Text(
                     PaymentDataLocale.type.getString(context),
-                    style: TextStyle(color: subColor),
+                    style: TextStyle(color: isDark ? Colors.white : subColor),
                   ),
                   selectedOptionBuilder: (context, value) {
                     final selected = PaymentData.fromJson(jsonDecode(value));
@@ -234,8 +234,8 @@ void showPaymentDialog(
                       ),
                       child: Text(
                         PaymentScreenLocale.cancel.getString(context),
-                        style: const TextStyle(
-                          color: Colors.black54,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black54,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

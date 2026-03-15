@@ -3,7 +3,7 @@ mixin EmployeeLocaleScreenLocale {
   static const employeeTitle = 'employee_title';
   static const employeeDescription = 'employee_description';
   static const employeeAdd = 'employee_add';
-  static const employeeTable = 'employee_table';
+  static const employeeCard = 'employee_card';
 
   static const employeeFirstName = 'employee_first_name';
   static const employeeLastName = 'employee_last_name';
@@ -55,7 +55,7 @@ mixin EmployeeLocaleScreenLocale {
     employeeTitle: 'Employees',
     employeeDescription: 'Manage employee information.',
     employeeAdd: 'Add Employee',
-    employeeTable: 'Employee List',
+    employeeCard: 'Employee List',
 
     employeeFirstName: 'First Name',
     employeeLastName: 'Last Name',
@@ -108,7 +108,7 @@ mixin EmployeeLocaleScreenLocale {
     employeeTitle: 'ဝန်ထမ်းများ',
     employeeDescription: 'ဝန်ထမ်းအချက်အလက်များကို စီမံခန့်ခွဲနိုင်ပါသည်။',
     employeeAdd: 'ဝန်ထမ်း အသစ်ထည့်ရန်',
-    employeeTable: 'ဝန်ထမ်းစာရင်း',
+    employeeCard: 'ဝန်ထမ်းစာရင်း',
 
     employeeFirstName: 'အမည် ',
     employeeLastName: 'နောက်ဆုံးအမည်',

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 mixin GeneralExpenseLocale {
   static const expenseDescription = 'expense_description';
   static const addExpense = 'add_expense';
@@ -17,6 +15,10 @@ mixin GeneralExpenseLocale {
   static const expenseValidationError = 'expense_validation_error';
   static const expenseAmountValidator = 'expense_amount_validator';
   static const expenseNoItems = 'expense_no_items';
+
+  // ✅ New keys
+  static const deleteSuccess = 'expense_delete_success';
+  static const deleteFail = 'expense_delete_fail';
 
   /// English translations
   static const EN = {
@@ -36,6 +38,10 @@ mixin GeneralExpenseLocale {
     expenseValidationError: 'Please fill out all required fields correctly.',
     expenseAmountValidator: 'Invalid amount',
     expenseNoItems: 'No items found',
+
+    // ✅ New
+    deleteSuccess: 'Expense deleted successfully',
+    deleteFail: 'Failed to delete expense',
   };
 
   /// Burmese translations
@@ -57,5 +63,9 @@ mixin GeneralExpenseLocale {
         'ကျေးဇူးပြု၍ လိုအပ်သော အကွက်များကို မှန်ကန်စွာ ဖြည့်ပါ။',
     expenseAmountValidator: 'ငွေပမာဏ မမှန်ကန်ပါ',
     expenseNoItems: 'ပစ္စည်း မတွေ့ပါ',
+
+    // ✅ New
+    deleteSuccess: 'အသုံးစရိတ်ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
+    deleteFail: 'အသုံးစရိတ် ဖျက်ရန် မအောင်မြင်ပါ',
   };
 }

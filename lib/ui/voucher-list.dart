@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/voucher.api.dart';
-import 'package:pos/component/debt-repay-voucher-component.dart';
+import 'package:pos/component/delete-dialog.dart';
 import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/no-item-found-widget.dart';
 import 'package:pos/component/voucher-list-component.dart';
+import 'package:pos/localization/general-local.dart';
+import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/models/voucher-detail.dart';
+import 'package:pos/riverpod/selected-user.riverpod.dart';
+import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/check-role.dart';
+import 'package:pos/utils/shad-toaster.dart';
 
 class VoucherList extends ConsumerStatefulWidget {
-  const VoucherList({super.key});
+  final int? userId;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  const VoucherList({super.key, this.userId, this.startDate, this.endDate});
 
   @override
   ConsumerState<VoucherList> createState() => _VoucherListState();
@@ -28,7 +39,13 @@ class _VoucherListState extends ConsumerState<VoucherList> {
           state.lastPageIsEmpty ? null : state.nextIntPageKey,
       fetchPage: (pageKey) => ref
           .read(voucherProvider.notifier)
-          .getVouchersByUserId(page: pageKey, limit: limit),
+          .getVouchers(
+            page: pageKey,
+            limit: limit,
+            userId: widget.userId,
+            startDate: widget.startDate,
+            endDate: widget.endDate,
+          ),
     );
   }
 
@@ -57,6 +74,64 @@ class _VoucherListState extends ConsumerState<VoucherList> {
     );
   }
 
+  void _delete(VoucherDetailModel voucher, bool isDark) {
+    showDeleteDialog(
+      context,
+      title: VoucherScreenLocale.deleteVoucher.getString(context),
+      isDark: isDark,
+      submit: () async {
+        //print("delete");
+        await ref
+            .read(voucherProvider.notifier)
+            .deleteVoucher(voucher.id)
+            .then((data) {
+              if (data) {
+                ShowToast(
+                  context,
+                  description: Text(
+                    VoucherScreenLocale.deletedSuccess.getString(context),
+                  ),
+                );
+                context.pop();
+                _pagingController.refresh();
+              }
+            })
+            .catchError((err) {
+              ShowToast(
+                context,
+                description: Text(
+                  GeneralScreenLocale.somethingWentWrong.getString(context),
+                ),
+                isError: true,
+              );
+            });
+      },
+    );
+  }
+
+  Widget getVoucherComponentByRole(
+    String role,
+    Color textColor,
+    Color subColor,
+    bool isDark,
+    VoucherDetailModel voucher,
+  ) {
+    return (isAdmin(role) || isManager(role))
+        ? VoucherComponent(
+            textColor: textColor,
+            subColor: subColor,
+            voucher: voucher,
+            pagingController: _pagingController,
+            onDelete: () => _delete(voucher, isDark),
+          )
+        : VoucherComponent(
+            textColor: textColor,
+            subColor: subColor,
+            voucher: voucher,
+            pagingController: _pagingController,
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
@@ -68,6 +143,13 @@ class _VoucherListState extends ConsumerState<VoucherList> {
     final rowHoverColor = isDark
         ? kPrimary.withOpacity(0.06)
         : kPrimary.withOpacity(0.04);
+
+    final user = ref.watch(userStateProvider);
+
+    // Listen to selected user changes and refresh paging controller
+    ref.listen<SelectedData?>(selectedDataStateProvider, (prev, next) {
+      _pagingController.refresh();
+    });
 
     return PagingListener(
       controller: _pagingController,
@@ -87,11 +169,12 @@ class _VoucherListState extends ConsumerState<VoucherList> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     decoration: containerDecoration,
-                    child: VoucherComponent(
-                      textColor: textColor,
-                      subColor: subColor,
-                      voucher: voucher,
-                      pagingController: _pagingController,
+                    child: getVoucherComponentByRole(
+                      user!.role,
+                      textColor,
+                      subColor,
+                      isDark,
+                      voucher,
                     ),
                   ),
                 );

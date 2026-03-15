@@ -22,14 +22,14 @@ mixin RepayLocaleScreen {
   static const repayRemainingAmount = 'repay_remaining_amount';
   static const repayTotalPaid = 'repay_total_paid';
   static const repayFullyPaid = 'repay_fully_paid';
-  static const repayHistoryTable = 'repay_history_table';
+  static const repayHistoryCard = 'repay_history_card';
   static const repaid = 'repaid';
 
   /// English translations
   static const EN = {
     repay: 'Repayment',
     repaid: 'Repaid',
-    repayHistoryTable: 'Repayment History',
+    repayHistoryCard: 'Repayment History',
     repayDescription: 'POS Repayment System',
     repayNo: 'No',
     repayAmountPlaceholder: 'Enter repayment amount',
@@ -58,7 +58,7 @@ mixin RepayLocaleScreen {
   static const MM = {
     repay: 'အကြွေးပေးချေမှု',
     repaid: 'ပေးချေပြီး',
-    repayHistoryTable: 'အကြွေးပေးချေမှု မှတ်တမ်းဇယား',
+    repayHistoryCard: 'အကြွေးပေးချေမှု မှတ်တမ်းဇယား',
     repayDescription: 'အကြွေးပေးချေမှု စနစ်',
     repayNo: 'စဉ်',
     repayAmountPlaceholder: 'ပေးချေမည့် ငွေပမာဏ ထည့်ပါ',

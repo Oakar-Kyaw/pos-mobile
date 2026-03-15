@@ -14,7 +14,7 @@ mixin InventoryManagementLocale {
   static const inventoryTotalAmount = 'inventory_total_amount';
   static const inventoryAddItem = 'inventory_add_item';
   static const inventorySubmit = 'inventory_submit';
-  static const inventoryTable = 'inventory_table';
+  static const inventoryCard = 'inventory_card';
   static const inventoryError = 'inventory_error';
   static const inventorySuccess = 'inventory_success';
 
@@ -33,7 +33,7 @@ mixin InventoryManagementLocale {
     inventoryTotalAmount: 'Total Amount',
     inventoryAddItem: 'Add Item',
     inventorySubmit: 'Submit',
-    inventoryTable: 'Inventory Records',
+    inventoryCard: 'Inventory Records',
     inventoryError: 'Something went wrong',
     inventorySuccess: 'Inventory record created successfully',
   };
@@ -54,7 +54,7 @@ mixin InventoryManagementLocale {
     inventoryTotalAmount: 'စုစုပေါင်းပမာဏ',
     inventoryAddItem: 'ပစ္စည်းထည့်ရန်',
     inventorySubmit: 'တင်သွင်းမည်',
-    inventoryTable: 'စာရင်းမှတ်တမ်းများ',
+    inventoryCard: 'စာရင်းမှတ်တမ်းများ',
     inventoryError: 'အမှားတစ်ခုဖြစ်ပွားခဲ့သည်',
     inventorySuccess: 'Inventory မှတ်တမ်းကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
   };

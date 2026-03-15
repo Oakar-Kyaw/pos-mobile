@@ -4,12 +4,14 @@ import 'package:pos/utils/font-size.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Widget? leading;
+  final List<Widget>? actions;
   final VoidCallback? onMenuPressed;
 
   const CustomAppBar({
     Key? key,
     required this.title,
     this.leading,
+    this.actions,
     this.onMenuPressed,
   }) : super(key: key);
 
@@ -27,6 +29,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         centerTitle: true,
+        actions: actions,
       ),
     );
   }

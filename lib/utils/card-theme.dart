@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class TableThemeConfiguration {
+class CardThemeConfiguration {
   final bool isDark;
   final Color surfaceColor;
   final Color kPrimary;
   final Color kSecondary;
   final Color dividerColor;
-  TableThemeConfiguration({
+  CardThemeConfiguration({
     required this.isDark,
     required this.surfaceColor,
     required this.kPrimary,
@@ -14,7 +14,7 @@ class TableThemeConfiguration {
     required this.dividerColor,
   });
 
-  BoxDecoration getTableContainerDecoration() {
+  BoxDecoration getCardContainerDecoration() {
     return BoxDecoration(
       color: surfaceColor,
       borderRadius: BorderRadius.circular(20),
@@ -30,7 +30,7 @@ class TableThemeConfiguration {
     );
   }
 
-  BoxDecoration getTableHeaderDecoration() {
+  BoxDecoration getCardHeaderDecoration() {
     return BoxDecoration(
       gradient: LinearGradient(
         colors: [
@@ -44,7 +44,7 @@ class TableThemeConfiguration {
     );
   }
 
-  BoxDecoration getTableRowDecoration(bool isEven) {
+  BoxDecoration getCardRowDecoration(bool isEven) {
     return BoxDecoration(
       color: isEven
           ? Colors.transparent

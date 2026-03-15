@@ -4,14 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/account.api.dart';
 import 'package:pos/component/app-bar.dart';
+import 'package:pos/component/delete-dialog.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/payment-data-local.dart';
+import 'package:pos/localization/payment-local.dart';
 import 'package:pos/models/payment-data.dart';
+import 'package:pos/models/user.dart';
+import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/account-form.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/check-role.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/formatAmount.dart';
-import 'package:pos/utils/responsive.dart';
+import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class PaymentDataPage extends ConsumerStatefulWidget {
@@ -45,8 +50,8 @@ class _PaymentDataPageState extends ConsumerState<PaymentDataPage> {
                   ref.read(paymentDataProvider.notifier).refreshAccounts(),
             ),
             const SizedBox(height: 25),
-            _buildTableContainer(context, isDark, (v) {
-              print("V ${v.accountName}");
+            _buildContainer(context, isDark, (v) {
+              //print("V ${v.accountName}");
               setState(() {
                 data = v;
               });
@@ -54,6 +59,41 @@ class _PaymentDataPageState extends ConsumerState<PaymentDataPage> {
           ],
         ),
       ),
+    );
+  }
+
+  void _delete(BuildContext context, PaymentData data, bool isDark) {
+    showDeleteDialog(
+      context,
+      title: PaymentScreenLocale.deletePaymentAccountConfirm.getString(context),
+      isDark: isDark,
+      submit: () async {
+        //print("delete");
+        await ref
+            .read(paymentDataProvider.notifier)
+            .deleteAccount(data.id)
+            .then((data) {
+              if (data) {
+                ShowToast(
+                  context,
+                  description: Text(
+                    PaymentScreenLocale.deletePaymentSuccess.getString(context),
+                  ),
+                );
+                context.pop();
+                ref.read(paymentDataProvider.notifier).refreshAccounts();
+              }
+            })
+            .catchError((err) {
+              ShowToast(
+                context,
+                description: Text(
+                  PaymentScreenLocale.deletePaymentFailed.getString(context),
+                ),
+                isError: true,
+              );
+            });
+      },
     );
   }
 
@@ -140,227 +180,186 @@ class _PaymentDataPageState extends ConsumerState<PaymentDataPage> {
     );
   }
 
-  // --- Table -----
-  // --- Table with ListView.builder ---
-  Widget _buildTableContainer(BuildContext context, bool isDark, set) {
-    final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
-    final dividerColor = isDark
-        ? Colors.white.withOpacity(0.08)
-        : const Color(0xFFE5E7EB);
+  // --- Card -----
+  // --- Card with ListView.builder ---
+  Widget _buildContainer(
+    BuildContext context,
+    bool isDark,
+    void Function(PaymentData) set,
+  ) {
     final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
-    final rowHoverColor = isDark
-        ? kPrimary.withOpacity(0.06)
-        : kPrimary.withOpacity(0.04);
+    final user = ref.watch(userStateProvider);
+    return ref
+        .watch(paymentDataProvider)
+        .when(
+          data: (accounts) {
+            if (accounts.isEmpty) {
+              return Center(
+                child: Text(
+                  PaymentDataLocale.accountNoItems.getString(context),
+                  style: TextStyle(color: subColor),
+                ),
+              );
+            }
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: accounts.length,
+              itemBuilder: (context, index) {
+                final account = accounts[index];
+                return _AccountCard(
+                  user: user!,
+                  account: account,
+                  isDark: isDark,
+                  textColor: textColor,
+                  subColor: subColor,
+                  onEdit: () => set.call(account),
+                  onDelete: () => _delete(context, account, isDark),
+                );
+              },
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(
+            child: Text("Error: $err", style: TextStyle(color: subColor)),
+          ),
+        );
+  }
+}
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: Container(
-        width: double.infinity,
-        height: 400,
-        decoration: BoxDecoration(
-          color: surfaceColor,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: isDark
-                  ? kPrimary.withOpacity(0.1)
-                  : Colors.black.withOpacity(0.06),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
+class _AccountCard extends StatelessWidget {
+  const _AccountCard({
+    required this.user,
+    required this.account,
+    required this.isDark,
+    required this.textColor,
+    required this.subColor,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final PaymentData account;
+  final bool isDark;
+  final Color textColor;
+  final Color subColor;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
+      decoration: BoxDecoration(
+        color: isDark ? kSurfaceDark : kSurfaceLight,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? kPrimary.withOpacity(0.1)
+                : Colors.black.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Table Header ──────────────────
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    kPrimary.withOpacity(isDark ? 0.25 : 0.08),
-                    kSecondary.withOpacity(isDark ? 0.15 : 0.04),
-                  ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: kPrimary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    LucideIcons.landmark,
+                    color: kPrimary,
+                    size: 18,
+                  ),
                 ),
-                border: Border(
-                  bottom: BorderSide(color: dividerColor, width: 1),
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  if (Responsive.isTablet(context) ||
-                      Responsive.isDesktop(context))
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        PaymentDataLocale.name.getString(context),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        account.accountName,
                         style: TextStyle(
+                          fontSize: FontSizeConfig.title(context),
+                          fontWeight: FontWeight.w700,
                           color: textColor,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  Expanded(
-                    flex: 5,
-                    child: Text(
-                      PaymentDataLocale.accountNumber.getString(context),
-                      style: TextStyle(
-                        color: textColor,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 4),
+                      Text(
+                        account.accountNumber ?? "-",
+                        style: TextStyle(
+                          fontSize: FontSizeConfig.body(context),
+                          color: subColor,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      PaymentDataLocale.type.getString(context),
-                      style: TextStyle(
-                        color: textColor,
-                        fontWeight: FontWeight.bold,
+                ),
+
+                if (isAdmin(user.role) || isManager(user.role))
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: onEdit,
+                        icon: Icon(
+                          Icons.edit,
+                          color: Colors.green,
+                          size: FontSizeConfig.iconSize(context),
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: Text(
-                      PaymentDataLocale.balance.getString(context),
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        color: textColor,
-                        fontWeight: FontWeight.bold,
+                      IconButton(
+                        onPressed: onDelete,
+                        icon: Icon(
+                          Icons.delete,
+                          color: Colors.red,
+                          size: FontSizeConfig.iconSize(context),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                  Expanded(
-                    flex: 3,
-                    child: SizedBox(),
-                    // Text(
-                    //   PaymentDataLocale.accountNo.getString(context),
-                    //   style: TextStyle(
-                    //     color: textColor,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    // ),
-                  ),
-                ],
-              ),
+              ],
             ),
-
-            // ── ListView.builder Rows ─────────
-            Expanded(
-              child: ref
-                  .watch(paymentDataProvider)
-                  .when(
-                    data: (accounts) {
-                      if (accounts.isEmpty) {
-                        return Center(
-                          child: Text(
-                            PaymentDataLocale.accountNoItems.getString(context),
-                            style: TextStyle(color: subColor),
-                          ),
-                        );
-                      }
-                      return ListView.builder(
-                        itemCount: accounts.length,
-                        itemBuilder: (context, index) {
-                          final account = accounts[index];
-                          final isEven = index % 2 == 0;
-                          return Container(
-                            color: isEven ? Colors.transparent : rowHoverColor,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            child: Row(
-                              children: [
-                                if (Responsive.isTablet(context) ||
-                                    Responsive.isDesktop(context))
-                                  Expanded(
-                                    flex: 2,
-
-                                    child: Text(
-                                      account.accountName,
-                                      style: TextStyle(color: textColor),
-                                    ),
-                                  ),
-                                Expanded(
-                                  flex: 5,
-                                  child: Text(
-                                    account.accountNumber ?? "-",
-                                    style: TextStyle(color: textColor),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    account.accountType,
-                                    style: TextStyle(color: textColor),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Text(
-                                    formatAmount(account.balance),
-                                    textAlign: TextAlign.right,
-                                    style: TextStyle(color: textColor),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      GestureDetector(
-                                        child: Icon(
-                                          Icons.edit,
-                                          color: Colors.green,
-                                          size: FontSizeConfig.iconSize(
-                                            context,
-                                          ),
-                                        ),
-
-                                        onTap: () {
-                                          print("tea");
-                                          set.call(account);
-                                        },
-                                      ),
-                                      const SizedBox(width: 14),
-                                      GestureDetector(
-                                        child: Icon(
-                                          Icons.delete,
-                                          color: Colors.red,
-                                          size: FontSizeConfig.iconSize(
-                                            context,
-                                          ),
-                                        ),
-
-                                        onTap: () {
-                                          //debugPrint("Delete ${cate.title}");
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (err, stack) => Center(
-                      child: Text(
-                        "Error: $err",
-                        style: TextStyle(color: subColor),
-                      ),
-                    ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Text(
+                  PaymentDataLocale.type.getString(context),
+                  style: TextStyle(color: subColor, fontSize: 12),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  account.accountType,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
                   ),
+                ),
+                const Spacer(),
+                Text(
+                  PaymentDataLocale.balance.getString(context),
+                  style: TextStyle(color: subColor, fontSize: 12),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  formatAmount(account.balance),
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

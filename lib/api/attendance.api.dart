@@ -15,22 +15,51 @@ class AttendanceAsyncNotifier extends AsyncNotifier<List<Attendance>> {
     required int page,
     required int limit,
     String? search,
+    DateTime? date,
+    int? filterUserId,
   }) async {
     final url = "v1/attendances";
 
-    final response = await _dio.get(
-      url,
-      query: {"page": page, "limit": limit, "search": search},
-    );
+    // Build query map dynamically
+    final Map<String, dynamic> query = {
+      "page": page,
+      "limit": limit,
+      if (search != null && search.isNotEmpty) "search": search,
+      if (date != null) "date": date.toIso8601String(),
+      if (filterUserId != null) "filterUserId": filterUserId,
+    };
 
-    final Map<String, dynamic> data = response.data;
+    final response = await _dio.get(url, query: query);
+
+    final data = response.data as Map<String, dynamic>;
 
     if (data["success"] == true) {
       final items = data["data"] as List;
+      return Attendance.listFromJson(items);
+    }
 
-      List<Attendance> attendances = Attendance.listFromJson(items);
+    throw Exception("Failed to fetch attendances");
+  }
 
-      return attendances;
+  /// -------- GET ALL ATTENDANCES AND GROUP BY STATUS --------
+  Future<AttendanceGroupedByStatus> getMonthlyAttendanceGroupedByStatus({
+    DateTime? date,
+    int? filterUserId,
+  }) async {
+    final url = "v1/attendances/monthly/grouped";
+
+    // Build query map dynamically
+    final Map<String, dynamic> query = {
+      if (date != null) "date": date.toIso8601String(),
+      if (filterUserId != null) "filterUserId": filterUserId,
+    };
+
+    final response = await _dio.get(url, query: query);
+
+    final data = response.data as Map<String, dynamic>;
+
+    if (data["success"] == true) {
+      return AttendanceGroupedByStatus.fromJson(data);
     }
 
     throw Exception("Failed to fetch attendances");
@@ -45,6 +74,32 @@ class AttendanceAsyncNotifier extends AsyncNotifier<List<Attendance>> {
 
     if (data["success"] == true) {
       return Attendance.fromJson(Map<String, dynamic>.from(data["data"]));
+    }
+
+    throw Exception("Failed to fetch attendance");
+  }
+
+  /// -------- GET ATTENDANCE BY ID --------
+  Future<Attendance?> getAttendanceByUserIdAndDate({
+    required DateTime date,
+  }) async {
+    final url = "v1/attendances/date/filter";
+
+    final response = await _dio.get(
+      url,
+      query: {"date": date.toIso8601String()},
+    );
+
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      if (data["data"] != null) {
+        // print("data is 🥹 $data");
+        return Attendance.fromJson(Map<String, dynamic>.from(data["data"]));
+      } else {
+        // No attendance found for the date
+        return null;
+      }
     }
 
     throw Exception("Failed to fetch attendance");
@@ -70,7 +125,7 @@ class AttendanceAsyncNotifier extends AsyncNotifier<List<Attendance>> {
         "checkIn": checkIn,
         "checkOut": checkOut,
         "note": note,
-        "workingHours": workingHours,
+        "workingMinutes": workingHours,
         "status": status,
         "lat": lat,
         "long": long,
@@ -95,20 +150,40 @@ class AttendanceAsyncNotifier extends AsyncNotifier<List<Attendance>> {
     String? long,
   }) async {
     final url = "v1/attendances/check-in";
-    //print(" attendance api ${date.toIso8601String()}");
+    print(" attendance api ${date.toIso8601String()}");
     final response = await _dio.post(
       url,
       data: {
         "date": date.toIso8601String(),
-        "checkIn": checkIn,
-        "workingHours": workingHours,
+        "workingMinutes": workingHours,
         "lat": lat,
         "long": long,
       },
     );
 
     final data = response.data;
-    print("data is $data");
+    if (data["success"] == true) {
+      return {"success": true};
+    }
+
+    throw Exception("Failed to create attendance");
+  }
+
+  /// -------- CREATE Check out --------
+  Future<Map<String, dynamic>> createCheckOut({
+    required DateTime date,
+    String? checkOut,
+    String? workingHours,
+  }) async {
+    final url = "v1/attendances/user/check-out";
+    //print(" attendance api ${date.toIso8601String()}");
+    final response = await _dio.post(
+      url,
+      data: {"date": date.toIso8601String(), "workingMinutes": workingHours},
+    );
+
+    final data = response.data;
+    //  print("data is $data");
     if (data["success"] == true) {
       await this.refresh();
       return {"success": true};
@@ -182,3 +257,11 @@ final attendanceProvider =
     AsyncNotifierProvider<AttendanceAsyncNotifier, List<Attendance>>(
       AttendanceAsyncNotifier.new,
     );
+
+final todayAttendanceProvider = FutureProvider.autoDispose<Attendance?>((
+  ref,
+) async {
+  final notifier = ref.read(attendanceProvider.notifier);
+  final date = DateTime.now();
+  return await notifier.getAttendanceByUserIdAndDate(date: date);
+});

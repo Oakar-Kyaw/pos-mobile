@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/general-expense.api.dart';
@@ -145,6 +146,7 @@ class _GeneralExpenseFormState extends ConsumerState<GeneralExpenseForm> {
           ShadInputFormField(
             controller: amount,
             validator: (v) => amountValidator(v, context),
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             keyboardType: TextInputType.number,
             label: label(GeneralExpenseLocale.expenseAmount.getString(context)),
             placeholder: placeholder(

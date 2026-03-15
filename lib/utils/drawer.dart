@@ -3,7 +3,11 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/localization/localization.dart';
+import 'package:pos/riverpod/login-check.dart';
+import 'package:pos/riverpod/company.riverpod.dart';
+import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/drawer-menu-list.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/secure-storage.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -25,14 +29,31 @@ class CustomerDrawer {
     }
 
     //make localization available in the drawer
+
+    Future<void> logout(WidgetRef ref) async {
+      final storage = SecureStorage();
+      await storage.deleteLoginData();
+      await storage.saveAcessAndRefreshToken(accessToken: '', refreshToken: '');
+      ref.read(checkLoginProvider.notifier).logout();
+      ref.read(companyStateProvider.notifier).clear();
+    }
+
     Future<void> changeLanguage(String langCode) async {
       localization.translate(langCode);
       SecureStorage _storage = SecureStorage();
       await _storage.saveLanguageSetting(langCode);
     }
 
+    List<MenuItem> getMenuList(String role) {
+      print(" User role is: $role");
+      if (role == "ADMIN") return menuListByAdmin(context);
+      if (role == 'MANAGER') return menuListByManager(context);
+      return menuListBySale(context);
+    }
+
     return Consumer(
       builder: (context, ref, _) {
+        final user = ref.watch(userStateProvider);
         final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
         final bgColor = isDark ? kBgDark : kBgLight;
         final textColor = isDark ? kTextDark : kTextLight;
@@ -46,115 +67,121 @@ class CustomerDrawer {
           'mm': DrawerScreenLocale.drawerMyanmar.getString(context),
         };
 
-        final menuItems = [
-          _MenuItem(
-            icon: LucideIcons.house,
-            label: DrawerScreenLocale.drawerHome.getString(context),
-            route: AppRoute.home,
-          ),
-          _MenuItem(
-            icon: LucideIcons.creditCard,
-            label: DrawerScreenLocale.drawerBankAccount.getString(context),
-            route: AppRoute.account,
-          ),
-          _MenuItem(
-            icon: LucideIcons.tag,
-            label: DrawerScreenLocale.drawerCategory.getString(context),
-            route: AppRoute.category,
-          ),
-          _MenuItem(
-            icon: LucideIcons.packageOpen,
-            label: DrawerScreenLocale.drawerProduct.getString(context),
-            route: AppRoute.product,
-          ),
+        // final menuItems = [
+        //   _MenuItem(
+        //     icon: LucideIcons.house,
+        //     label: DrawerScreenLocale.drawerHome.getString(context),
+        //     route: AppRoute.home,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.creditCard,
+        //     label: DrawerScreenLocale.drawerBankAccount.getString(context),
+        //     route: AppRoute.account,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.tag,
+        //     label: DrawerScreenLocale.drawerCategory.getString(context),
+        //     route: AppRoute.category,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.packageOpen,
+        //     label: DrawerScreenLocale.drawerProduct.getString(context),
+        //     route: AppRoute.product,
+        //   ),
 
-          // ───────── SALES ─────────
-          _MenuItem(
-            icon: LucideIcons.ticket,
-            label: DrawerScreenLocale.drawerVoucher.getString(context),
-            route: AppRoute.vouchers,
-          ),
-          _MenuItem(
-            icon: LucideIcons.trendingUp,
-            label: DrawerScreenLocale.drawerIncome.getString(context),
-            route: AppRoute.income,
-          ),
-          _MenuItem(
-            icon: LucideIcons.clipboardList,
-            label: DrawerScreenLocale.drawerSaleReport.getString(context),
-            route: AppRoute.saleReports,
-          ),
+        //   // ───────── SALES ─────────
+        //   _MenuItem(
+        //     icon: LucideIcons.ticket,
+        //     label: DrawerScreenLocale.drawerVoucher.getString(context),
+        //     route: AppRoute.vouchers,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.trendingUp,
+        //     label: DrawerScreenLocale.drawerIncome.getString(context),
+        //     route: AppRoute.income,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.clipboardList,
+        //     label: DrawerScreenLocale.drawerSaleReport.getString(context),
+        //     route: AppRoute.saleReports,
+        //   ),
 
-          // ───────── FINANCE ─────────
-          _MenuItem(
-            icon: LucideIcons.receipt,
-            label: DrawerScreenLocale.drawerExpense.getString(context),
-            route: AppRoute.generalExpense,
-          ),
-          _MenuItem(
-            icon: LucideIcons.rotateCcw,
-            label: DrawerScreenLocale.drawerRefund.getString(context),
-            route: AppRoute.refund,
-          ),
-          _MenuItem(
-            icon: LucideIcons.wallet,
-            label: DrawerScreenLocale.drawerDebt.getString(context),
-            route: AppRoute.debt,
-          ),
-          _MenuItem(
-            icon: LucideIcons.handCoins,
-            label: DrawerScreenLocale.drawerRepay.getString(context),
-            route: AppRoute.repay,
-          ),
-          _MenuItem(
-            icon: LucideIcons.coins,
-            label: DrawerScreenLocale.drawerProfit.getString(context),
-            route: AppRoute.home,
-          ),
+        //   // ───────── FINANCE ─────────
+        //   _MenuItem(
+        //     icon: LucideIcons.receipt,
+        //     label: DrawerScreenLocale.drawerExpense.getString(context),
+        //     route: AppRoute.generalExpense,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.rotateCcw,
+        //     label: DrawerScreenLocale.drawerRefund.getString(context),
+        //     route: AppRoute.refund,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.wallet,
+        //     label: DrawerScreenLocale.drawerDebt.getString(context),
+        //     route: AppRoute.debt,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.handCoins,
+        //     label: DrawerScreenLocale.drawerRepay.getString(context),
+        //     route: AppRoute.repay,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.coins,
+        //     label: DrawerScreenLocale.drawerProfit.getString(context),
+        //     route: AppRoute.home,
+        //   ),
 
-          // ───────── HR ─────────
-          _MenuItem(
-            icon: LucideIcons.users,
-            label: DrawerScreenLocale.drawerEmployee.getString(context),
-            route: AppRoute.employee,
-          ),
-          _MenuItem(
-            icon: LucideIcons.calendarCheck,
-            label: DrawerScreenLocale.drawerAttendance.getString(context),
-            route: AppRoute.attendance,
-          ),
-          _MenuItem(
-            icon: LucideIcons.banknote,
-            label: DrawerScreenLocale.drawerEmployeeSalary.getString(context),
-            route: AppRoute.home,
-          ),
+        //   // ───────── HR ─────────
+        //   _MenuItem(
+        //     icon: LucideIcons.users,
+        //     label: DrawerScreenLocale.drawerEmployee.getString(context),
+        //     route: AppRoute.employee,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.calendarCheck,
+        //     label: DrawerScreenLocale.drawerAttendance.getString(context),
+        //     route: AppRoute.attendance,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.banknote,
+        //     label: DrawerScreenLocale.drawerEmployeeSalary.getString(context),
+        //     route: AppRoute.payroll,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.clipboardCheck,
+        //     label: DrawerScreenLocale.drawerHrRule.getString(context),
+        //     route: AppRoute.hrRule,
+        //   ),
 
-          // ───────── INVENTORY CONTROL ─────────
-          _MenuItem(
-            icon: LucideIcons.triangle,
-            label: DrawerScreenLocale.drawerExpireItems.getString(context),
-            route: AppRoute.expireItem,
-          ),
-          _MenuItem(
-            icon: LucideIcons.clipboardPlus,
-            label: DrawerScreenLocale.drawerRequestItems.getString(context),
-            route: AppRoute.requestItem,
-          ),
+        //   // ───────── INVENTORY CONTROL ─────────
+        //   _MenuItem(
+        //     icon: LucideIcons.triangle,
+        //     label: DrawerScreenLocale.drawerExpireItems.getString(context),
+        //     route: AppRoute.expireItem,
+        //   ),
+        //   _MenuItem(
+        //     icon: LucideIcons.clipboardPlus,
+        //     label: DrawerScreenLocale.drawerRequestItems.getString(context),
+        //     route: AppRoute.requestItem,
+        //   ),
 
-          _MenuItem(
-            icon: LucideIcons.rocket,
-            label: DrawerScreenLocale.drawerUpgrade.getString(context),
-            route: AppRoute.home,
-          ),
+        //   _MenuItem(
+        //     icon: LucideIcons.rocket,
+        //     label: DrawerScreenLocale.drawerUpgrade.getString(context),
+        //     route: AppRoute.home,
+        //   ),
 
-          _MenuItem(
-            icon: LucideIcons.rocket,
-            label: DrawerScreenLocale.drawerUpgradeSuggestion.getString(
-              context,
-            ),
-            route: AppRoute.home,
-          ),
-        ];
+        //   _MenuItem(
+        //     icon: LucideIcons.rocket,
+        //     label: DrawerScreenLocale.drawerUpgradeSuggestion.getString(
+        //       context,
+        //     ),
+        //     route: AppRoute.home,
+        //   ),
+        // ];
+
         return Drawer(
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           backgroundColor: bgColor,
@@ -221,7 +248,7 @@ class CustomerDrawer {
                     ),
                     children: [
                       // Nav items
-                      ...menuItems.map(
+                      ...getMenuList(user!.role).map(
                         (item) => _drawerItem(
                           context,
                           item: item,
@@ -342,6 +369,54 @@ class CustomerDrawer {
                           ],
                         ),
                       ),
+
+                      if (isLoggedIn) ...[
+                        const SizedBox(height: 10),
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 4),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? Colors.white.withOpacity(0.04)
+                                : Colors.black.withOpacity(0.03),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ListTile(
+                            dense: true,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            leading: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: kRed.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                LucideIcons.logOut,
+                                color: kRed,
+                                size: 16,
+                              ),
+                            ),
+                            title: Text(
+                              DrawerScreenLocale.drawerLogout.getString(
+                                context,
+                              ),
+                              style: TextStyle(
+                                fontSize: FontSizeConfig.body(context),
+                                color: textColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            onTap: () async {
+                              Navigator.pop(context);
+                              await logout(ref);
+                              if (context.mounted) {
+                                context.go(AppRoute.login);
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -398,7 +473,7 @@ class CustomerDrawer {
 
   Widget _drawerItem(
     BuildContext context, {
-    required _MenuItem item,
+    required MenuItem item,
     required bool isDark,
     required Color textColor,
     required Color dividerColor,
@@ -433,15 +508,4 @@ class CustomerDrawer {
       ),
     );
   }
-}
-
-class _MenuItem {
-  final IconData icon;
-  final String label;
-  final String route;
-  const _MenuItem({
-    required this.icon,
-    required this.label,
-    required this.route,
-  });
 }

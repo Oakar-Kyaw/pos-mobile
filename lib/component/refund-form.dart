@@ -123,9 +123,13 @@ class _RefundFormState extends ConsumerState<RefundForm> {
           }
         })
         .onError((error, stackTrace) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text("Error: $error")));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "${RefundLocale.refundValidationError.getString(context)}: $error",
+              ),
+            ),
+          );
         });
   }
 
@@ -156,7 +160,11 @@ class _RefundFormState extends ConsumerState<RefundForm> {
           /// Voucher Select
           Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 5),
-            child: _label(context, "Select Voucher", labelColor),
+            child: _label(
+              context,
+              RefundLocale.refundSelectVoucher.getString(context),
+              labelColor,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -170,7 +178,11 @@ class _RefundFormState extends ConsumerState<RefundForm> {
           /// Item Select
           Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 5),
-            child: _label(context, "Select Product Items", labelColor),
+            child: _label(
+              context,
+              RefundLocale.refundSelectItems.getString(context),
+              labelColor,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -193,14 +205,18 @@ class _RefundFormState extends ConsumerState<RefundForm> {
           /// Selected Items List
           Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 5),
-            child: _label(context, "Refund Items", labelColor),
+            child: _label(
+              context,
+              RefundLocale.refundItems.getString(context),
+              labelColor,
+            ),
           ),
 
           if (refundItems.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Text(
-                "No items selected for refund.",
+                RefundLocale.refundNoSelectedItems.getString(context),
                 style: TextStyle(color: subColor),
               ),
             )
@@ -226,7 +242,7 @@ class _RefundFormState extends ConsumerState<RefundForm> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text("Qty: "),
+                      Text('${RefundLocale.refundQty.getString(context)}: '),
                       const SizedBox(width: 6),
                       SizedBox(
                         width: 60,
@@ -260,9 +276,15 @@ class _RefundFormState extends ConsumerState<RefundForm> {
               onChanged: (value) => setState(() => refundType = value!),
               spacing: 5,
               items: [
-                ShadRadio(label: Text('Full'), value: 'FULL'),
+                ShadRadio(
+                  label: Text(RefundLocale.refundFull.getString(context)),
+                  value: 'FULL',
+                ),
                 SizedBox(height: 10),
-                ShadRadio(label: Text('Partial'), value: 'PARTIAL'),
+                ShadRadio(
+                  label: Text(RefundLocale.refundPartial.getString(context)),
+                  value: 'PARTIAL',
+                ),
               ],
             ),
           ),
@@ -300,7 +322,11 @@ class _RefundFormState extends ConsumerState<RefundForm> {
           /// Select Account Label
           Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 10),
-            child: _label(context, "Select Account", labelColor),
+            child: _label(
+              context,
+              RefundLocale.refundSelectAccount.getString(context),
+              labelColor,
+            ),
           ),
 
           /// ── Account Type ───────────────────
@@ -369,8 +395,9 @@ class _RefundFormState extends ConsumerState<RefundForm> {
                 child: CircularProgressIndicator(color: progressIndicatorColor),
               ),
             ),
-            error: (error, stackTrace) =>
-                Text("Error loading payment list: $error"),
+            error: (error, stackTrace) => Text(
+              "${RefundLocale.refundValidationError.getString(context)}: $error",
+            ),
           ),
 
           _gap(height: 10),
@@ -379,7 +406,7 @@ class _RefundFormState extends ConsumerState<RefundForm> {
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
               children: [
-                Text("Total Refund Amount"),
+                Text(RefundLocale.refundTotalAmount.getString(context)),
                 const Spacer(),
                 Text(
                   "\$${refundItems.fold(0.0, (sum, item) => sum + (item.price * item.quantity))}",
@@ -407,9 +434,9 @@ class _RefundFormState extends ConsumerState<RefundForm> {
                 child: ShadButton(
                   backgroundColor: Colors.transparent,
                   onPressed: _submit,
-                  child: const Text(
-                    "Create Refund",
-                    style: TextStyle(color: Colors.white),
+                  child: Text(
+                    RefundLocale.refundCreate.getString(context),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ),

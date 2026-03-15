@@ -12,10 +12,10 @@ class AttendanceList extends ConsumerStatefulWidget {
   const AttendanceList({super.key});
 
   @override
-  ConsumerState<AttendanceList> createState() => _AttendanceListState();
+  ConsumerState<AttendanceList> createState() => AttendanceListState();
 }
 
-class _AttendanceListState extends ConsumerState<AttendanceList> {
+class AttendanceListState extends ConsumerState<AttendanceList> {
   late final PagingController<int, Attendance> _pagingController;
   final int limit = 31;
 
@@ -30,6 +30,11 @@ class _AttendanceListState extends ConsumerState<AttendanceList> {
           .getAttendances(page: pageKey, limit: limit),
     );
     // ref.listenManual(provider, listener)
+  }
+
+  ///Expose a public method to refresh the list
+  void refresh() {
+    _pagingController.refresh();
   }
 
   @override
@@ -81,7 +86,7 @@ class _AttendanceListState extends ConsumerState<AttendanceList> {
                   child: AttendanceCard(
                     textColor: textColor,
                     subColor: subColor,
-                    pagingController: _pagingController,
+                    //pagingController: _pagingController,
                     attendance: attendance,
                   ),
                 );

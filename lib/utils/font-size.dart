@@ -5,7 +5,7 @@ class FontSizeConfig {
   static title(BuildContext context) {
     if (Responsive.isMobile(context)) {
       return 14.0;
-    } else if (Responsive.isTablet(context)) {
+    } else if (Responsive.isCardt(context)) {
       return 18.0;
     } else {
       return 20.0;
@@ -15,7 +15,7 @@ class FontSizeConfig {
   static body(BuildContext context) {
     if (Responsive.isMobile(context)) {
       return 12.0;
-    } else if (Responsive.isTablet(context)) {
+    } else if (Responsive.isCardt(context)) {
       return 14.0;
     } else {
       return 16.0;
@@ -25,7 +25,7 @@ class FontSizeConfig {
   static double iconSize(BuildContext context) {
     if (Responsive.isMobile(context)) {
       return 20;
-    } else if (Responsive.isTablet(context)) {
+    } else if (Responsive.isCardt(context)) {
       return 24;
     } else {
       return 28;

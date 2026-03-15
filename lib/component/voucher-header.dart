@@ -47,33 +47,68 @@ class HeaderSection extends StatelessWidget {
                   ],
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                voucher.voucherCode ?? '—',
-                style: TextStyle(
-                  fontSize: FontSizeConfig.title(context),
-                  fontWeight: FontWeight.w700,
-                  color: textColor,
-                ),
+              const SizedBox(height: 10),
+              VoucherCardDescription(
+                voucher: voucher,
+                textColor: textColor,
+                subColor: subColor,
               ),
               const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(Icons.calendar_today_rounded, size: 12, color: subColor),
-                  const SizedBox(width: 4),
-                  Text(
-                    DateFormat(
-                      'dd MMM yyyy EEEE',
-                    ).format(voucher.createdAt ?? DateTime.now()),
-                    style: TextStyle(
-                      fontSize: FontSizeConfig.body(context),
-                      color: subColor,
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class VoucherCardDescription extends StatelessWidget {
+  const VoucherCardDescription({
+    super.key,
+    required this.voucher,
+    required this.textColor,
+    required this.subColor,
+  });
+
+  final VoucherDetailModel voucher;
+  final Color textColor;
+  final Color subColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              voucher.voucherCode ?? '—',
+              style: TextStyle(
+                fontSize: FontSizeConfig.title(context),
+                fontWeight: FontWeight.w700,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                Icon(Icons.calendar_today_rounded, size: 12, color: subColor),
+                const SizedBox(width: 4),
+                Text(
+                  DateFormat(
+                    'dd MMM yyyy EEEE',
+                  ).format(voucher.createdAt ?? DateTime.now()),
+                  style: TextStyle(
+                    fontSize: FontSizeConfig.body(context),
+                    color: subColor,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
         _TotalAmount(voucher: voucher),
       ],
@@ -89,7 +124,6 @@ class _TotalAmount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
           VoucherScreenLocale.total.getString(context),

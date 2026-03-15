@@ -3,9 +3,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/component/accent-bar.dart';
 import 'package:pos/localization/attendance-local.dart';
-import 'package:pos/localization/employee-local.dart';
 import 'package:pos/models/attendance.dart';
-import 'package:pos/models/user.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/badge.dart';
 import 'package:pos/utils/font-size.dart';
@@ -17,13 +15,13 @@ class AttendanceCard extends StatelessWidget {
     required this.textColor,
     required this.subColor,
     required this.attendance,
-    required this.pagingController,
+    //required this.pagingController,
   });
 
   final Color textColor;
   final Color subColor;
   final Attendance attendance;
-  PagingController<int, Attendance> pagingController;
+  // final PagingController<int, Attendance> pagingController;
 
   @override
   Widget build(BuildContext context) {
@@ -134,6 +132,28 @@ class RowWidget extends StatelessWidget {
   }
 }
 
+Color getColorByAttendanceStatus(String status) {
+  switch (status) {
+    case "ABSENT":
+      return kRed;
+
+    case "PRESENT":
+      return kGreen;
+
+    case "HALF_DAY":
+      return Colors.orange;
+
+    case "LEAVE":
+      return Colors.blue;
+
+    case "HOLIDAY":
+      return kPrimary;
+
+    default:
+      return Colors.grey;
+  }
+}
+
 class AttendanceHeader extends StatelessWidget {
   AttendanceHeader({super.key, required this.attendance});
 
@@ -143,20 +163,32 @@ class AttendanceHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        BadgeWidget(icon: Icons.person, label: attendance.status, color: kRed),
+        BadgeWidget(
+          icon: Icons.person,
+          label: attendance.status,
+          color: getColorByAttendanceStatus(attendance.status),
+        ),
+        SizedBox(width: 8),
+        attendance.isLate
+            ? BadgeWidget(
+                icon: Icons.warning,
+                label: AttendanceLocaleScreenLocale.attendanceLate.getString(
+                  context,
+                ),
+                color: kPrimary,
+              )
+            : SizedBox(),
+        SizedBox(width: 8),
+        attendance.isEarlyLeave
+            ? BadgeWidget(
+                icon: Icons.exit_to_app,
+                label: AttendanceLocaleScreenLocale.attendanceEarlyLeave
+                    .getString(context),
+                color: kSurfaceDark,
+              )
+            : SizedBox(),
         SizedBox(width: 8),
       ],
     );
   }
 }
-
-// class SalaryWidget extends StatelessWidget {
-//   final String title;
-//   final String salary;
-//   SalaryWidget({required this.salary, required this.title});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(children: [Text(title), Spacer(), Text(salary)]);
-//   }
-// }

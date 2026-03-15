@@ -14,12 +14,14 @@ class GeneralExpenseAsyncNotifier extends AsyncNotifier<List<GeneralExpense>> {
   Future<List<GeneralExpense>> fetchExpenses({
     int page = 1,
     int limit = 10,
+    int? userId,
     DateTime? startDate,
     DateTime? endDate,
   }) async {
     final query = <String, dynamic>{
       'page': page,
       'limit': limit,
+      if (userId != null) 'filterUserId': userId,
       if (startDate != null) 'startDate': startDate.toIso8601String(),
       if (endDate != null) 'endDate': endDate.toIso8601String(),
     };

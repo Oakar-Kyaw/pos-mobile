@@ -24,11 +24,16 @@ mixin PaymentScreenLocale {
   static const deliveryFee = 'delivery_fee';
   static const cancel = 'cancel_payment';
 
-  // ✅ NEW PHOTO KEYS
+  // Photo
   static const paymentPhoto = 'payment_photo';
   static const uploadPhoto = 'upload_photo';
   static const viewPhoto = 'view_photo';
   static const removePhoto = 'remove_photo';
+
+  // Delete
+  static const deletePaymentAccountConfirm = 'delete_payment_account_confirm';
+  static const deletePaymentSuccess = 'delete_payment_success';
+  static const deletePaymentFailed = 'delete_payment_failed';
 
   // ===== English =====
   static const EN = {
@@ -60,6 +65,10 @@ mixin PaymentScreenLocale {
     uploadPhoto: 'Upload Photo',
     viewPhoto: 'View Photo',
     removePhoto: 'Remove Photo',
+
+    deletePaymentAccountConfirm: 'Do you want to delete this payment account?',
+    deletePaymentSuccess: 'Payment account deleted successfully.',
+    deletePaymentFailed: 'Failed to delete payment account.',
   };
 
   // ===== Burmese =====
@@ -92,5 +101,9 @@ mixin PaymentScreenLocale {
     uploadPhoto: 'ဓာတ်ပုံ တင်ရန်',
     viewPhoto: 'ဓာတ်ပုံ ကြည့်ရန်',
     removePhoto: 'ဓာတ်ပုံ ဖယ်ရှားရန်',
+
+    deletePaymentAccountConfirm: 'ဤငွေပေးချေမှု အကောင့်ကို ဖျက်လိုပါသလား?',
+    deletePaymentSuccess: 'ငွေပေးချေမှု အကောင့်ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။',
+    deletePaymentFailed: 'ငွေပေးချေမှု အကောင့် ဖျက်ရာတွင် မအောင်မြင်ပါ။',
   };
 }

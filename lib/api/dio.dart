@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pos/localization/error-local.dart';
 import 'package:pos/localization/login-local.dart';
 import 'package:pos/utils/secure-storage.dart';
+import 'package:pos/utils/time-util.dart';
 
 class DioService {
   static final DioService _instance = DioService._internal();
@@ -26,12 +27,15 @@ class DioService {
         onRequest: (options, handler) async {
           final secureStorage = SecureStorage();
           final tokens = await secureStorage.getAcessAndRefreshToken();
+          final timezone = await TimezoneUtil.getTimezone();
 
           final accessToken = tokens?['accessToken'];
 
           if (accessToken != null && accessToken.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $accessToken';
           }
+
+          options.headers["x-timezone"] = timezone;
           //print("access token $accessToken");
           return handler.next(options);
         },
@@ -40,6 +44,7 @@ class DioService {
         },
         onError: (DioException e, handler) {
           final errorMessage = _handleError(e);
+          // print("Error message is $e");
           return handler.reject(
             DioException(
               requestOptions: e.requestOptions,
@@ -57,7 +62,7 @@ class DioService {
   // ================= ERROR HANDLER =================
 
   _handleError(DioException e) {
-    print("Exception is: ${e.response}");
+    print("Exception is: ${e}");
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
         return Exception("Connection timeout. Please try again.");
@@ -86,6 +91,8 @@ class DioService {
           return LoginScreenLocale.emailNotFound;
         } else if (statusCode == 500) {
           return "Internal server error.";
+        } else if (statusCode == 409) {
+          return "Data already Exists";
         } else {
           return "Something went wrong.";
         }

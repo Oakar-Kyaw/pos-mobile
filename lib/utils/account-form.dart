@@ -161,6 +161,7 @@ class _AccountFormState extends ConsumerState<AccountForm> {
     Widget placeholder(String text) =>
         Text(text, style: TextStyle(fontSize: FontSizeConfig.body(context)));
 
+    //  print("exist data is: ${widget.existedData?.accountType}");
     return ShadForm(
       key: _formKey,
       child: Column(
@@ -202,13 +203,20 @@ class _AccountFormState extends ConsumerState<AccountForm> {
 
           /// ── Account Type ───────────────────
           ShadSelect<String>(
+            initialValue: widget.existedData != null
+                ? paymentMethodCollections[widget.existedData!.accountType]
+                : null,
             minWidth: double.infinity,
             placeholder: Text(
               PaymentDataLocale.type.getString(context),
               style: TextStyle(color: subColor),
             ),
             selectedOptionBuilder: (context, value) =>
-                Text(paymentMethodCollections[value]!),
+                widget.existedData != null
+                ? Text(
+                    paymentMethodCollections[widget.existedData!.accountType]!,
+                  )
+                : Text(paymentMethodCollections[value]!),
             onChanged: (value) {
               if (value == null) return;
               setState(() => accountType = value);

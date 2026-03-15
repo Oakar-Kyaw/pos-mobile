@@ -2,7 +2,7 @@ mixin DebtLocaleScreenLocale {
   static const debtTitle = 'debt_title';
   static const debtDescription = 'debt_description';
   static const debtAdd = 'debt_add';
-  static const debtTable = 'debt_table';
+  static const debtCard = 'debt_card';
   static const debtCustomer = 'debt_customer';
   static const debtAmount = 'debt_amount';
   static const debtRemaining = 'debt_remaining';
@@ -20,7 +20,7 @@ mixin DebtLocaleScreenLocale {
     debtTitle: 'Debt Vouchers',
     debtDescription: 'Manage customer debt vouchers.',
     debtAdd: 'Add Debt Voucher',
-    debtTable: 'Debt Voucher Lists',
+    debtCard: 'Debt Voucher Lists',
     debtCustomer: 'Customer',
     debtAmount: 'Total Amount',
     debtRemaining: 'Remaining Amount',
@@ -39,7 +39,7 @@ mixin DebtLocaleScreenLocale {
     debtTitle: 'ကြွေးမြီ ဘောက်ချာများ',
     debtDescription: 'ဖောက်သည်ကြွေးမြီ ဘောက်ချာများကို စီမံခန့်ခွဲနိုင်ပါသည်။',
     debtAdd: 'ကြွေးမြီ ဘောက်ချာ ထည့်ရန်',
-    debtTable: 'ကြွေးမြီ ဘောက်ချာ စာရင်းများ',
+    debtCard: 'ကြွေးမြီ ဘောက်ချာ စာရင်းများ',
     debtCustomer: 'ဖောက်သည်',
     debtAmount: 'စုစုပေါင်း ငွေပမာဏ',
     debtRemaining: 'ကျန်ရှိငွေ',

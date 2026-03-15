@@ -11,20 +11,25 @@ import 'package:pos/src/debt-voucher.dart';
 import 'package:pos/src/employee.dart';
 import 'package:pos/src/expire-item-list.dart';
 import 'package:pos/src/general-expense.dart';
+import 'package:pos/src/general-expense-create.dart';
 import 'package:pos/src/home.dart';
+import 'package:pos/src/hr-rule.dart';
 import 'package:pos/src/income.dart';
 import 'package:pos/src/inventory-items.dart';
 import 'package:pos/src/login.dart';
+import 'package:pos/src/payroll-create.dart';
+import 'package:pos/src/payroll-payslip.dart';
 import 'package:pos/src/product.dart';
 import 'package:pos/src/receipt.dart';
 import 'package:pos/src/refund.dart';
+import 'package:pos/src/refund-create.dart';
 import 'package:pos/src/repay.dart';
 import 'package:pos/src/request-item.dart';
+import 'package:pos/src/payroll-salary.dart';
 import 'package:pos/src/sale-report.dart';
 import 'package:pos/src/setting.dart';
 import 'package:pos/src/voucher.dart';
 import 'package:pos/ui/employee-create.dart';
-import 'package:pos/ui/employee-form.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -74,6 +79,11 @@ final routeProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => Setting(),
       ),
       GoRoute(
+        path: AppRoute.profile,
+        name: AppRoute.profile,
+        builder: (context, state) => Setting(),
+      ),
+      GoRoute(
         path: AppRoute.category,
         name: AppRoute.category,
         builder: (context, state) => const CategoryPage(),
@@ -104,7 +114,7 @@ final routeProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoute.vouchers,
         name: AppRoute.vouchers,
-        builder: (context, state) => VoucherTablePage(),
+        builder: (context, state) => VoucherCardPage(),
       ),
       GoRoute(
         path: AppRoute.income,
@@ -127,9 +137,19 @@ final routeProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => GeneralExpensePage(),
       ),
       GoRoute(
+        path: AppRoute.generalExpenseCreate,
+        name: AppRoute.generalExpenseCreate,
+        builder: (context, state) => const GeneralExpenseCreatePage(),
+      ),
+      GoRoute(
         path: AppRoute.refund,
         name: AppRoute.refund,
         builder: (context, state) => const RefundPage(),
+      ),
+      GoRoute(
+        path: AppRoute.refundCreate,
+        name: AppRoute.refundCreate,
+        builder: (context, state) => const RefundCreatePage(),
       ),
       GoRoute(
         path: AppRoute.debt,
@@ -174,6 +194,30 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.attendance,
         name: AppRoute.attendance,
         builder: (context, state) => AttendancePage(),
+      ),
+      GoRoute(
+        path: AppRoute.payroll,
+        name: AppRoute.payroll,
+        builder: (context, state) => PayrollSalaryPage(),
+      ),
+      GoRoute(
+        path: AppRoute.payrollCreate,
+        name: AppRoute.payrollCreate,
+        builder: (context, state) => PayrollCreatePage(),
+      ),
+
+      GoRoute(
+        path: '${AppRoute.payrollPayslip}/:id',
+        name: AppRoute.payrollPayslip,
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return PayrollPayslipPage(id: id);
+        },
+      ),
+      GoRoute(
+        path: AppRoute.hrRule,
+        name: AppRoute.hrRule,
+        builder: (context, state) => HrRulePage(),
       ),
       GoRoute(
         path: AppRoute.login,

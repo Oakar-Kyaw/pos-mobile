@@ -27,7 +27,7 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
           state.lastPageIsEmpty ? null : state.nextIntPageKey,
       fetchPage: (pageKey) => ref
           .read(voucherProvider.notifier)
-          .getVouchersByUserId(page: pageKey, limit: limit, existDebt: true),
+          .getVouchers(page: pageKey, limit: limit, existDebt: true),
     );
   }
 

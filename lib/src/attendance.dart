@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/attendance.api.dart';
 import 'package:pos/component/app-bar.dart';
+import 'package:pos/component/loading-component.dart';
 import 'package:pos/localization/attendance-local.dart';
 import 'package:pos/localization/drawer-local.dart';
+import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/ui/attendance-list.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
+import 'package:pos/utils/check-role.dart';
 import 'package:pos/utils/description-widget.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/route-constant.dart';
@@ -23,8 +26,8 @@ class AttendancePage extends ConsumerStatefulWidget {
 }
 
 class _AttendancePageState extends ConsumerState<AttendancePage> {
-  bool isCheckIn = true;
-  Future<void> submitAttendance() async {
+  final _attendanceListKey = GlobalKey<AttendanceListState>();
+  Future<void> submitCheckIn() async {
     final date = DateTime.now();
 
     await ref
@@ -45,9 +48,43 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
                 style: TextStyle(fontSize: FontSizeConfig.title(context)),
               ),
             );
-            setState(() {
-              isCheckIn = false;
-            });
+            _attendanceListKey.currentState?.refresh();
+            ref.invalidate(todayAttendanceProvider);
+          } else {
+            ShowToast(
+              context,
+              description: Text(
+                AttendanceLocaleScreenLocale.attendanceFail.getString(context),
+                style: TextStyle(fontSize: FontSizeConfig.title(context)),
+              ),
+            );
+          }
+        });
+  }
+
+  Future<void> submitCheckOut() async {
+    final date = DateTime.now();
+
+    await ref
+        .read(attendanceProvider.notifier)
+        .createCheckOut(
+          date: date,
+          checkOut:
+              "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}",
+        )
+        .then((v) {
+          if (v["success"]) {
+            ShowToast(
+              context,
+              description: Text(
+                AttendanceLocaleScreenLocale.attendanceSuccess.getString(
+                  context,
+                ),
+                style: TextStyle(fontSize: FontSizeConfig.title(context)),
+              ),
+            );
+            _attendanceListKey.currentState?.refresh();
+            ref.invalidate(todayAttendanceProvider);
           } else {
             ShowToast(
               context,
@@ -65,7 +102,8 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
-
+    final todayAttendance = ref.watch(todayAttendanceProvider);
+    final user = ref.watch(userStateProvider);
     return Scaffold(
       backgroundColor: bgColor,
       appBar: CustomAppBar(
@@ -80,38 +118,72 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DescriptionWidget(
-              isDark: isDark,
-              description: AttendanceLocaleScreenLocale.attendanceDescription
-                  .getString(context),
-              icon: LucideIcons.clock,
-              subColor: subColor,
-            ),
+            if (isAdmin(user!.role) || isManager(user.role)) ...[
+              DescriptionWidget(
+                isDark: isDark,
+                description: AttendanceLocaleScreenLocale.attendanceDescription
+                    .getString(context),
+                icon: LucideIcons.clock,
+                subColor: subColor,
+              ),
+
+              const SizedBox(height: 20),
+
+              GradientSubmitButton(
+                onPressed: () => context.pushNamed(AppRoute.attendanceCreate),
+                text: DrawerScreenLocale.drawerCreate.getString(context),
+                width: 120,
+              ),
+            ],
 
             const SizedBox(height: 20),
 
-            GradientSubmitButton(
-              onPressed: () => context.pushNamed(AppRoute.attendanceCreate),
-              text: DrawerScreenLocale.drawerCreate.getString(context),
-              width: 120,
-            ),
+            todayAttendance.when(
+              data: (attendance) {
+                String buttonText;
+                bool isButtonEnabled = true;
+                VoidCallback? onPressed;
 
-            const SizedBox(height: 20),
-            isCheckIn
-                ? GradientSubmitButton(
-                    onPressed: submitAttendance,
-                    text: AttendanceLocaleScreenLocale.attendanceCheckIn
-                        .getString(context),
-                    width: 120,
-                  )
-                : GradientSubmitButton(
-                    onPressed: submitAttendance,
-                    text: AttendanceLocaleScreenLocale.attendanceCheckOut
-                        .getString(context),
-                    width: 150,
-                  ),
+                if (attendance == null) {
+                  // Case 1: no attendance → Check In
+                  buttonText = AttendanceLocaleScreenLocale.attendanceCheckIn
+                      .getString(context);
+                  onPressed = submitCheckIn; // pass the function, don't call it
+                } else if (attendance.checkIn != null &&
+                    attendance.checkOut == null) {
+                  // Case 2: checked in, not checked out → Check Out
+                  buttonText = AttendanceLocaleScreenLocale.attendanceCheckOut
+                      .getString(context);
+                  onPressed = submitCheckOut; // same function handles check-out
+                } else {
+                  // Case 3: already checked out → disable button
+                  buttonText = AttendanceLocaleScreenLocale.attendanceCompleted
+                      .getString(context);
+                  isButtonEnabled = false;
+                  onPressed = () {}; // disables the button
+                }
+
+                return isButtonEnabled
+                    ? GradientSubmitButton(
+                        onPressed: onPressed,
+                        text: buttonText,
+                        width: 150,
+                      )
+                    : GradientSubmitButton(
+                        onPressed: onPressed,
+                        text: buttonText,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        width: 150,
+                      );
+              },
+              loading: () => LoadingWidget(),
+              error: (err, __) => Text(err.toString()),
+            ),
             SizedBox(height: 20),
-            const Expanded(child: AttendanceList()),
+            Expanded(child: AttendanceList(key: _attendanceListKey)),
           ],
         ),
       ),

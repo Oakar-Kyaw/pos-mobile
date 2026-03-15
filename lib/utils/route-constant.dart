@@ -12,8 +12,10 @@ class AppRoute {
   static const String vouchers = "/vouchers";
   static const String saleReports = "/sale-reports";
   static const String generalExpense = "/general-expenses";
+  static const String generalExpenseCreate = "/general-expenses/create";
   static const String account = "/bank-account";
   static const String refund = "/refund";
+  static const String refundCreate = "/refund/create";
   static const String debt = "/debt";
   static const String repay = "/repay";
   static const String expireItem = "/expire-items";
@@ -25,4 +27,8 @@ class AppRoute {
   static const String employeeCreate = '/employee-create';
   static const String attendance = '/attendance';
   static const String attendanceCreate = '/attendance-create';
+  static const String payroll = '/payroll';
+  static const String payrollCreate = '/payroll-create';
+  static const String payrollPayslip = '/payroll-payslip';
+  static const String hrRule = '/hr-rule';
 }

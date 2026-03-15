@@ -11,6 +11,7 @@ mixin VoucherScreenLocale {
   static const price = 'voucher_price';
   static const addItem = 'voucher_add_item';
   static const createdSuccess = 'voucher_created_success';
+  static const deletedSuccess = 'voucher_deleted_success';
   static const receipt = 'voucher_receipt';
   static const printReceipt = 'voucher_print_receipt';
   static const thankYouMessage = 'voucher_thank_you_message';
@@ -28,6 +29,7 @@ mixin VoucherScreenLocale {
   static const voucher = 'voucher';
   static const hasDebt = 'has_debt';
   static const repay = 'repayment';
+  static const deleteVoucher = 'delete_voucher';
 
   // ===== English =====
   static const EN = {
@@ -43,6 +45,7 @@ mixin VoucherScreenLocale {
     price: 'Price',
     addItem: 'Add New Item',
     createdSuccess: 'Voucher created successfully',
+    deletedSuccess: 'Voucher deleted successfully',
     receipt: 'Receipt',
     printReceipt: 'Print Receipt',
     item: 'Item',
@@ -54,14 +57,14 @@ mixin VoucherScreenLocale {
     date: 'Date',
     searchVoucherPlaceholder: 'Search by voucher code or its date',
 
-    // ✅ Added
     existDebt: 'Remaining Debt',
     isRefund: 'Refund Voucher',
     trueKeyboard: 'true',
     falseKeyboard: 'false',
     hasDebt: 'HAS DEBT',
 
-    // Marketing Style Message
+    deleteVoucher: 'Do you want to delete this voucher?',
+
     thankYouMessage:
         'Thank you for shopping with us ❤️\nWe truly appreciate your support!\nWe look forward to serving you again. Shop more & save more!',
   };
@@ -80,6 +83,7 @@ mixin VoucherScreenLocale {
     price: 'စျေးနှုန်း',
     addItem: 'ပစ္စည်း အသစ် ထည့်မည်',
     createdSuccess: 'ဘောက်ချာကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
+    deletedSuccess: 'ဘောက်ချာကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
     receipt: 'ပြေစာ',
     printReceipt: 'ပြေစာ ထုတ်မည်',
     item: 'ပစ္စည်း',
@@ -91,14 +95,14 @@ mixin VoucherScreenLocale {
     date: 'ရက်စွဲ',
     searchVoucherPlaceholder: 'ဘောက်ချာကုဒ် သို့မဟုတ် ရက်စွဲ ဖြင့် ရှာဖွေပါ',
 
-    // ✅ Added
     existDebt: 'ပေးချေရန် ငွေရှိသည်',
     isRefund: 'ပြန်လည်ငွေပေးချေ ဘောက်ချာ',
     trueKeyboard: 'ရှိ',
     falseKeyboard: 'မရှိ',
     hasDebt: 'ကြွေးမြီ ရှိ',
 
-    // Marketing Style Message
+    deleteVoucher: 'ဤဘောက်ချာကို ဖျက်လိုပါသလား?',
+
     thankYouMessage:
         'ဝယ်ယူအားပေးမှုအတွက် ကျေးဇူးအထူးတင်ရှိပါသည် ❤️\nသင့်ရဲ့ အားပေးမှုကို တန်ဖိုးထားပါသည်။\nနောက်တစ်ကြိမ် ထပ်မံ ဝယ်ယူအားပေးရန် မျှော်လင့်ပါသည် !',
   };

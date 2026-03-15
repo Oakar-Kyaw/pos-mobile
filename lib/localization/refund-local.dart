@@ -1,5 +1,3 @@
-import 'dart:math';
-
 mixin RefundLocale {
   static const String refund = "refund";
   static const refundDescription = 'refund_description';
@@ -19,6 +17,16 @@ mixin RefundLocale {
   static const refundNoItems = 'refund_no_items';
   static const refundAmountPlaceholder = 'refund_amount_placeholder';
   static const refundReasonPlaceholder = 'refund_reason_placeholder';
+  static const refundSelectVoucher = 'refund_select_voucher';
+  static const refundSelectItems = 'refund_select_items';
+  static const refundItems = 'refund_items';
+  static const refundNoSelectedItems = 'refund_no_selected_items';
+  static const refundQty = 'refund_qty';
+  static const refundFull = 'refund_full';
+  static const refundPartial = 'refund_partial';
+  static const refundSelectAccount = 'refund_select_account';
+  static const refundTotalAmount = 'refund_total_amount';
+  static const refundCreate = 'refund_create';
 
   // 🔥 NEW — Refund Method & Voucher
   static const refundMethod = 'refund_method';
@@ -27,12 +35,12 @@ mixin RefundLocale {
   static const refundStoreCredit = 'refund_store_credit';
   static const refundVoucher = 'refund_voucher';
   static const refundVoucherCreated = 'refund_voucher_created';
-  static const refundTable = 'refund_table';
+  static const refundCard = 'refund_card';
 
   /// English translations
   static const EN = {
     refund: 'Refund',
-    refundTable: 'Refund Table',
+    refundCard: 'Refund Card',
     refundDescription: 'POS',
     refundNo: 'No',
     refundAmountPlaceholder: 'Enter refund amount',
@@ -50,6 +58,16 @@ mixin RefundLocale {
     refundAmountValidator: 'Invalid amount',
     refundNoItems: 'No items found',
     refundReasonPlaceholder: 'Enter reason for refund',
+    refundSelectVoucher: 'Select Voucher',
+    refundSelectItems: 'Select Product Items',
+    refundItems: 'Refund Items',
+    refundNoSelectedItems: 'No items selected for refund.',
+    refundQty: 'Qty',
+    refundFull: 'Full',
+    refundPartial: 'Partial',
+    refundSelectAccount: 'Select Account',
+    refundTotalAmount: 'Total Refund Amount',
+    refundCreate: 'Create Refund',
     // 🔥 NEW
     refundMethod: 'Refund Method',
     refundCash: 'Cash Refund',
@@ -62,7 +80,7 @@ mixin RefundLocale {
   /// Burmese translations
   static const MM = {
     refund: 'ပြန်အမ်းပေးမှု',
-    refundTable: 'ပြန်အမ်းပေးမှု ဇယား',
+    refundCard: 'ပြန်အမ်းပေးမှု ဇယား',
     refundAmountPlaceholder: 'ပြန်အမ်းပေးမှု ငွေပမာဏ ထည့်ပါ',
     refundDescription: 'အရောင်း ဆော့ဖ်ဝဲ',
     refundNo: 'စဉ်',
@@ -73,6 +91,16 @@ mixin RefundLocale {
     refundPaymentMethod: 'ငွေပေးချေမှုနည်းလမ်း',
     refundButton: 'ပြန်အမ်းပေးမည်',
     refundReasonPlaceholder: 'ပြန်အမ်းပေးမှု အကြောင်းရင်း ထည့်ပါ',
+    refundSelectVoucher: 'ဘောက်ချာရွေးရန်',
+    refundSelectItems: 'ပစ္စည်းရွေးရန်',
+    refundItems: 'ပြန်အမ်းပေးမည့် ပစ္စည်းများ',
+    refundNoSelectedItems: 'ပြန်အမ်းပေးမည့် ပစ္စည်းမရှိပါ',
+    refundQty: 'အရေအတွက်',
+    refundFull: 'ပြည့်',
+    refundPartial: 'အပိုင်း',
+    refundSelectAccount: 'အကောင့်ရွေးရန်',
+    refundTotalAmount: 'စုစုပေါင်း ပြန်အမ်းပေးငွေ',
+    refundCreate: 'ပြန်အမ်းပေးမည်',
     refundSaveSuccess: 'ပြန်အမ်းပေးမှုကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ',
     refundSaveFailed: 'ပြန်အမ်းပေးမှု သိမ်းဆည်းမှု မအောင်မြင်ပါ',
     refundForm: 'ပြန်အမ်းပေးမှု ဖောင်',

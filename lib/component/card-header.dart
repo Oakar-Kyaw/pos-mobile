@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos/utils/font-size.dart';
 
-Widget buildTableHeader(
+Widget buildCardHeader(
   String text,
   BuildContext context,
   Color textColor, {

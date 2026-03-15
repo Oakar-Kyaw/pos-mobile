@@ -36,6 +36,33 @@ class CategoryAsyncNotifier extends AsyncNotifier<List<Category>> {
 
     throw Exception("Failed to post");
   }
+
+  Future<bool> updateCategory({
+    required int id,
+    required Map<String, dynamic> json,
+  }) async {
+    final url = "v1/category/$id";
+    final response = await _dio.patch(url, data: json);
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      return true;
+    }
+
+    throw Exception("Failed to update category");
+  }
+
+  Future<bool> deleteCategory(int id) async {
+    final url = "v1/category/$id";
+    final response = await _dio.delete(url);
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      return true;
+    }
+
+    throw Exception("Failed to delete category");
+  }
 }
 
 final categoryProvider = AsyncNotifierProvider(CategoryAsyncNotifier.new);

@@ -10,15 +10,19 @@ import 'package:pos/api/payment-data.api.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/localization/home-local.dart';
+import 'package:pos/models/company.dart';
 import 'package:pos/models/product.dart';
 import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/riverpod/payment-list.dart';
 import 'package:pos/riverpod/voucher-detail.dart';
+import 'package:pos/riverpod/login-check.dart';
+import 'package:pos/riverpod/company.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/drawer.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
+import 'package:pos/utils/secure-storage.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
@@ -31,6 +35,7 @@ class MyHomePage extends ConsumerStatefulWidget {
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
   final String limit = "20";
+  final secureStorage = SecureStorage();
 
   late final PagingController<int, Product> _pagingController =
       PagingController<int, Product>(
@@ -70,14 +75,17 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
-
-    ref.watch(paymentDataProvider);
+    final company = ref.watch(companyStateProvider);
+    //print("comapny ${company!.photoUrl}");
+    // ref.watch(paymentDataProvider);
 
     return Scaffold(
       backgroundColor: bgColor,
-      drawer: CustomerDrawer().buildDrawer(context),
+      drawer: CustomerDrawer(
+        isLoggedIn: ref.watch(checkLoginProvider),
+      ).buildDrawer(context),
       appBar: CustomAppBar(
-        title: HomeScreenLocale.homeTitle.getString(context),
+        title: company?.name ?? HomeScreenLocale.homeTitle.getString(context),
       ),
       body: Stack(
         children: [
@@ -93,8 +101,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                   right: 8,
                 ),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: Responsive.isTablet(context) ? 6 : 4,
-                  mainAxisExtent: Responsive.isTablet(context) ? 150 : 120,
+                  crossAxisCount: Responsive.isCardt(context) ? 6 : 4,
+                  mainAxisExtent: Responsive.isCardt(context) ? 150 : 120,
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
                 ),

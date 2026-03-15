@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos/utils/app-theme.dart';
 
-Widget buildTableCell(
+Widget buildCardCell(
   String text,
   Color textColor, {
   bool alignRight = false,

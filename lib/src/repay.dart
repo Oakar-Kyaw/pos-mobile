@@ -32,7 +32,7 @@ class _RepaymentHistoryPageState extends ConsumerState<RepaymentHistoryPage> {
           onPressed: () => context.pop(),
           icon: const Icon(LucideIcons.arrowLeft),
         ),
-        title: RepayLocaleScreen.repayHistoryTable.getString(context),
+        title: RepayLocaleScreen.repayHistoryCard.getString(context),
       ),
       body: Padding(
         padding: const EdgeInsets.all(5),
@@ -78,7 +78,7 @@ class _RepaymentHistoryPageState extends ConsumerState<RepaymentHistoryPage> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      RepayLocaleScreen.repayHistoryTable.getString(context),
+                      RepayLocaleScreen.repayHistoryCard.getString(context),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),

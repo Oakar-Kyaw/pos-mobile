@@ -3,15 +3,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pos/component/app-bar.dart';
-import 'package:pos/localization/app-local.dart';
-import 'package:pos/localization/home-local.dart';
 import 'package:pos/localization/localization.dart';
+import 'package:pos/models/user.dart';
 import 'package:pos/riverpod/login-check.dart';
+import 'package:pos/riverpod/company.riverpod.dart';
+import 'package:pos/models/company.dart';
+import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/drawer.dart';
-import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/go-router.dart';
+import 'package:pos/utils/local-user.dart';
 import 'package:pos/utils/secure-storage.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -21,7 +21,10 @@ void main() async {
   initLocalization();
   await dotenv.load(fileName: ".env");
   //Pre-load font so it's ready before any theme build
-  await GoogleFonts.pendingFonts([GoogleFonts.merriweather()]);
+  await GoogleFonts.pendingFonts([
+    GoogleFonts.merriweather(),
+    //GoogleFonts.notoSansMyanmar(),
+  ]);
   runApp(ProviderScope(child: const MyApp()));
 }
 
@@ -32,7 +35,8 @@ class MyApp extends ConsumerStatefulWidget {
   ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-final _merriweather = GoogleFonts.merriweather().fontFamily;
+final _fontFamily = GoogleFonts.merriweather().fontFamily;
+//final _fontFamily = GoogleFonts.notoSansMyanmar().fontFamily;
 
 class _MyAppState extends ConsumerState<MyApp> {
   final _secureStorage = SecureStorage();
@@ -63,6 +67,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     if (isLogin) {
       ref.read(checkLoginProvider.notifier).login();
+      await addToUserLocalStateWidget(ref);
     } else {
       ref.read(checkLoginProvider.notifier).logout();
     }
@@ -93,12 +98,12 @@ class _MyAppState extends ConsumerState<MyApp> {
             scaffoldBackgroundColor: kBgLight,
             textTheme: Theme.of(
               context,
-            ).textTheme.apply(fontFamily: _merriweather),
+            ).textTheme.apply(fontFamily: _fontFamily),
           ),
           darkTheme: ThemeData.dark().copyWith(
             scaffoldBackgroundColor: kBgDark, // 👈 add this
             textTheme: ThemeData.dark().textTheme.apply(
-              fontFamily: _merriweather,
+              fontFamily: _fontFamily,
             ),
           ),
           themeMode: themeMode,

@@ -81,15 +81,34 @@ class SecureStorage {
     // Convert map to JSON string
     String jsonString = jsonEncode(data);
     //print("save login data: $jsonString");
-    await storage.write(key: "user", value: jsonString);
+    await storage.write(key: "userId", value: jsonString);
   }
 
   getLoginData() async {
+    String? jsonString = await storage.read(key: "userId");
+    // print("getLogin data is: $jsonString");
+    if (jsonString != null) {
+      final Map<String, dynamic> map = jsonDecode(jsonString);
+      return map;
+      // return User.fromJson(map);
+    }
+    return null;
+  }
+
+  Future<void> saveUser(data) async {
+    // Convert map to JSON string
+    String jsonString = jsonEncode(data);
+    //print("save login data: $jsonString");
+    await storage.write(key: "user", value: jsonString);
+  }
+
+  getUser() async {
     String? jsonString = await storage.read(key: "user");
     // print("getLogin data is: $jsonString");
     if (jsonString != null) {
       final Map<String, dynamic> map = jsonDecode(jsonString);
       // return User.fromJson(map);
+      return map;
     }
     return null;
   }
