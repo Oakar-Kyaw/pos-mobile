@@ -16,6 +16,8 @@ class AttendanceAsyncNotifier extends AsyncNotifier<List<Attendance>> {
     required int limit,
     String? search,
     DateTime? date,
+    DateTime? startDate,
+    DateTime? endDate,
     int? filterUserId,
   }) async {
     final url = "v1/attendances";
@@ -26,6 +28,8 @@ class AttendanceAsyncNotifier extends AsyncNotifier<List<Attendance>> {
       "limit": limit,
       if (search != null && search.isNotEmpty) "search": search,
       if (date != null) "date": date.toIso8601String(),
+      if (startDate != null) "startDate": startDate.toIso8601String(),
+      if (endDate != null) "endDate": endDate.toIso8601String(),
       if (filterUserId != null) "filterUserId": filterUserId,
     };
 
@@ -77,6 +81,20 @@ class AttendanceAsyncNotifier extends AsyncNotifier<List<Attendance>> {
     }
 
     throw Exception("Failed to fetch attendance");
+  }
+
+  /// -------- DELETE ATTENDANCE --------
+  Future<bool> deleteAttendance(int id) async {
+    final url = "v1/attendances/$id";
+
+    final response = await _dio.delete(url);
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      return true;
+    }
+
+    throw Exception(data["message"] ?? "Failed to delete attendance");
   }
 
   /// -------- GET ATTENDANCE BY ID --------
@@ -210,18 +228,6 @@ class AttendanceAsyncNotifier extends AsyncNotifier<List<Attendance>> {
 
     if (data["success"] != true) {
       throw Exception("Failed to update attendance");
-    }
-  }
-
-  /// -------- DELETE ATTENDANCE --------
-  Future<void> deleteAttendance(int id) async {
-    final url = "v1/attendances/$id";
-
-    final response = await _dio.delete(url);
-    final Map<String, dynamic> data = response.data;
-
-    if (data["success"] != true) {
-      throw Exception("Failed to delete attendance");
     }
   }
 

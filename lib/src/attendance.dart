@@ -4,9 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/attendance.api.dart';
 import 'package:pos/component/app-bar.dart';
+import 'package:pos/component/date-select.dart';
 import 'package:pos/component/loading-component.dart';
+import 'package:pos/component/user-select.dart';
 import 'package:pos/localization/attendance-local.dart';
 import 'package:pos/localization/drawer-local.dart';
+import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/ui/attendance-list.dart';
 import 'package:pos/utils/app-theme.dart';
@@ -27,6 +30,17 @@ class AttendancePage extends ConsumerStatefulWidget {
 
 class _AttendancePageState extends ConsumerState<AttendancePage> {
   final _attendanceListKey = GlobalKey<AttendanceListState>();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _clearSelectedData();
+  }
+
+  void _clearSelectedData() {
+    ref.read(selectedDataStateProvider.notifier).clear();
+  }
+
   Future<void> submitCheckIn() async {
     final date = DateTime.now();
 
@@ -101,9 +115,11 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
+    final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
     final todayAttendance = ref.watch(todayAttendanceProvider);
     final user = ref.watch(userStateProvider);
+    final selectedData = ref.watch(selectedDataStateProvider);
     return Scaffold(
       backgroundColor: bgColor,
       appBar: CustomAppBar(
@@ -182,11 +198,65 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
               loading: () => LoadingWidget(),
               error: (err, __) => Text(err.toString()),
             ),
-            SizedBox(height: 20),
-            Expanded(child: AttendanceList(key: _attendanceListKey)),
+            const SizedBox(height: 20),
+            AttendanceLabel(textColor: textColor),
+            if (isAdmin(user.role) || isManager(user.role))
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: DateSelect(),
+              ),
+            Expanded(
+              child: AttendanceList(
+                key: _attendanceListKey,
+                userId: selectedData?.userId,
+                startDate: selectedData?.startDate,
+                endDate: selectedData?.endDate,
+              ),
+            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class AttendanceLabel extends ConsumerWidget {
+  const AttendanceLabel({super.key, required this.textColor});
+
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userStateProvider);
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 18,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [kPrimary, kSecondary],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          AttendanceLocaleScreenLocale.attendanceTitle.getString(context),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: textColor,
+            letterSpacing: -0.2,
+          ),
+        ),
+        if (user != null && (isAdmin(user.role) || isManager(user.role))) ...[
+          const Spacer(),
+          const UserSelect(),
+        ],
+      ],
     );
   }
 }

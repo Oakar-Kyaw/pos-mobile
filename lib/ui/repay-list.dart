@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/voucher.api.dart';
+import 'package:pos/component/delete-dialog.dart';
 import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/no-item-found-widget.dart';
 import 'package:pos/component/repay-card.dart';
+import 'package:pos/localization/general-local.dart';
+import 'package:pos/localization/repay-local.dart';
 import 'package:pos/models/repayment.dart';
+import 'package:pos/riverpod/selected-user.riverpod.dart';
+import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/check-role.dart';
+import 'package:pos/utils/shad-toaster.dart';
 
 class RepaymentList extends ConsumerStatefulWidget {
-  const RepaymentList({super.key});
+  const RepaymentList({super.key, this.userId, this.startDate, this.endDate});
+
+  final int? userId;
+  final DateTime? startDate;
+  final DateTime? endDate;
 
   @override
   ConsumerState<RepaymentList> createState() => _RepaymentListState();
@@ -27,7 +40,13 @@ class _RepaymentListState extends ConsumerState<RepaymentList> {
           state.lastPageIsEmpty ? null : state.nextIntPageKey,
       fetchPage: (pageKey) => ref
           .read(voucherProvider.notifier)
-          .getRepayment(page: pageKey, limit: limit),
+          .getRepayment(
+            page: pageKey,
+            limit: limit,
+            userId: widget.userId,
+            startDate: widget.startDate,
+            endDate: widget.endDate,
+          ),
     );
   }
 
@@ -56,11 +75,50 @@ class _RepaymentListState extends ConsumerState<RepaymentList> {
     );
   }
 
+  void _delete(Repay repayment, bool isDark) {
+    showDeleteDialog(
+      context,
+      title: RepayLocaleScreen.repayDeleteConfirm.getString(context),
+      isDark: isDark,
+      submit: () async {
+        await ref
+            .read(voucherProvider.notifier)
+            .deleteRepayment(repayment.id)
+            .then((data) {
+              if (data) {
+                ShowToast(
+                  context,
+                  description: Text(
+                    RepayLocaleScreen.repayDeleteSuccess.getString(context),
+                  ),
+                );
+                context.pop();
+                _pagingController.refresh();
+              }
+            })
+            .catchError((err) {
+              ShowToast(
+                context,
+                description: Text(
+                  GeneralScreenLocale.somethingWentWrong.getString(context),
+                ),
+                isError: true,
+              );
+            });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
+    final user = ref.watch(userStateProvider);
+
+    ref.listen<SelectedData?>(selectedDataStateProvider, (prev, next) {
+      _pagingController.refresh();
+    });
 
     return PagingListener(
       controller: _pagingController,
@@ -75,6 +133,11 @@ class _RepaymentListState extends ConsumerState<RepaymentList> {
                 repayment: repayment,
                 textColor: textColor,
                 subColor: subColor,
+                onDelete:
+                    (user != null &&
+                            (isAdmin(user.role) || isManager(user.role)))
+                        ? () => _delete(repayment, isDark)
+                        : null,
               ),
             );
           },

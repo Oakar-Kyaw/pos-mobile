@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/voucher.api.dart';
+import 'package:pos/component/delete-dialog.dart';
 import 'package:pos/component/debt-repay-voucher-component.dart';
 import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/no-item-found-widget.dart';
+import 'package:pos/localization/general-local.dart';
+import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/models/voucher-detail.dart';
+import 'package:pos/riverpod/selected-user.riverpod.dart';
+import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/check-role.dart';
+import 'package:pos/utils/shad-toaster.dart';
 
 class DebtListTile extends ConsumerStatefulWidget {
-  const DebtListTile({super.key});
+  const DebtListTile({super.key, this.userId, this.startDate, this.endDate});
+
+  final int? userId;
+  final DateTime? startDate;
+  final DateTime? endDate;
 
   @override
   ConsumerState<DebtListTile> createState() => _DebtListTileState();
@@ -27,7 +40,14 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
           state.lastPageIsEmpty ? null : state.nextIntPageKey,
       fetchPage: (pageKey) => ref
           .read(voucherProvider.notifier)
-          .getVouchers(page: pageKey, limit: limit, existDebt: true),
+          .getVouchers(
+            page: pageKey,
+            limit: limit,
+            existDebt: true,
+            userId: widget.userId,
+            startDate: widget.startDate,
+            endDate: widget.endDate,
+          ),
     );
   }
 
@@ -35,6 +55,11 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
   void dispose() {
     super.dispose();
     _pagingController.dispose();
+    _clearSelectedData();
+  }
+
+  void _clearSelectedData() {
+    ref.read(selectedDataStateProvider.notifier).clear();
   }
 
   BoxDecoration getContainerBoxDecorationByEven(Color dividerColor) {
@@ -56,6 +81,40 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
     );
   }
 
+  void _delete(VoucherDetailModel voucher, bool isDark) {
+    showDeleteDialog(
+      context,
+      title: VoucherScreenLocale.deleteVoucher.getString(context),
+      isDark: isDark,
+      submit: () async {
+        await ref
+            .read(voucherProvider.notifier)
+            .deleteVoucher(voucher.id)
+            .then((data) {
+              if (data) {
+                ShowToast(
+                  context,
+                  description: Text(
+                    VoucherScreenLocale.deletedSuccess.getString(context),
+                  ),
+                );
+                context.pop();
+                _pagingController.refresh();
+              }
+            })
+            .catchError((err) {
+              ShowToast(
+                context,
+                description: Text(
+                  GeneralScreenLocale.somethingWentWrong.getString(context),
+                ),
+                isError: true,
+              );
+            });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
@@ -67,6 +126,11 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
     final rowHoverColor = isDark
         ? kPrimary.withOpacity(0.06)
         : kPrimary.withOpacity(0.04);
+    final user = ref.watch(userStateProvider);
+
+    ref.listen<SelectedData?>(selectedDataStateProvider, (prev, next) {
+      _pagingController.refresh();
+    });
 
     return PagingListener(
       controller: _pagingController,
@@ -91,6 +155,11 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
                       subColor: subColor,
                       voucher: voucher,
                       pagingController: _pagingController,
+                      onDelete:
+                          (user != null &&
+                              (isAdmin(user.role) || isManager(user.role)))
+                          ? () => _delete(voucher, isDark)
+                          : null,
                     ),
                   ),
                 );

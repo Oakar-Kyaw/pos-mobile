@@ -29,6 +29,9 @@ mixin AttendanceLocaleScreenLocale {
 
   static const attendanceSuccess = 'attendance_success';
   static const attendanceFail = 'attendance_fail';
+  static const attendanceDeleteConfirm = 'attendance_delete_confirm';
+  static const attendanceDeleteSuccess = 'attendance_delete_success';
+  static const attendanceDeleteFail = 'attendance_delete_fail';
 
   // 🇺🇸 English
   static const EN = {
@@ -62,6 +65,9 @@ mixin AttendanceLocaleScreenLocale {
 
     attendanceSuccess: 'Attendance recorded successfully!',
     attendanceFail: 'Failed to record attendance.',
+    attendanceDeleteConfirm: 'Do you want to delete this attendance?',
+    attendanceDeleteSuccess: 'Attendance deleted successfully',
+    attendanceDeleteFail: 'Failed to delete attendance',
   };
 
   // 🇲🇲 Burmese
@@ -96,5 +102,8 @@ mixin AttendanceLocaleScreenLocale {
 
     attendanceSuccess: 'တက်ရောက်မှုကို အောင်မြင်စွာ မှတ်တမ်းတင်ပြီးပါပြီ!',
     attendanceFail: 'တက်ရောက်မှု မှတ်တမ်းတင်ရာတွင် မအောင်မြင်ပါ။',
+    attendanceDeleteConfirm: 'ဤတက်ရောက်မှုကို ဖျက်လိုပါသလား?',
+    attendanceDeleteSuccess: 'တက်ရောက်မှုကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
+    attendanceDeleteFail: 'တက်ရောက်မှု ဖျက်ရန် မအောင်မြင်ပါ',
   };
 }

@@ -107,12 +107,22 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
     required int page,
     required int limit,
     required String type,
+    int? userId,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     final url = "v1/products/inventory/list";
 
     final response = await _dio.get(
       url,
-      query: {"page": page, "limit": limit, "type": type},
+      query: {
+        "page": page,
+        "limit": limit,
+        "type": type,
+        if (userId != null) "filterUserId": userId,
+        if (startDate != null) "startDate": startDate.toIso8601String(),
+        if (endDate != null) "endDate": endDate.toIso8601String(),
+      },
     );
     final data = response.data;
 
@@ -122,6 +132,19 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
     }
 
     throw Exception("Failed to get inventory item");
+  }
+
+  /// -------- Delete Expire / Damage / Request --------
+  Future<bool> deleteInventoryManagement(int id) async {
+    final url = "v1/products/inventory/list/$id";
+    final response = await _dio.delete(url);
+    final data = response.data;
+
+    if (data["success"] == true) {
+      return true;
+    }
+
+    throw Exception(data["message"] ?? "Failed to delete inventory item");
   }
 }
 

@@ -6,10 +6,15 @@ import 'package:pos/component/expire-damage-component.dart';
 import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/no-item-found-widget.dart';
 import 'package:pos/models/inventory-management.dart';
+import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 
 class RequestItemLists extends ConsumerStatefulWidget {
-  const RequestItemLists({super.key});
+  const RequestItemLists({super.key, this.userId, this.startDate, this.endDate});
+
+  final int? userId;
+  final DateTime? startDate;
+  final DateTime? endDate;
 
   @override
   ConsumerState<RequestItemLists> createState() => _ExpireDamageListsState();
@@ -31,6 +36,9 @@ class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
             page: pageKey,
             limit: limit,
             type: "REQUESTED",
+            userId: widget.userId,
+            startDate: widget.startDate,
+            endDate: widget.endDate,
           ),
     );
   }
@@ -71,6 +79,10 @@ class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
     final rowHoverColor = isDark
         ? kPrimary.withOpacity(0.06)
         : kPrimary.withOpacity(0.04);
+
+    ref.listen<SelectedData?>(selectedDataStateProvider, (prev, next) {
+      _pagingController.refresh();
+    });
 
     return PagingListener(
       controller: _pagingController,

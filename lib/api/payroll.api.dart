@@ -24,7 +24,7 @@ class PayrollAsyncNotifier extends AsyncNotifier<List<PayrollRecord>> {
     final Map<String, dynamic> query = {
       'page': page,
       'limit': limit,
-      if (userId != null) 'userId': userId,
+      if (userId != null) 'filterUserId': userId,
       if (month != null) 'month': month,
       if (year != null) 'year': year,
       if (branchId != null) 'branchId': branchId,
@@ -90,6 +90,20 @@ class PayrollAsyncNotifier extends AsyncNotifier<List<PayrollRecord>> {
     }
 
     throw Exception(data['message'] ?? 'Failed to fetch payroll');
+  }
+
+  /// -------- DELETE PAYROLL --------
+  Future<bool> deletePayroll(int id) async {
+    final url = 'v1/payrolls/$id';
+
+    final response = await _dio.delete(url);
+    final Map<String, dynamic> data = Map<String, dynamic>.from(response.data);
+
+    if (data['success'] == true) {
+      return true;
+    }
+
+    throw Exception(data['message'] ?? 'Failed to delete payroll');
   }
 }
 

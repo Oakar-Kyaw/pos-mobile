@@ -41,6 +41,9 @@ mixin PayrollLocaleScreenLocale {
 
   static const payrollSuccess = 'payroll_success';
   static const payrollFail = 'payroll_fail';
+  static const payrollDeleteConfirm = 'payroll_delete_confirm';
+  static const payrollDeleteSuccess = 'payroll_delete_success';
+  static const payrollDeleteFail = 'payroll_delete_fail';
 
   // 🇺🇸 English
   static const EN = {
@@ -85,6 +88,9 @@ mixin PayrollLocaleScreenLocale {
 
     payrollSuccess: 'Payroll recorded successfully!',
     payrollFail: 'Failed to record payroll.',
+    payrollDeleteConfirm: 'Do you want to delete this payroll?',
+    payrollDeleteSuccess: 'Payroll deleted successfully',
+    payrollDeleteFail: 'Failed to delete payroll',
   };
 
   // 🇲🇲 Burmese
@@ -130,5 +136,8 @@ mixin PayrollLocaleScreenLocale {
 
     payrollSuccess: 'လစာကို အောင်မြင်စွာ မှတ်တမ်းတင်ပြီးပါပြီ!',
     payrollFail: 'လစာမှတ်တမ်းတင်ရာတွင် မအောင်မြင်ပါ။',
+    payrollDeleteConfirm: 'ဤလစာကို ဖျက်လိုပါသလား?',
+    payrollDeleteSuccess: 'လစာကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
+    payrollDeleteFail: 'လစာ ဖျက်ရန် မအောင်မြင်ပါ',
   };
 }

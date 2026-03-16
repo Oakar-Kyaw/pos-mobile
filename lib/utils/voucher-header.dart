@@ -56,80 +56,95 @@ class VoucherHeader extends StatelessWidget {
               const SizedBox(height: 8),
 
               // ID
-              Text(
-                '#${inventory.id ?? '—'}',
-                style: TextStyle(
-                  fontSize: FontSizeConfig.title(context),
-                  fontWeight: FontWeight.w700,
-                  color: textColor,
-                ),
-              ),
-              const SizedBox(height: 4),
-
-              // Date
-              if (inventory.createdAt != null)
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today_rounded,
-                      size: 11,
-                      color: subColor,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      DateFormat(
-                        'dd MMM yyyy EEEE',
-                      ).format(inventory.createdAt!),
-                      style: TextStyle(
-                        fontSize: FontSizeConfig.body(context),
-                        color: subColor,
-                      ),
-                    ),
-                  ],
-                ),
-            ],
-          ),
-        ),
-
-        // Total amount
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text('Total', style: TextStyle(fontSize: 11, color: subColor)),
-            const SizedBox(height: 4),
-            Text(
-              formatAmount(inventory.totalAmount),
-              style: TextStyle(
-                fontSize: FontSizeConfig.title(context) + 2,
-                fontWeight: FontWeight.w800,
-                color: accent,
-              ),
-            ),
-            const SizedBox(height: 4),
-            // Item count pill
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: accent.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.layers_rounded, size: 11, color: accent),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${inventory.items.length} items',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: accent,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '#${inventory.id ?? '—'}',
+                        style: TextStyle(
+                          fontSize: FontSizeConfig.title(context),
+                          fontWeight: FontWeight.w700,
+                          color: textColor,
+                        ),
+                      ),
+                      // Date
+                      if (inventory.createdAt != null)
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today_rounded,
+                              size: 11,
+                              color: subColor,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              DateFormat(
+                                'dd MMM yyyy EEEE',
+                              ).format(inventory.createdAt!),
+                              style: TextStyle(
+                                fontSize: FontSizeConfig.body(context),
+                                color: subColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                  // Total amount
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Total',
+                        style: TextStyle(fontSize: 11, color: subColor),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        formatAmount(inventory.totalAmount),
+                        style: TextStyle(
+                          fontSize: FontSizeConfig.title(context) + 2,
+                          fontWeight: FontWeight.w800,
+                          color: accent,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      // Item count pill
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: accent.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(Icons.layers_rounded, size: 11, color: accent),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${inventory.items.length} items',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: accent,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+            ],
+          ),
         ),
       ],
     );

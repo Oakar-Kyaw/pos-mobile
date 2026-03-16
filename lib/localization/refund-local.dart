@@ -27,6 +27,9 @@ mixin RefundLocale {
   static const refundSelectAccount = 'refund_select_account';
   static const refundTotalAmount = 'refund_total_amount';
   static const refundCreate = 'refund_create';
+  static const refundDeleteConfirm = 'refund_delete_confirm';
+  static const refundDeleteSuccess = 'refund_delete_success';
+  static const refundDeleteFail = 'refund_delete_fail';
 
   // 🔥 NEW — Refund Method & Voucher
   static const refundMethod = 'refund_method';
@@ -68,6 +71,9 @@ mixin RefundLocale {
     refundSelectAccount: 'Select Account',
     refundTotalAmount: 'Total Refund Amount',
     refundCreate: 'Create Refund',
+    refundDeleteConfirm: 'Do you want to delete this refund?',
+    refundDeleteSuccess: 'Refund deleted successfully',
+    refundDeleteFail: 'Failed to delete refund',
     // 🔥 NEW
     refundMethod: 'Refund Method',
     refundCash: 'Cash Refund',
@@ -101,6 +107,9 @@ mixin RefundLocale {
     refundSelectAccount: 'အကောင့်ရွေးရန်',
     refundTotalAmount: 'စုစုပေါင်း ပြန်အမ်းပေးငွေ',
     refundCreate: 'ပြန်အမ်းပေးမည်',
+    refundDeleteConfirm: 'ဤပြန်အမ်းပေးမှုကို ဖျက်လိုပါသလား?',
+    refundDeleteSuccess: 'ပြန်အမ်းပေးမှုကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
+    refundDeleteFail: 'ပြန်အမ်းပေးမှု ဖျက်ရန် မအောင်မြင်ပါ',
     refundSaveSuccess: 'ပြန်အမ်းပေးမှုကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ',
     refundSaveFailed: 'ပြန်အမ်းပေးမှု သိမ်းဆည်းမှု မအောင်မြင်ပါ',
     refundForm: 'ပြန်အမ်းပေးမှု ဖောင်',

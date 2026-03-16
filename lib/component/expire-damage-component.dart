@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos/component/delete-icon.dart';
 import 'package:pos/models/inventory-management.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
@@ -12,11 +13,13 @@ class ExpireDamageCard extends StatelessWidget {
     required this.inventory,
     required this.textColor,
     required this.subColor,
+    this.onDelete,
   });
 
   final InventoryManagement inventory;
   final Color textColor;
   final Color subColor;
+  final VoidCallback? onDelete;
 
   Color get _accentColor {
     switch (inventory.type.toLowerCase()) {
@@ -61,6 +64,7 @@ class ExpireDamageCard extends StatelessWidget {
       child: Stack(
         children: [
           LeftAccentBar(accent: accent),
+          if (onDelete != null) DeleteIcon(onDelete: onDelete),
 
           // ── Content ──
           Padding(

@@ -52,6 +52,17 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _pagingController.dispose();
+    _clearSelectedData();
+  }
+
+  void _clearSelectedData() {
+    ref.read(selectedDataStateProvider.notifier).clear();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;

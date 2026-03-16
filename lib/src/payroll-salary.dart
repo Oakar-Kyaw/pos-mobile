@@ -3,8 +3,10 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
+import 'package:pos/component/user-select.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/payroll-local.dart';
+import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/ui/payroll-list.dart';
 import 'package:pos/utils/app-theme.dart';
@@ -22,16 +24,24 @@ class PayrollSalaryPage extends ConsumerStatefulWidget {
 }
 
 class _PayrollSalaryPageState extends ConsumerState<PayrollSalaryPage> {
-  int? _filterUserId;
-  DateTime? _fromDate;
-  DateTime? _toDate;
+  @override
+  void dispose() {
+    _clearSelectedData();
+    super.dispose();
+  }
+
+  void _clearSelectedData() {
+    ref.read(selectedDataStateProvider.notifier).clear();
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userStateProvider);
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
+    final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
+    final selectedData = ref.watch(selectedDataStateProvider);
     return Scaffold(
       backgroundColor: bgColor,
       appBar: CustomAppBar(
@@ -65,16 +75,64 @@ class _PayrollSalaryPageState extends ConsumerState<PayrollSalaryPage> {
             ],
             const SizedBox(height: 20),
 
-            Expanded(
-              child: PayrollList(
-                userId: _filterUserId,
-                fromDate: _fromDate,
-                toDate: _toDate,
+            PayrollLabel(textColor: textColor),
+            if (isAdmin(user.role) || isManager(user.role))
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: ShadDatePicker(
+                  onChanged: (value) {
+                    ref
+                        .read(selectedDataStateProvider.notifier)
+                        .setStartDate(value);
+                  },
+                ),
               ),
-            ),
+
+            Expanded(child: PayrollList(selectedData: selectedData)),
           ],
         ),
       ),
+    );
+  }
+}
+
+class PayrollLabel extends ConsumerWidget {
+  const PayrollLabel({super.key, required this.textColor});
+
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userStateProvider);
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 18,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [kPrimary, kSecondary],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          PayrollLocaleScreenLocale.payrollCard.getString(context),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: textColor,
+            letterSpacing: -0.2,
+          ),
+        ),
+        if (user != null && (isAdmin(user.role) || isManager(user.role))) ...[
+          const Spacer(),
+          const UserSelect(),
+        ],
+      ],
     );
   }
 }

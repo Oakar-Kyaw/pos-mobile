@@ -17,6 +17,9 @@ mixin InventoryManagementLocale {
   static const inventoryCard = 'inventory_card';
   static const inventoryError = 'inventory_error';
   static const inventorySuccess = 'inventory_success';
+  static const inventoryDeleteConfirm = 'inventory_delete_confirm';
+  static const inventoryDeleteSuccess = 'inventory_delete_success';
+  static const inventoryDeleteFail = 'inventory_delete_fail';
 
   // 🇺🇸 English
   static const EN = {
@@ -36,6 +39,9 @@ mixin InventoryManagementLocale {
     inventoryCard: 'Inventory Records',
     inventoryError: 'Something went wrong',
     inventorySuccess: 'Inventory record created successfully',
+    inventoryDeleteConfirm: 'Do you want to delete this inventory record?',
+    inventoryDeleteSuccess: 'Inventory record deleted successfully',
+    inventoryDeleteFail: 'Failed to delete inventory record',
   };
 
   // 🇲🇲 Burmese
@@ -57,5 +63,8 @@ mixin InventoryManagementLocale {
     inventoryCard: 'စာရင်းမှတ်တမ်းများ',
     inventoryError: 'အမှားတစ်ခုဖြစ်ပွားခဲ့သည်',
     inventorySuccess: 'Inventory မှတ်တမ်းကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
+    inventoryDeleteConfirm: 'ဤ Inventory မှတ်တမ်းကို ဖျက်လိုပါသလား?',
+    inventoryDeleteSuccess: 'Inventory မှတ်တမ်းကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
+    inventoryDeleteFail: 'Inventory မှတ်တမ်း ဖျက်ရန် မအောင်မြင်ပါ',
   };
 }

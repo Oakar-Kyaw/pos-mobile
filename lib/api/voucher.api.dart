@@ -187,10 +187,22 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
   Future<List<Repay>> getRepayment({
     required int page,
     required int limit,
+    int? userId,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     final url = "v1/vouchers/repay/datas";
 
-    final response = await _dio.get(url, query: {"page": page, "limit": limit});
+    final response = await _dio.get(
+      url,
+      query: {
+        "page": page,
+        "limit": limit,
+        if (userId != null) "filterUserId": userId,
+        if (startDate != null) "startDate": startDate,
+        if (endDate != null) "endDate": endDate,
+      },
+    );
     final data = response.data;
 
     if (data["success"] == true) {
@@ -199,6 +211,19 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
     }
 
     throw Exception("Failed to get repayment");
+  }
+
+  /// -------- Delete repayment --------
+  Future<bool> deleteRepayment(int id) async {
+    final url = "v1/vouchers/repay/datas/$id";
+    final response = await _dio.delete(url);
+    final data = response.data;
+
+    if (data["success"] == true) {
+      return true;
+    }
+
+    throw Exception(data["message"] ?? "Failed to delete repayment");
   }
 }
 

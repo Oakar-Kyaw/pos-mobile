@@ -11,10 +11,25 @@ class RefundAsyncNotifier extends AsyncNotifier<List<Refund>> {
   }
 
   // ================= FETCH ALL REFUNDS =================
-  Future<List<Refund>> fetchRefunds({int page = 1, int limit = 10}) async {
+  Future<List<Refund>> fetchRefunds({
+    int page = 1,
+    int limit = 10,
+    int? userId,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
     final url = "v1/refunds";
 
-    final response = await _dio.get(url, query: {"page": page, "limit": limit});
+    final response = await _dio.get(
+      url,
+      query: {
+        "page": page,
+        "limit": limit,
+        if (userId != null) "filterUserId": userId,
+        if (startDate != null) "startDate": startDate,
+        if (endDate != null) "endDate": endDate,
+      },
+    );
     final Map<String, dynamic> data = response.data;
 
     if (data["success"] == true) {
@@ -41,6 +56,20 @@ class RefundAsyncNotifier extends AsyncNotifier<List<Refund>> {
     }
 
     throw Exception("Failed to create refund");
+  }
+
+  // ================= DELETE REFUND =================
+  Future<bool> deleteRefund(int id) async {
+    final url = "v1/refunds/$id";
+
+    final response = await _dio.delete(url);
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      return true;
+    }
+
+    throw Exception(data["message"] ?? "Failed to delete refund");
   }
 
   // ================= REFRESH =================

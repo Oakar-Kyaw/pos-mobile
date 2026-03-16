@@ -17,6 +17,9 @@ mixin RepayLocaleScreen {
   static const repayNoItems = 'repay_no_items';
   static const repayAmountPlaceholder = 'repay_amount_placeholder';
   static const repayNotePlaceholder = 'repay_note_placeholder';
+  static const repayDeleteConfirm = 'repay_delete_confirm';
+  static const repayDeleteSuccess = 'repay_delete_success';
+  static const repayDeleteFail = 'repay_delete_fail';
 
   // 🔥 NEW — Debt & Remaining
   static const repayRemainingAmount = 'repay_remaining_amount';
@@ -47,6 +50,9 @@ mixin RepayLocaleScreen {
     repayAmountValidator: 'Invalid amount',
     repayNoItems: 'No repayment records found',
     repayNotePlaceholder: 'Enter repayment note',
+    repayDeleteConfirm: 'Do you want to delete this repayment?',
+    repayDeleteSuccess: 'Repayment deleted successfully',
+    repayDeleteFail: 'Failed to delete repayment',
 
     // 🔥 NEW
     repayRemainingAmount: 'Remaining Amount',
@@ -77,6 +83,9 @@ mixin RepayLocaleScreen {
     repayAmountValidator: 'ငွေပမာဏ မမှန်ကန်ပါ',
     repayNoItems: 'အကြွေးပေးချေမှု မှတ်တမ်း မတွေ့ပါ',
     repayNotePlaceholder: 'ပေးချေမှု မှတ်ချက် ထည့်ပါ',
+    repayDeleteConfirm: 'ဤအကြွေးပေးချေမှုကို ဖျက်လိုပါသလား?',
+    repayDeleteSuccess: 'အကြွေးပေးချေမှုကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
+    repayDeleteFail: 'အကြွေးပေးချေမှု ဖျက်ရန် မအောင်မြင်ပါ',
 
     // 🔥 NEW
     repayRemainingAmount: 'ကျန်ရှိနေသေးသော ငွေပမာဏ',
