@@ -18,6 +18,8 @@ class Attendance {
   final bool isLate;
   final bool isEarlyLeave;
   final String? note;
+  final String overtimeType;
+  final int overtimeMinutes;
 
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -38,6 +40,8 @@ class Attendance {
     this.note,
     required this.createdAt,
     required this.updatedAt,
+    required this.overtimeType,
+    required this.overtimeMinutes,
   });
 
   factory Attendance.fromJson(Map<String, dynamic> json) {
@@ -61,6 +65,8 @@ class Attendance {
       isLate: json['isLate'],
       isEarlyLeave: json['isEarlyLeave'],
       note: json['note'],
+      overtimeType: json['overtimeType'],
+      overtimeMinutes: json['overtimeMinutes'],
 
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),

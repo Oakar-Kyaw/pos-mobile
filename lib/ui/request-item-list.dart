@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localization/flutter_localization.dart';
+import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/product.api.dart';
+import 'package:pos/component/delete-dialog.dart';
 import 'package:pos/component/expire-damage-component.dart';
 import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/no-item-found-widget.dart';
+import 'package:pos/localization/inventory-management-local.dart';
 import 'package:pos/models/inventory-management.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
+import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/check-role.dart';
+import 'package:pos/utils/shad-toaster.dart';
 
 class RequestItemLists extends ConsumerStatefulWidget {
-  const RequestItemLists({super.key, this.userId, this.startDate, this.endDate});
+  const RequestItemLists({
+    super.key,
+    this.userId,
+    this.startDate,
+    this.endDate,
+  });
 
   final int? userId;
   final DateTime? startDate;
@@ -68,6 +80,46 @@ class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
     );
   }
 
+  void _delete(InventoryManagement inventory, bool isDark) {
+    showDeleteDialog(
+      context,
+      title: InventoryManagementLocale.inventoryDeleteConfirm.getString(
+        context,
+      ),
+      isDark: isDark,
+      submit: () async {
+        await ref
+            .read(productProvider.notifier)
+            .deleteInventoryManagement(inventory.id!)
+            .then((data) {
+              if (data) {
+                ShowToast(
+                  context,
+                  description: Text(
+                    InventoryManagementLocale.inventoryDeleteSuccess.getString(
+                      context,
+                    ),
+                  ),
+                );
+                context.pop();
+                _pagingController.refresh();
+              }
+            })
+            .catchError((err) {
+              ShowToast(
+                context,
+                description: Text(
+                  InventoryManagementLocale.inventoryDeleteFail.getString(
+                    context,
+                  ),
+                ),
+                isError: true,
+              );
+            });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
@@ -79,6 +131,7 @@ class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
     final rowHoverColor = isDark
         ? kPrimary.withOpacity(0.06)
         : kPrimary.withOpacity(0.04);
+    final user = ref.watch(userStateProvider);
 
     ref.listen<SelectedData?>(selectedDataStateProvider, (prev, next) {
       _pagingController.refresh();
@@ -107,6 +160,11 @@ class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
                       textColor: textColor,
                       subColor: subColor,
                       inventory: expireItem,
+                      onDelete:
+                          (user != null &&
+                              (isAdmin(user.role) || isManager(user.role)))
+                          ? () => _delete(expireItem, isDark)
+                          : null,
                       //pagingController: _pagingController,
                     ),
                   ),

@@ -55,10 +55,16 @@ class _UserSelectState extends ConsumerState<UserSelect> {
               setState(() {
                 selectedValue = value;
               });
-
-              ref
-                  .read(selectedDataStateProvider.notifier)
-                  .setUser(int.tryParse(value!));
+              //print("user select value ${value == ''}");
+              if (value == '' || value == null) {
+                // All selected
+                ref.read(selectedDataStateProvider.notifier).clearUser();
+              } else {
+                // Specific user selected
+                ref
+                    .read(selectedDataStateProvider.notifier)
+                    .setUser(int.tryParse(value)!);
+              }
             },
             selectedOptionBuilder: (context, value) {
               final option = shadOptions.firstWhere(

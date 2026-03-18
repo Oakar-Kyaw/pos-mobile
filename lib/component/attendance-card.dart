@@ -83,16 +83,17 @@ class AttendanceCard extends StatelessWidget {
                       Row(
                         children: [
                           RowWidget(
-                            title: AttendanceLocaleScreenLocale.attendanceCheckIn
+                            title: AttendanceLocaleScreenLocale
+                                .attendanceCheckIn
                                 .getString(context),
                             time: attendance.checkIn.toString(),
                             textColor: textColor,
                           ),
                           const Spacer(),
                           RowWidget(
-                            title:
-                                AttendanceLocaleScreenLocale.attendanceCheckOut
-                                    .getString(context),
+                            title: AttendanceLocaleScreenLocale
+                                .attendanceCheckOut
+                                .getString(context),
                             time: attendance.checkOut.toString(),
                             textColor: textColor,
                           ),
@@ -140,6 +141,13 @@ class RowWidget extends StatelessWidget {
       ],
     );
   }
+}
+
+String formatToHour(int minutes) {
+  final hours = minutes ~/ 60;
+  final mins = minutes % 60;
+
+  return '${hours.toString().padLeft(2, '0')}:${mins.toString().padLeft(2, '0')}';
 }
 
 Color getColorByAttendanceStatus(String status) {
@@ -197,6 +205,44 @@ class AttendanceHeader extends StatelessWidget {
                 color: kSurfaceDark,
               )
             : SizedBox(),
+        attendance.overtimeType == 'MINUTES'
+            ? Row(
+                children: [
+                  Text(
+                    AttendanceLocaleScreenLocale.attendanceOvertime.getString(
+                      context,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  BadgeWidget(
+                    icon: Icons.lock_clock,
+                    label: formatToHour(attendance.overtimeMinutes),
+                    color: kSurfaceDark,
+                  ),
+                ],
+              )
+            : SizedBox(),
+
+        attendance.overtimeType == 'DAY'
+            ? Row(
+                children: [
+                  Text(
+                    AttendanceLocaleScreenLocale.attendanceOvertime.getString(
+                      context,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  BadgeWidget(
+                    icon: Icons.punch_clock,
+                    label: AttendanceLocaleScreenLocale.attendanceDay.getString(
+                      context,
+                    ),
+                    color: kSurfaceDark,
+                  ),
+                ],
+              )
+            : SizedBox(),
+
         SizedBox(width: 8),
       ],
     );

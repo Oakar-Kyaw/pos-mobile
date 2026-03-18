@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/src/account.dart';
 import 'package:pos/src/attendance.dart';
+import 'package:pos/src/attendance-create.dart';
 import 'package:pos/src/category.dart';
 import 'package:pos/src/company-profile.dart';
 import 'package:pos/src/create-voucher.dart';
@@ -194,6 +195,11 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.attendance,
         name: AppRoute.attendance,
         builder: (context, state) => AttendancePage(),
+      ),
+      GoRoute(
+        path: AppRoute.attendanceCreate,
+        name: AppRoute.attendanceCreate,
+        builder: (context, state) => AttendanceCreatePage(),
       ),
       GoRoute(
         path: AppRoute.payroll,

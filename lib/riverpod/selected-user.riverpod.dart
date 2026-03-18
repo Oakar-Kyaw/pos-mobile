@@ -26,6 +26,15 @@ class SelectedDataNotifier extends Notifier<SelectedData?> {
     state = (state ?? SelectedData()).copyWith(userId: userId);
   }
 
+  void clearUser() {
+    final old = state;
+    state = SelectedData(
+      userId: null,
+      startDate: old?.startDate,
+      endDate: old?.endDate,
+    );
+  }
+
   void setStartDate(DateTime? startDate) {
     state = (state ?? SelectedData()).copyWith(startDate: startDate);
   }

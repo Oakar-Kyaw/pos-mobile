@@ -33,8 +33,8 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
 
   @override
   void dispose() {
-    super.dispose();
     _clearSelectedData();
+    super.dispose();
   }
 
   void _clearSelectedData() {
@@ -120,6 +120,7 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
     final todayAttendance = ref.watch(todayAttendanceProvider);
     final user = ref.watch(userStateProvider);
     final selectedData = ref.watch(selectedDataStateProvider);
+    //print("aaattendacne selected is 📊 ${selectedData?.userId}");
     return Scaffold(
       backgroundColor: bgColor,
       appBar: CustomAppBar(

@@ -126,6 +126,9 @@ class AttendanceAsyncNotifier extends AsyncNotifier<List<Attendance>> {
   /// -------- CREATE ATTENDANCE --------
   Future<Map<String, dynamic>> createAttendance({
     required DateTime date,
+    String? overtimeType,
+    String? overtimeMinutes,
+    int? userId,
     String? status,
     String? checkIn,
     String? checkOut,
@@ -140,10 +143,13 @@ class AttendanceAsyncNotifier extends AsyncNotifier<List<Attendance>> {
       url,
       data: {
         "date": date.toIso8601String(),
+        if (userId != null) "userId": userId,
         "checkIn": checkIn,
         "checkOut": checkOut,
         "note": note,
         "workingMinutes": workingHours,
+        'overtimeType': overtimeType,
+        'overtimeMinutes': overtimeMinutes,
         "status": status,
         "lat": lat,
         "long": long,
