@@ -24,8 +24,8 @@ class DebtVoucherPage extends ConsumerStatefulWidget {
 class _DebtVoucherPageState extends ConsumerState<DebtVoucherPage> {
   @override
   void dispose() {
-    super.dispose();
     _clearSelectedData();
+    super.dispose();
   }
 
   void _clearSelectedData() {

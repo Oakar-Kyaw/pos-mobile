@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pos/features/account-upgrade/presentation/pages/account-upgrade.dart';
+import 'package:pos/features/leave/presentation/pages/leave-create-page.dart';
+import 'package:pos/features/leave/presentation/pages/leave-pages.dart';
 import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/src/account.dart';
 import 'package:pos/src/attendance.dart';
@@ -211,7 +214,21 @@ final routeProvider = Provider<GoRouter>((ref) {
         name: AppRoute.payrollCreate,
         builder: (context, state) => PayrollCreatePage(),
       ),
-
+      GoRoute(
+        path: AppRoute.leave,
+        name: AppRoute.leave,
+        builder: (context, state) => LeavePage(),
+      ),
+      GoRoute(
+        path: AppRoute.leaveCreate,
+        name: AppRoute.leaveCreate,
+        builder: (context, state) => LeaveCreatePage(),
+      ),
+      GoRoute(
+        path: AppRoute.accountUpgrade,
+        name: AppRoute.accountUpgrade,
+        builder: (context, state) => AccountUpgradePage(),
+      ),
       GoRoute(
         path: '${AppRoute.payrollPayslip}/:id',
         name: AppRoute.payrollPayslip,

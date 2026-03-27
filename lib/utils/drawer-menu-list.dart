@@ -93,6 +93,11 @@ List<MenuItem> menuListByAdmin(BuildContext context) => [
     route: AppRoute.attendance,
   ),
   MenuItem(
+    icon: Icons.event_busy,
+    label: DrawerScreenLocale.drawerLeave.getString(context),
+    route: AppRoute.leave,
+  ),
+  MenuItem(
     icon: LucideIcons.banknote,
     label: DrawerScreenLocale.drawerEmployeeSalary.getString(context),
     route: AppRoute.payroll,
@@ -118,13 +123,7 @@ List<MenuItem> menuListByAdmin(BuildContext context) => [
   MenuItem(
     icon: LucideIcons.rocket,
     label: DrawerScreenLocale.drawerUpgrade.getString(context),
-    route: AppRoute.home,
-  ),
-
-  MenuItem(
-    icon: LucideIcons.rocket,
-    label: DrawerScreenLocale.drawerUpgradeSuggestion.getString(context),
-    route: AppRoute.home,
+    route: AppRoute.accountUpgrade,
   ),
 ];
 

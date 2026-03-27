@@ -23,6 +23,7 @@ mixin DrawerScreenLocale {
   // ✅ NEW ITEMS
   static const drawerEmployee = 'drawer_employee';
   static const drawerAttendance = 'drawer_attendance';
+  static const drawerLeave = 'drawer_leave'; // ✅ ADDED
   static const drawerRefund = 'drawer_refund';
   static const drawerDebt = 'drawer_debt';
   static const drawerExpireItems = 'drawer_expire_items';
@@ -60,6 +61,7 @@ mixin DrawerScreenLocale {
     // ✅ Added
     drawerEmployee: 'Employees',
     drawerAttendance: 'Attendance',
+    drawerLeave: 'Leave', // ✅ ADDED
     drawerHrRule: 'HR Rules',
     drawerRefund: 'Refund',
     drawerDebt: 'Debt',
@@ -76,11 +78,10 @@ mixin DrawerScreenLocale {
   static const MM = {
     drawerHome: 'ပင်မ',
     drawerCategory: 'အမျိုးအစားများ',
-    drawerHrRule: 'HR စည်းမျဉ်းများ',
     drawerCompany: 'ကုမ္ပဏီမှတ်ပုံတင်ခြင်း',
     drawerProduct: 'ကုန်ပစ္စည်းများ',
     drawerIncome: 'ဝင်ငွေ',
-    drawerExpense: 'အထွေ‌ထွေ အသုံးစရိတ်များ',
+    drawerExpense: 'အထွေထွေ အသုံးစရိတ်များ',
     drawerProfit: 'အမြတ်အစွန်း',
     drawerVoucher: 'ဘောက်ချာများ',
     drawerLogin: 'လော့ဂ်အင်',
@@ -93,10 +94,12 @@ mixin DrawerScreenLocale {
     drawerDark: "အမှောင်",
     drawerPosSystem: 'အရောင်းစနစ်',
     drawerPosManagement: 'စီမံဒက်စ်ဘုတ်',
+    drawerHrRule: 'HR စည်းမျဉ်းများ',
 
     // ✅ Added
     drawerEmployee: 'ဝန်ထမ်းများ',
     drawerAttendance: 'တက်ရောက်မှု',
+    drawerLeave: 'ခွင့်ယူမှု',
     drawerRefund: 'ပြန်အမ်းပေးမှု',
     drawerDebt: 'ကြွေးမြီ',
     drawerExpireItems: 'သက်တမ်းကုန်ပစ္စည်းများ',

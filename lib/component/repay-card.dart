@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:pos/component/delete-icon.dart';
+import 'package:pos/core/widgets/left-green-bar.dart';
 import 'package:pos/localization/debt-local.dart';
 import 'package:pos/localization/repay-local.dart';
 import 'package:pos/localization/voucher-local.dart';
@@ -49,20 +50,7 @@ class RepaymentCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Left accent bar
-                  Container(
-                    width: 4,
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        bottomLeft: Radius.circular(16),
-                      ),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [kGreen, kGreen.withOpacity(0.4)],
-                      ),
-                    ),
-                  ),
+                  LeftGreenBar(),
 
                   // Content
                   Expanded(

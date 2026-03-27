@@ -4,20 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/attendance.api.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/component/loading-component.dart';
-import 'package:pos/localization/attendance-local.dart';
-import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/hr-rule-local.dart';
-import 'package:pos/localization/payroll-local.dart';
-import 'package:pos/ui/attendance-list.dart';
 import 'package:pos/ui/hr-rule-form.dart';
 import 'package:pos/ui/hr-rule-list.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/button.dart';
 import 'package:pos/utils/description-widget.dart';
-import 'package:pos/utils/font-size.dart';
-import 'package:pos/utils/route-constant.dart';
-import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class HrRulePage extends ConsumerStatefulWidget {

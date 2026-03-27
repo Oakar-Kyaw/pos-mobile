@@ -1,3 +1,4 @@
+import 'package:pos/localization/account-upgrade.dart';
 import 'package:pos/localization/attendance-local.dart';
 import 'package:pos/localization/category-local.dart';
 import 'package:pos/localization/company-local.dart';
@@ -11,10 +12,12 @@ import 'package:pos/localization/home-local.dart';
 import 'package:pos/localization/hr-rule-local.dart';
 import 'package:pos/localization/income-local.dart';
 import 'package:pos/localization/inventory-management-local.dart';
+import 'package:pos/localization/leave-local.dart';
 import 'package:pos/localization/login-local.dart';
 import 'package:pos/localization/payment-data-local.dart';
 import 'package:pos/localization/payment-local.dart';
 import 'package:pos/localization/payroll-local.dart';
+import 'package:pos/localization/plan_feature_locale.dart';
 import 'package:pos/localization/product-local.dart';
 import 'package:pos/localization/refund-local.dart';
 import 'package:pos/localization/repay-local.dart';
@@ -45,6 +48,9 @@ mixin AppLocale {
     ...PayrollLocaleScreenLocale.EN,
     ...HrRuleLocaleScreen.EN,
     ...GeneralScreenLocale.EN,
+    ...LeaveScreenLocale.EN,
+    ...AccountUpgradeScreenLocale.EN,
+    ...PlanFeatureLocaleScreen.EN,
   };
 
   static const Map<String, dynamic> MM = {
@@ -70,5 +76,8 @@ mixin AppLocale {
     ...PayrollLocaleScreenLocale.MM,
     ...HrRuleLocaleScreen.MM,
     ...GeneralScreenLocale.MM,
+    ...LeaveScreenLocale.MM,
+    ...AccountUpgradeScreenLocale.MM,
+    ...PlanFeatureLocaleScreen.MM,
   };
 }

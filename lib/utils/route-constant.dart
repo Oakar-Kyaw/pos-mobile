@@ -31,4 +31,7 @@ class AppRoute {
   static const String payrollCreate = '/payroll-create';
   static const String payrollPayslip = '/payroll-payslip';
   static const String hrRule = '/hr-rule';
+  static const String leave = '/leave';
+  static const String leaveCreate = '/leave-create';
+  static const String accountUpgrade = '/account-upgrade';
 }
