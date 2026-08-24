@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
-import 'package:pos/models/account.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/models/payment-data.dart';
-import 'package:pos/riverpod/payment-list.dart';
 
 class PaymentDataAsyncNotifier extends AsyncNotifier<List<PaymentData>> {
-  final DioService _dio = DioService();
+  late DioService _dio;
 
   @override
   Future<List<PaymentData>> build() async {
+    _dio = ref.watch(dioServiceProvider);
     return await fetchAccounts();
   }
 

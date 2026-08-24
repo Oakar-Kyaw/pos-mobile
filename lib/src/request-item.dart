@@ -3,13 +3,12 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/component/date-select.dart';
-import 'package:pos/component/user-select.dart';
+import 'package:pos/core/utils/date-range-select.dart';
+import 'package:pos/core/utils/user-select.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/inventory-management-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
-import 'package:pos/ui/expire-item-list.dart';
 import 'package:pos/ui/request-item-list.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
@@ -62,15 +61,14 @@ class _RequestItemPageState extends ConsumerState<RequestItemPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── Description Banner ──────────────────
-            DescriptionWidget(
-              isDark: isDark,
-              description: config.description,
-              icon: config.icon,
-              subColor: subColor,
-            ),
+            // DescriptionWidget(
+            //   isDark: isDark,
+            //   description: config.description,
+            //   icon: config.icon,
+            //   subColor: subColor,
+            // ),
 
-            const SizedBox(height: 20),
-
+            // const SizedBox(height: 20),
             GradientSubmitButton(
               onPressed: () =>
                   context.pushNamed(AppRoute.inventoryItem, extra: 'Request'),
@@ -84,7 +82,7 @@ class _RequestItemPageState extends ConsumerState<RequestItemPage> {
             if (user != null && (isAdmin(user.role) || isManager(user.role)))
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
-                child: DateSelect(),
+                child: DateRangeSelect(),
               ),
 
             Expanded(

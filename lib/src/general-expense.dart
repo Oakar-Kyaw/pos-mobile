@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/general-expense.api.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/component/date-select.dart';
-import 'package:pos/component/user-select.dart';
+import 'package:pos/core/utils/date-range-select.dart';
+import 'package:pos/core/utils/user-select.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/general-expense-local.dart';
 import 'package:pos/models/general-expense.dart';
@@ -107,7 +107,7 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
             if (isAdmin(user!.role) || isManager(user.role)) ...[
               UserSelect(),
               SizedBox(height: 10),
-              DateSelect(),
+              DateRangeSelect(),
               SizedBox(height: 10),
             ],
             GeneralExpenseCard(

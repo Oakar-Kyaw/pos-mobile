@@ -20,6 +20,8 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
     double? total,
     double? subTotal,
     double? tax,
+    double? discountAmount,
+    double? discountPercent,
     String? note,
     String? type,
   }) {
@@ -34,6 +36,8 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
         payments: payments,
         totalPaymentAmount: totalPaymentAmount,
         deliveryFee: deliveryFee,
+        discountAmount: discountAmount,
+        discountPercent: discountPercent,
       );
     }
   }
@@ -63,10 +67,30 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
     }
   }
 
+  void updatePaymentAmount(String id, String amount) {
+    if (state == null || state!.payments.isEmpty) return;
+
+    final parsed = double.tryParse(amount) ?? 0.0;
+    // print(
+    //   "parsed amount is $parsed ${state?.payments[0].paymentData?.id} ${id} ${state?.payments[0].copyWith(amount: 99)}",
+    // );
+    state = state!.copyWith(
+      payments: state!.payments
+          .map(
+            (e) => e.paymentData!.id.toString() == id
+                ? e.copyWith(amount: parsed)
+                : e,
+          )
+          .toList(),
+    );
+    calculate();
+  }
+
   void removePaymentByid(String id) {
+    print("id $id");
     if (state != null) {
       List<VoucherPayment> items = state!.payments
-          .where((e) => e.id != id)
+          .where((e) => e.paymentDataId.toString() != id)
           .toList();
       state = state!.copyWith(payments: items);
       calculate();
@@ -87,12 +111,29 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
         paymentTotal += payment.amount;
       }
 
-      double totalWithTax = itemsTotal + state!.tax + state!.deliveryFee;
-      double remainingPaymentAmounts = totalWithTax - paymentTotal;
-      //print("remain $remainingPaymentAmounts $paymentTotal ");
-      // Update state immutably
+      double totalPrice = itemsTotal + state!.tax + state!.deliveryFee;
+
+      // percentage-based discount, guarded against 0/negative
+      double percentDiscountAmount = state!.discountPercent > 0
+          ? totalPrice * (state!.discountPercent / 100)
+          : 0.0;
+
+      double totalWithTaxAndDiscount =
+          totalPrice - state!.discountAmount - percentDiscountAmount;
+
+      // clamp so total never goes negative from an overly large discount
+      if (totalWithTaxAndDiscount < 0) {
+        totalWithTaxAndDiscount = 0;
+      }
+
+      double remainingPaymentAmounts = totalWithTaxAndDiscount - paymentTotal;
+
+      if (remainingPaymentAmounts < 0) {
+        return;
+      }
+
       state = state!.copyWith(
-        total: totalWithTax,
+        total: totalWithTaxAndDiscount,
         subTotal: itemsTotal,
         totalPaymentAmount: paymentTotal,
         remainingPaymentAmount: remainingPaymentAmounts,

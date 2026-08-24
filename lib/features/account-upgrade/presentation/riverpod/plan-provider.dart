@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/features/account-upgrade/data/datasources/plan-api.dart';
 import 'package:pos/features/account-upgrade/data/repositories/plan-repository.dart';
 import 'package:pos/features/account-upgrade/domain/entites/plan.dart';
 
 final planRepositoryProvider = Provider<PlanRepository>((ref) {
-  final dio = DioService();
-  final api = PlanApi(dio);
+  final _dio = ref.watch(dioServiceProvider);
+  final api = PlanApi(_dio);
   final repository = PlanRepository(api);
   return repository;
 });

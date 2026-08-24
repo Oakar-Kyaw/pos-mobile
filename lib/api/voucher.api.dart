@@ -1,15 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/models/repayment.dart';
 import 'package:pos/models/voucher-detail.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
 
 class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
-  final DioService _dio = DioService();
+  late DioService _dio;
 
   @override
   Future<List<VoucherDetailModel>> build() async {
+    _dio = ref.watch(dioServiceProvider);
     return await getVouchers(page: 0, limit: 10);
   }
 
@@ -114,6 +116,8 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
       "remainingPaymentAmount": voucher.remainingPaymentAmount,
       "totalPaymentAmount": voucher.totalPaymentAmount,
       "total": voucher.total,
+      "discountPercent": voucher.discountPercent,
+      "discountAmount": voucher.discountAmount,
       "items": itemsJson,
       "payments": paymentsJson,
       if (multipartFiles.isNotEmpty) "files": multipartFiles,

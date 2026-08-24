@@ -4,6 +4,7 @@ class AppRoute {
   static const String profile = '/profile';
   static const String category = '/category';
   static const String product = '/product';
+  static const String productList = '/product-list';
   static const String companyProfile = "/company-profile";
   static const String login = "/login";
   static const String createVoucher = "/create-voucher";
@@ -34,4 +35,11 @@ class AppRoute {
   static const String leave = '/leave';
   static const String leaveCreate = '/leave-create';
   static const String accountUpgrade = '/account-upgrade';
+  static const String printer = '/printer';
+  static const String voucherCalculation = '/voucher-calculation';
+  static const String productBarcodeScan = '/product-barcode';
+  static const String purchaseHistory = '/purchase-history';
+  static const String purchaseCreate = '/purchase-create';
+  static const String purchaseEdit = '/purchase-edit';
+  static const String purchaseDetail = '/purchase-item-detail';
 }

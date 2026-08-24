@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "276643624568",
+    "project_id": "pos-notification-be5a7",
+    "storage_bucket": "pos-notification-be5a7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:276643624568:android:b875f54bab8e73da68df8d",
+        "android_client_info": {
+          "package_name": "com.oakarkyaw.posmaster"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDWvVkUOYcDwJ5ynOLCGXQrUUaBgRUmkY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

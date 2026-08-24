@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
@@ -11,10 +12,14 @@ class EWalletWidget extends ConsumerWidget {
   final File? image;
   final Function clearPhoto;
   final Function uploadPhoto;
+  final Function onChangedAmount;
+  final VoidCallback onConfirm;
   const EWalletWidget({
     super.key,
     required this.clearPhoto,
     required this.uploadPhoto,
+    required this.onChangedAmount,
+    required this.onConfirm,
     this.image,
   });
 
@@ -30,6 +35,17 @@ class EWalletWidget extends ConsumerWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 10),
+        Row(
+          children: [
+            Text("+1 234 567 890", style: TextStyle(fontSize: 16)),
+            IconButton(
+              icon: Icon(Icons.copy, size: 18),
+              onPressed: () =>
+                  Clipboard.setData(ClipboardData(text: "+1 234 567 890")),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
         Container(
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -39,6 +55,18 @@ class EWalletWidget extends ConsumerWidget {
           child: Text(
             "Upload your screenshot that has been transferred to my phone account",
             style: TextStyle(color: Colors.white),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text("Amount", style: TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: ShadInputFormField(
+            onChanged: (v) => onChangedAmount(v),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+            ],
           ),
         ),
         const SizedBox(height: 20),
@@ -52,7 +80,7 @@ class EWalletWidget extends ConsumerWidget {
         const SizedBox(height: 20),
 
         GradientSubmitButton(
-          onPressed: () {},
+          onPressed: onConfirm,
           text: "Confirm",
           width: double.infinity,
         ),

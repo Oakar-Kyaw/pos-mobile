@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:pos/localization/inventory-management-local.dart';
+import 'package:pos/localization/purchase-local.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class InventoryActionConfig {
@@ -18,6 +19,9 @@ class InventoryActionConfig {
 
       case 'Request':
         return InventoryManagementLocale.inventoryRequested.getString(context);
+
+      case 'Purchase':
+        return PurchaseLocale.purchaseManagementTitle.getString(context);
 
       default:
         return '';

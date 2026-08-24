@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/attendance.api.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/component/date-select.dart';
+import 'package:pos/core/utils/date-range-select.dart';
 import 'package:pos/component/loading-component.dart';
-import 'package:pos/component/user-select.dart';
+import 'package:pos/core/utils/user-select.dart';
 import 'package:pos/localization/attendance-local.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
@@ -204,7 +204,7 @@ class _AttendancePageState extends ConsumerState<AttendancePage> {
             if (isAdmin(user.role) || isManager(user.role))
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
-                child: DateSelect(),
+                child: DateRangeSelect(),
               ),
             Expanded(
               child: AttendanceList(

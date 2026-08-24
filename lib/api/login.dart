@@ -1,16 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/riverpod/login-check.dart';
-import 'package:pos/riverpod/company.riverpod.dart';
-import 'package:pos/models/company.dart';
 import 'package:pos/utils/local-user.dart';
 import 'package:pos/utils/secure-storage.dart';
 
 class LoginAsyncNotifier extends AsyncNotifier<Map<String, dynamic>?> {
-  final DioService _dio = DioService();
+  late DioService _dio;
   final _secureStorage = SecureStorage();
   @override
   Future<Map<String, dynamic>?> build() async {
+    _dio = ref.watch(dioServiceProvider);
     return null;
   }
 

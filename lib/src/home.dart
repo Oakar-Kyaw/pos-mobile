@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
+import 'package:pos/core/widgets/custom-button.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/models/product.dart';
 import 'package:pos/models/voucher-detail.dart';
@@ -15,7 +17,6 @@ import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/riverpod/company.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/drawer.dart';
-import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/secure-storage.dart';
@@ -30,7 +31,12 @@ class MyHomePage extends ConsumerStatefulWidget {
 }
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
-  final String limit = "20";
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  final String limit = "40";
   final secureStorage = SecureStorage();
 
   late final PagingController<int, Product> _pagingController =
@@ -39,7 +45,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             state.lastPageIsEmpty ? null : state.nextIntPageKey,
         fetchPage: (pageKey) => ref
             .read(productProvider.notifier)
-            .getProductByUserId(pageKey.toString(), limit),
+            .getProductLists(pageKey.toString(), limit),
       );
 
   void setVoucher() {
@@ -82,6 +88,19 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ).buildDrawer(context),
       appBar: CustomAppBar(
         title: company?.name ?? HomeScreenLocale.homeTitle.getString(context),
+        actions: [
+          IconButton(
+            onPressed: () => context.pushNamed(AppRoute.productBarcodeScan),
+            icon: Icon(LucideIcons.scanBarcode),
+          ),
+          IconButton(
+            onPressed: () {
+              //go to printer page
+              context.pushNamed(AppRoute.printer);
+            },
+            icon: Icon(LucideIcons.printer),
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -89,58 +108,65 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           PagingListener(
             controller: _pagingController,
             builder: (context, state, fetchNextPage) {
-              return PagedGridView<int, Product>(
-                padding: const EdgeInsets.only(
-                  bottom: 100,
-                  top: 8,
-                  left: 8,
-                  right: 8,
-                ),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: Responsive.isCardt(context) ? 6 : 4,
-                  mainAxisExtent: Responsive.isCardt(context) ? 150 : 120,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                ),
-                state: state,
-                fetchNextPage: fetchNextPage,
-                builderDelegate: PagedChildBuilderDelegate<Product>(
-                  itemBuilder: (context, item, index) {
-                    return _ProductCard(
-                      item: item,
-                      isDark: isDark,
-                      isSelected:
-                          ref
-                              .watch(voucherDetailProvider)
-                              ?.items
-                              .any((s) => s.id == item.id) ??
-                          false,
-                      onChanged: (value) {
-                        setState(() {
-                          if (value == true) {
-                            if (ref.read(voucherDetailProvider) == null) {
-                              setVoucher();
+              return RefreshIndicator(
+                onRefresh: () async {
+                  _pagingController.refresh();
+                },
+                child: PagedGridView<int, Product>(
+                  padding: const EdgeInsets.only(
+                    bottom: 100,
+                    top: 8,
+                    left: 8,
+                    right: 8,
+                  ),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: Responsive.isTablet(context) ? 6 : 4,
+                    mainAxisExtent: Responsive.isTablet(context) ? 150 : 120,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  state: state,
+                  fetchNextPage: fetchNextPage,
+                  builderDelegate: PagedChildBuilderDelegate<Product>(
+                    itemBuilder: (context, item, index) {
+                      return _ProductCard(
+                        item: item,
+                        isDark: isDark,
+                        isSelected:
+                            ref
+                                .watch(voucherDetailProvider)
+                                ?.items
+                                .any((s) => s.id == item.id) ??
+                            false,
+                        onChanged: (value) {
+                          setState(() {
+                            if (value == true) {
+                              if (ref.read(voucherDetailProvider) == null) {
+                                setVoucher();
+                              }
+                              selectedItems(
+                                ItemModel(
+                                  id: item.id,
+                                  name: item.name,
+                                  quantity: 1,
+                                  price: item.price,
+                                  photoUrl: item.photoUrl,
+                                ),
+                              );
+                            } else {
+                              clearSelectedItem(item.id);
                             }
-                            selectedItems(
-                              ItemModel(
-                                id: item.id,
-                                name: item.name,
-                                quantity: 1,
-                                price: item.price,
-                                photoUrl: item.photoUrl,
-                              ),
-                            );
-                          } else {
-                            clearSelectedItem(item.id);
-                          }
-                        });
-                      },
-                    );
-                  },
-                  firstPageProgressIndicatorBuilder: (_) =>
-                      Center(child: CircularProgressIndicator(color: kPrimary)),
-                  newPageProgressIndicatorBuilder: (_) =>
-                      Center(child: CircularProgressIndicator(color: kPrimary)),
+                          });
+                        },
+                      );
+                    },
+                    firstPageProgressIndicatorBuilder: (_) => Center(
+                      child: CircularProgressIndicator(color: kPrimary),
+                    ),
+                    newPageProgressIndicatorBuilder: (_) => Center(
+                      child: CircularProgressIndicator(color: kPrimary),
+                    ),
+                  ),
                 ),
               );
             },
@@ -177,7 +203,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Save button
-                        _ActionButton(
+                        customButton(
                           label: HomeScreenLocale.save.getString(context),
                           isDark: isDark,
                           gradient: false,
@@ -187,7 +213,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                         const SizedBox(width: 8),
 
                         // Create Voucher button — gradient
-                        _ActionButton(
+                        customButton(
                           label: HomeScreenLocale.createVoucher.getString(
                             context,
                           ),
@@ -322,68 +348,20 @@ class _ProductCard extends StatelessWidget {
 
   Widget _productImage(Product item) {
     return item.photoUrl != null
-        ? Image.network(item.photoUrl!, fit: BoxFit.cover)
+        ? CachedNetworkImage(
+            imageUrl: item.photoUrl ?? "",
+            width: 65,
+            height: 70,
+            fit: BoxFit.cover,
+            placeholder: (context, url) =>
+                Container(width: 65, height: 70, color: Colors.grey.shade200),
+            errorWidget: (context, url, error) => Container(
+              width: 65,
+              height: 70,
+              color: Colors.grey.shade200,
+              child: const Icon(Icons.image_not_supported_outlined, size: 20),
+            ),
+          )
         : Image.asset("assets/default.jpg", fit: BoxFit.cover);
-  }
-}
-
-// ─────────────────────────────────────────
-// Action Button
-// ─────────────────────────────────────────
-class _ActionButton extends StatelessWidget {
-  final String label;
-  final bool isDark;
-  final bool gradient;
-  final VoidCallback onTap;
-
-  const _ActionButton({
-    required this.label,
-    required this.isDark,
-    required this.gradient,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        constraints: const BoxConstraints(minWidth: 120),
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          gradient: gradient
-              ? const LinearGradient(
-                  colors: [kPrimary, kSecondary],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                )
-              : null,
-          color: gradient
-              ? null
-              : (isDark ? Colors.white.withOpacity(0.12) : Colors.white),
-          borderRadius: BorderRadius.circular(22),
-          boxShadow: gradient
-              ? [
-                  BoxShadow(
-                    color: kPrimary.withOpacity(0.35),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: FontSizeConfig.body(context),
-            color: gradient
-                ? Colors.white
-                : (isDark ? Colors.white : kTextLight),
-          ),
-        ),
-      ),
-    );
   }
 }

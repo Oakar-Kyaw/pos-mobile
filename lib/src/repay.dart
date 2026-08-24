@@ -3,8 +3,8 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/component/date-select.dart';
-import 'package:pos/component/user-select.dart';
+import 'package:pos/core/utils/date-range-select.dart';
+import 'package:pos/core/utils/user-select.dart';
 import 'package:pos/localization/repay-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
@@ -72,7 +72,7 @@ class _RepaymentHistoryPageState extends ConsumerState<RepaymentHistoryPage> {
           if (user != null && (isAdmin(user.role) || isManager(user.role)))
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: DateSelect(),
+              child: DateRangeSelect(),
             ),
           Expanded(
             child: RepaymentList(

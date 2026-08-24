@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/category.api.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/bar-code.dart';
+import 'package:pos/core/widgets/input.dart';
 import 'package:pos/models/category.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -136,7 +137,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// Product Name
-          _input(
+          customInput(
             context,
             label: ProductScreenLocale.productName,
             placeholder: ProductScreenLocale.productNamePlaceholder,
@@ -144,12 +145,12 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             labelColor: labelColor,
           ),
 
-          _gap(),
+          customGap(),
 
           /// Category
           Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 5),
-            child: _label(
+            child: customLabel(
               context,
               CategoryScreenLocale.categoryName,
               labelColor,
@@ -181,10 +182,10 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             ),
           ),
 
-          _gap(),
+          customGap(),
 
           /// Product Code
-          _input(
+          customInput(
             context,
             label: ProductScreenLocale.productCode,
             placeholder: ProductScreenLocale.productCodePlaceholder,
@@ -192,12 +193,16 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             labelColor: labelColor,
           ),
 
-          _gap(),
+          customGap(),
 
           /// Barcode
           Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 5),
-            child: _label(context, ProductScreenLocale.barcode, labelColor),
+            child: customLabel(
+              context,
+              ProductScreenLocale.barcode,
+              labelColor,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -249,24 +254,27 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             ),
           ),
 
-          _gap(),
+          // customGap(),
 
-          /// Description
-          _input(
-            context,
-            label: ProductScreenLocale.description,
-            placeholder: ProductScreenLocale.descriptionPlaceholder,
-            controller: descriptionCtrl,
-            maxLines: 3,
-            labelColor: labelColor,
-          ),
-
-          _gap(),
+          // /// Description
+          // customInput(
+          //   context,
+          //   label: ProductScreenLocale.description,
+          //   placeholder: ProductScreenLocale.descriptionPlaceholder,
+          //   controller: descriptionCtrl,
+          //   maxLines: 3,
+          //   labelColor: labelColor,
+          // ),
+          customGap(),
 
           /// Photo
           Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 5),
-            child: _label(context, ProductScreenLocale.photoUrl, labelColor),
+            child: customLabel(
+              context,
+              ProductScreenLocale.photoUrl,
+              labelColor,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -346,10 +354,10 @@ class _ProductFormState extends ConsumerState<ProductForm> {
                   ),
           ),
 
-          _gap(),
+          customGap(),
 
           /// Price
-          _input(
+          customInput(
             context,
             label: ProductScreenLocale.productPrice,
             placeholder: ProductScreenLocale.productPricePlaceholder,
@@ -358,10 +366,10 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             labelColor: labelColor,
           ),
 
-          _gap(),
+          customGap(),
 
           /// Cost Price
-          _input(
+          customInput(
             context,
             label: ProductScreenLocale.productCostPrice,
             placeholder: ProductScreenLocale.productCostPricePlaceholder,
@@ -370,10 +378,10 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             labelColor: labelColor,
           ),
 
-          _gap(),
+          customGap(),
 
           /// Stock
-          _input(
+          customInput(
             context,
             label: ProductScreenLocale.productStock,
             placeholder: ProductScreenLocale.productStockPlaceholder,
@@ -382,10 +390,10 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             labelColor: labelColor,
           ),
 
-          _gap(),
+          customGap(),
 
           /// Min Stock
-          _input(
+          customInput(
             context,
             label: ProductScreenLocale.minStock,
             placeholder: ProductScreenLocale.minStockPlaceholder,
@@ -394,26 +402,25 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             labelColor: labelColor,
           ),
 
-          _gap(),
+          // customGap(),
 
           /// Active Switch
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: ShadSwitchFormField(
-              label: Text(
-                ProductScreenLocale.isActive.getString(context),
-                style: TextStyle(
-                  fontSize: FontSizeConfig.body(context),
-                  fontWeight: FontWeight.bold,
-                  color: labelColor,
-                ),
-              ),
-              initialValue: true,
-              onChanged: (value) => isActive = value,
-            ),
-          ),
-
-          _gap(),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 10),
+          //   child: ShadSwitchFormField(
+          //     label: Text(
+          //       ProductScreenLocale.isActive.getString(context),
+          //       style: TextStyle(
+          //         fontSize: FontSizeConfig.body(context),
+          //         fontWeight: FontWeight.bold,
+          //         color: labelColor,
+          //       ),
+          //     ),
+          //     initialValue: true,
+          //     onChanged: (value) => isActive = value,
+          //   ),
+          // ),
+          customGap(),
 
           /// Submit Button
           Padding(
@@ -441,46 +448,6 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _gap({double height = 20}) => SizedBox(height: height);
-
-  Widget _label(BuildContext context, String key, Color color) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 5),
-      child: Text(
-        key.getString(context),
-        style: TextStyle(
-          fontSize: FontSizeConfig.body(context),
-          fontWeight: FontWeight.bold,
-          color: color,
-        ),
-      ),
-    );
-  }
-
-  Widget _input(
-    BuildContext context, {
-    required dynamic label,
-    required String placeholder,
-    required TextEditingController controller,
-    required Color labelColor,
-    int maxLines = 1,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: ShadInputFormField(
-        controller: controller,
-        label: _label(context, label, labelColor),
-        maxLines: maxLines,
-        keyboardType: keyboardType,
-        placeholder: Text(
-          placeholder.getString(context),
-          style: TextStyle(fontSize: FontSizeConfig.body(context)),
-        ),
       ),
     );
   }

@@ -3,9 +3,9 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/component/date-select.dart';
+import 'package:pos/core/utils/date-range-select.dart';
 import 'package:pos/component/refund-card.dart';
-import 'package:pos/component/user-select.dart';
+import 'package:pos/core/utils/user-select.dart';
 import 'package:pos/localization/refund-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
@@ -30,45 +30,49 @@ class _RefundPageState extends ConsumerState<RefundPage> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
-    final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
     final user = ref.watch(userStateProvider);
     final selectedData = ref.watch(selectedDataStateProvider);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: CustomAppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(LucideIcons.arrowLeft),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) =>
+          ref.read(selectedDataStateProvider.notifier).clear(),
+      child: Scaffold(
+        backgroundColor: bgColor,
+        appBar: CustomAppBar(
+          leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: const Icon(LucideIcons.arrowLeft),
+          ),
+          title: RefundLocale.refund.getString(context),
         ),
-        title: RefundLocale.refund.getString(context),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DescriptionWidget(
-              isDark: isDark,
-              description: RefundLocale.addRefund.getString(context),
-              icon: LucideIcons.dollarSign,
-              subColor: subColor,
-            ),
-            const SizedBox(height: 20),
-            if (isAdmin(user!.role) || isManager(user.role)) ...[
-              GradientSubmitButton(
-                onPressed: () => context.pushNamed(AppRoute.refundCreate),
-                text: RefundLocale.refundButton.getString(context),
-                width: 150,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DescriptionWidget(
+                isDark: isDark,
+                description: RefundLocale.addRefund.getString(context),
+                icon: LucideIcons.dollarSign,
+                subColor: subColor,
               ),
-              SizedBox(height: 20),
-              UserSelect(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
+              if (isAdmin(user!.role) || isManager(user.role)) ...[
+                GradientSubmitButton(
+                  onPressed: () => context.pushNamed(AppRoute.refundCreate),
+                  text: RefundLocale.refundButton.getString(context),
+                  width: 150,
+                ),
+                SizedBox(height: 20),
+                UserSelect(),
+                SizedBox(height: 20),
+              ],
+              DateRangeSelect(),
+              const SizedBox(height: 20),
+              Expanded(child: RefundCard(selectedData: selectedData)),
             ],
-            DateSelect(),
-            const SizedBox(height: 20),
-            Expanded(child: RefundCard(selectedData: selectedData)),
-          ],
+          ),
         ),
       ),
     );

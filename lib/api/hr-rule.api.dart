@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/models/hr-rule.dart';
 
 class HrRuleAsyncNotifier extends AsyncNotifier<List<HrRule>> {
-  final DioService _dio = DioService();
+  late DioService _dio;
 
   @override
   Future<List<HrRule>> build() async {
+    _dio = ref.watch(dioServiceProvider);
     return await getHrRules();
   }
 

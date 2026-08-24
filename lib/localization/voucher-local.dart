@@ -28,8 +28,11 @@ mixin VoucherScreenLocale {
   static const falseKeyboard = 'is_false';
   static const voucher = 'voucher';
   static const hasDebt = 'has_debt';
+  static const hasDiscount = 'has_discount';
   static const repay = 'repayment';
   static const deleteVoucher = 'delete_voucher';
+  static const scanWithBarCode = 'scan_with_barcode';
+  static const voucherCalculate = 'calculate';
 
   // ===== English =====
   static const EN = {
@@ -50,23 +53,34 @@ mixin VoucherScreenLocale {
     printReceipt: 'Print Receipt',
     item: 'Item',
     amount: 'Amount',
+
     viewAllVouchers:
         'You can see all your vouchers on this page. Tap on any voucher to view its full details.',
+
     voucherCode: 'Voucher Code',
     no: 'No',
     date: 'Date',
-    searchVoucherPlaceholder: 'Search by voucher code or its date',
+
+    searchVoucherPlaceholder: 'Search by voucher code or date',
 
     existDebt: 'Remaining Debt',
     isRefund: 'Refund Voucher',
-    trueKeyboard: 'true',
-    falseKeyboard: 'false',
+
+    trueKeyboard: 'True',
+    falseKeyboard: 'False',
+
     hasDebt: 'HAS DEBT',
+    hasDiscount: 'HAS DISCOUNT',
+
+    repay: 'Repayment',
 
     deleteVoucher: 'Do you want to delete this voucher?',
 
-    thankYouMessage:
-        'Thank you for shopping with us ❤️\nWe truly appreciate your support!\nWe look forward to serving you again. Shop more & save more!',
+    scanWithBarCode: 'Scan with Barcode',
+
+    voucherCalculate: 'Calculate',
+
+    thankYouMessage: 'Thank you for shopping with us',
   };
 
   // ===== Myanmar =====
@@ -74,36 +88,62 @@ mixin VoucherScreenLocale {
     title: 'ဘောက်ချာ ဖန်တီးခြင်း',
     voucher: 'ဘောက်ချာ',
     noItems: 'ဒေတာ မရှိပါ',
-    subtotal: 'စုစုပေါင်း (ပစ္စည်းစုစုပေါင်းစျေးနှုန်း)',
+
+    subtotal: 'ပစ္စည်းစုစုပေါင်း ဈေးနှုန်း',
     tax: 'အခွန်',
     total: 'စုစုပေါင်း',
-    note: 'မှတ်ချက် ရေးရန်',
-    save: 'ဘောက်ချာ သိမ်းမည်',
-    quantity: 'အရေအတွက်',
-    price: 'စျေးနှုန်း',
-    addItem: 'ပစ္စည်း အသစ် ထည့်မည်',
-    createdSuccess: 'ဘောက်ချာကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
-    deletedSuccess: 'ဘောက်ချာကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
-    receipt: 'ပြေစာ',
-    printReceipt: 'ပြေစာ ထုတ်မည်',
-    item: 'ပစ္စည်း',
-    amount: 'ငွေပမာဏ',
-    viewAllVouchers:
-        'ဤစာမျက်နှာတွင် သင့်၏ ဘောက်ချာအားလုံးကို ကြည့်ရှုနိုင်ပါသည်။ ဘောက်ချာတစ်ခုချင်းစီကို နှိပ်၍ အသေးစိတ် အချက်အလက်များကို ကြည့်ရှုနိုင်ပါသည်။',
-    voucherCode: 'ဘောက်ချာကုဒ်',
-    no: 'စဉ်',
-    date: 'ရက်စွဲ',
-    searchVoucherPlaceholder: 'ဘောက်ချာကုဒ် သို့မဟုတ် ရက်စွဲ ဖြင့် ရှာဖွေပါ',
 
-    existDebt: 'ပေးချေရန် ငွေရှိသည်',
-    isRefund: 'ပြန်လည်ငွေပေးချေ ဘောက်ချာ',
+    note: 'မှတ်ချက်',
+    save: 'ဘောက်ချာ သိမ်းမည်',
+
+    quantity: 'အရေအတွက်',
+    price: 'ဈေးနှုန်း',
+
+    addItem: 'ပစ္စည်းအသစ် ထည့်မည်',
+
+    createdSuccess: 'ဘောက်ချာကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
+
+    deletedSuccess: 'ဘောက်ချာကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
+
+    receipt: 'ပြေစာ',
+
+    printReceipt: 'ပြေစာ ထုတ်မည်',
+
+    item: 'ပစ္စည်း',
+
+    amount: 'ငွေပမာဏ',
+
+    viewAllVouchers:
+        'ဤစာမျက်နှာတွင် သင့်ဘောက်ချာများအားလုံးကို ကြည့်ရှုနိုင်ပါသည်။ ဘောက်ချာတစ်ခုချင်းစီကို နှိပ်၍ အသေးစိတ်အချက်အလက်များကို ကြည့်ရှုနိုင်ပါသည်။',
+
+    voucherCode: 'ဘောက်ချာကုဒ်',
+
+    no: 'စဉ်',
+
+    date: 'ရက်စွဲ',
+
+    searchVoucherPlaceholder: 'ဘောက်ချာကုဒ် သို့မဟုတ် ရက်စွဲဖြင့် ရှာဖွေပါ',
+
+    existDebt: 'ကျန်ရှိသော အကြွေး',
+
+    isRefund: 'ပြန်အမ်းငွေ ဘောက်ချာ',
+
     trueKeyboard: 'ရှိ',
+
     falseKeyboard: 'မရှိ',
-    hasDebt: 'ကြွေးမြီ ရှိ',
+
+    hasDebt: 'အကြွေးရှိသည်',
+
+    hasDiscount: 'လျှော့ဈေး ရှိသည်',
+
+    repay: 'အကြွေး ပြန်ဆပ်ခြင်း',
 
     deleteVoucher: 'ဤဘောက်ချာကို ဖျက်လိုပါသလား?',
 
-    thankYouMessage:
-        'ဝယ်ယူအားပေးမှုအတွက် ကျေးဇူးအထူးတင်ရှိပါသည် ❤️\nသင့်ရဲ့ အားပေးမှုကို တန်ဖိုးထားပါသည်။\nနောက်တစ်ကြိမ် ထပ်မံ ဝယ်ယူအားပေးရန် မျှော်လင့်ပါသည် !',
+    scanWithBarCode: 'ဘားကုဒ်ဖြင့် စကန်ဖတ်မည်',
+
+    voucherCalculate: 'တွက်ချက်မည်',
+
+    thankYouMessage: 'ဝယ်ယူအားပေးမှုအတွက် အထူးကျေးဇူးတင်ရှိပါသည်',
   };
 }

@@ -49,17 +49,6 @@ class _RefundCardState extends ConsumerState<RefundCard> {
     );
   }
 
-  @override
-  void dispose() {
-    _pagingController.dispose();
-    super.dispose();
-    _clearSelectedData();
-  }
-
-  void _clearSelectedData() {
-    ref.read(selectedDataStateProvider.notifier).clear();
-  }
-
   void _delete(Refund refund, bool isDark) {
     showDeleteDialog(
       context,

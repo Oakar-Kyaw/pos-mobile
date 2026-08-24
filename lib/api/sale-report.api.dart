@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/models/sale-report.dart';
 
 class SaleReportAsyncNotifier extends AsyncNotifier<SaleReport> {
-  final DioService _dio = DioService();
+  late DioService _dio;
 
   @override
   Future<SaleReport> build() async {
+    _dio = ref.watch(dioServiceProvider);
     return await _fetchOpeningAndClosing();
   }
 

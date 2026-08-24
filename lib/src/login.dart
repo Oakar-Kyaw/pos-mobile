@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
+import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/login.dart';
 import 'package:pos/utils/app-theme.dart';
@@ -10,6 +12,7 @@ import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:pos/localization/login-local.dart';
+import 'dart:async';
 
 class LoginScreen extends ConsumerStatefulWidget {
   final bool? showToast;
@@ -302,4 +305,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
     );
   }
+}
+
+Widget invoiceReceiptWidget({
+  required double receiptWidth,
+  required String shopName,
+  required String address,
+  required String invoiceNo,
+  required DateTime date,
+  required double total,
+  String? paymentMethod,
+  String footerNote = 'Thank you for your purchase!',
+}) {
+  return SizedBox(
+    width: receiptWidth,
+    child: Material(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Text(
+                shopName,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }

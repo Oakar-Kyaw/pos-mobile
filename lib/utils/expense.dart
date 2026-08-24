@@ -33,7 +33,7 @@ class _GeneralExpenseFormState extends ConsumerState<GeneralExpenseForm> {
     if (isSubmitting) return;
     setState(() => isSubmitting = true);
     print(
-      "Submitting expense: Title: ${title.text}, Amount: ${amount.text}, Reason: ${reason.text}, Date: ${selectedDate?.toIso8601String() ?? 'Not selected'}, Payment Method: $paymentMethod",
+      "Submitting expense: Title: ${title.text}, Amount: ${amount.text}, Reason: ${reason.text}, Date: ${selectedDate.toIso8601String()}, Payment Method: $paymentMethod",
     );
     final success = await ref
         .read(generalExpenseProvider.notifier)

@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/features/leave/data/datasources/leave-api.dart';
 import 'package:pos/features/leave/data/models/create-leave.dart';
 import 'package:pos/features/leave/data/repositories/leave-repository.dart';
 import 'package:pos/features/leave/domain/entites/leave.dart';
 
 final leaveRepositoryProvider = Provider<LeaveRepository>((ref) {
-  final dio = DioService();
-  final api = LeaveApi(dio);
+  final _dio = ref.watch(dioServiceProvider);
+  final api = LeaveApi(_dio);
   final repository = LeaveRepository(api);
   return repository;
 });

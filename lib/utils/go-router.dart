@@ -2,18 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/features/account-upgrade/presentation/pages/account-upgrade.dart';
+import 'package:pos/features/create-voucher/presentation/pages/create-voucher.dart';
+import 'package:pos/features/expire-item/presentation/page/expire-item.dart';
 import 'package:pos/features/leave/presentation/pages/leave-create-page.dart';
 import 'package:pos/features/leave/presentation/pages/leave-pages.dart';
+import 'package:pos/features/printer/presentation/page/printer.page.dart';
+import 'package:pos/features/product/presentation/page/product-bar-code-scan.dart';
+import 'package:pos/features/product/presentation/page/product-list-page.dart';
+import 'package:pos/features/purchase-history/data/model/purchase.dart';
+import 'package:pos/features/purchase-history/presentation/page/create-purchase-item.dart';
+import 'package:pos/features/purchase-history/presentation/page/purchase-detail.dart';
+import 'package:pos/features/purchase-history/presentation/page/purchase-edit.dart';
+import 'package:pos/features/purchase-history/presentation/page/purchase-history.dart';
+import 'package:pos/features/supplier/data/model/supplier.dart';
 import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/src/account.dart';
 import 'package:pos/src/attendance.dart';
 import 'package:pos/src/attendance-create.dart';
 import 'package:pos/src/category.dart';
 import 'package:pos/src/company-profile.dart';
-import 'package:pos/src/create-voucher.dart';
 import 'package:pos/src/debt-voucher.dart';
 import 'package:pos/src/employee.dart';
-import 'package:pos/src/expire-item-list.dart';
 import 'package:pos/src/general-expense.dart';
 import 'package:pos/src/general-expense-create.dart';
 import 'package:pos/src/home.dart';
@@ -38,6 +47,10 @@ import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'root',
+);
+
 //go router can't listen to notifier that is why we should create this
 final routeProvider = Provider<GoRouter>((ref) {
   // A. Create the "Radio" (The Bridge)
@@ -53,6 +66,7 @@ final routeProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: AppRoute.home,
+    navigatorKey: rootNavigatorKey,
     // D. Give the Bouncer the Radio
     // Now, when authStateListener updates, the redirect logic re-runs.
     refreshListenable: authListener,
@@ -120,6 +134,21 @@ final routeProvider = Provider<GoRouter>((ref) {
         name: AppRoute.vouchers,
         builder: (context, state) => VoucherCardPage(),
       ),
+      GoRoute(
+        path: AppRoute.productBarcodeScan,
+        name: AppRoute.productBarcodeScan,
+        builder: (context, state) => ProductBarcodeScanPage(),
+      ),
+      GoRoute(
+        path: AppRoute.productList,
+        name: AppRoute.productList,
+        builder: (context, state) => ProductListsPage(),
+      ),
+      // GoRoute(
+      //   path: AppRoute.voucherCalculation,
+      //   name: AppRoute.voucherCalculation,
+      //   builder: (context, state) => VoucherCalculationPage(),
+      // ),
       GoRoute(
         path: AppRoute.income,
         name: AppRoute.income,
@@ -190,6 +219,28 @@ final routeProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => EmployeeCreatePage(),
       ),
       GoRoute(
+        path: AppRoute.purchaseHistory,
+        name: AppRoute.purchaseHistory,
+        builder: (context, state) => PurchaseItemPage(),
+      ),
+      GoRoute(
+        path: AppRoute.purchaseDetail,
+        name: AppRoute.purchaseDetail,
+        builder: (context, state) =>
+            PurchaseDetailPage(purchase: state.extra as Purchase),
+      ),
+      GoRoute(
+        path: AppRoute.purchaseEdit,
+        name: AppRoute.purchaseEdit,
+        builder: (context, state) =>
+            PurchaseEditPage(purchase: state.extra as Purchase),
+      ),
+      GoRoute(
+        path: AppRoute.purchaseCreate,
+        name: AppRoute.purchaseCreate,
+        builder: (context, state) => PurchaseCreatePage(),
+      ),
+      GoRoute(
         path: AppRoute.requestItem,
         name: AppRoute.requestItem,
         builder: (context, state) => RequestItemPage(),
@@ -241,6 +292,11 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.hrRule,
         name: AppRoute.hrRule,
         builder: (context, state) => HrRulePage(),
+      ),
+      GoRoute(
+        path: AppRoute.printer,
+        name: AppRoute.printer,
+        builder: (context, state) => PrinterPage(),
       ),
       GoRoute(
         path: AppRoute.login,

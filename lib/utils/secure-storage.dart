@@ -84,7 +84,7 @@ class SecureStorage {
     await storage.write(key: "userId", value: jsonString);
   }
 
-  getLoginData() async {
+  Future<Map<String, dynamic>?> getLoginData() async {
     String? jsonString = await storage.read(key: "userId");
     // print("getLogin data is: $jsonString");
     if (jsonString != null) {
@@ -115,7 +115,7 @@ class SecureStorage {
 
   Future<void> saveAcessAndRefreshToken({
     required String accessToken,
-    required String refreshToken,
+    String? refreshToken,
   }) async {
     // Convert map to JSON string
     String jsonString = jsonEncode({

@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/models/attendance.dart';
 
 class AttendanceAsyncNotifier extends AsyncNotifier<List<Attendance>> {
-  final DioService _dio = DioService();
+  late DioService _dio;
 
   @override
   Future<List<Attendance>> build() async {
+    _dio = ref.watch(dioServiceProvider);
     return await getAttendances(page: 1, limit: 10);
   }
 

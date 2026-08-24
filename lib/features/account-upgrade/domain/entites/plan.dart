@@ -3,6 +3,7 @@ class Plan {
   final String name;
   final String title;
   final int durationDays;
+  final int month;
   final String priceMMK;
   final String priceUSD;
   final int discountPercent;
@@ -18,6 +19,7 @@ class Plan {
     required this.id,
     required this.name,
     required this.title,
+    required this.month,
     required this.durationDays,
     required this.priceMMK,
     required this.priceUSD,

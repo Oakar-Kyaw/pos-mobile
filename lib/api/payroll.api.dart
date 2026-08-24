@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/models/payroll.dart';
 
 class PayrollAsyncNotifier extends AsyncNotifier<List<PayrollRecord>> {
-  final DioService _dio = DioService();
+  late DioService _dio;
 
   @override
   Future<List<PayrollRecord>> build() async {
+    _dio = ref.watch(dioServiceProvider);
     return await getAllPayroll(page: 1, limit: 10);
   }
 

@@ -1,4 +1,4 @@
-package com.oakarkyaw.pos
+package com.oakarkyaw.posmaster
 
 import io.flutter.embedding.android.FlutterActivity
 

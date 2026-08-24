@@ -118,10 +118,9 @@ class PlanCard extends StatelessWidget {
       ),
       footer: GradientSubmitButton(
         onPressed: () {
-          print("gradient");
           showShadDialog(
             context: context,
-            builder: (context) => AccountUpgradeDialog(),
+            builder: (context) => AccountUpgradeDialog(plan: planData),
           );
         },
         text: AccountUpgradeScreenLocale.upgradeTitle.getString(context),

@@ -8,6 +8,10 @@ mixin ProductScreenLocale {
   static const editProduct = 'product_edit';
   static const deleteProduct = 'product_delete';
 
+  static const search = 'product_search';
+  static const searchPlaceholder = 'product_search_placeholder';
+  static const searchNoResult = 'product_search_no_result';
+
   static const productName = 'product_name';
   static const productNamePlaceholder = 'product_name_placeholder';
   static const productNameError = 'product_name_error';
@@ -17,6 +21,11 @@ mixin ProductScreenLocale {
 
   static const barcode = 'product_barcode';
   static const barcodePlaceholder = 'product_barcode_placeholder';
+
+  static const barcodeScan = 'product_barcode_scan';
+  static const barcodeScanning = 'product_barcode_scanning';
+  static const barcodeScanSuccess = 'product_barcode_scan_success';
+  static const barcodeScanFailed = 'product_barcode_scan_failed';
 
   static const description = 'product_description_field';
   static const descriptionPlaceholder = 'product_description_placeholder';
@@ -41,11 +50,15 @@ mixin ProductScreenLocale {
   static const isActive = 'product_is_active';
 
   static const save = 'product_save';
+  static const saveEdit = 'product_save_edit';
+  static const saving = 'product_saving';
+  static const unsavedChanges = 'product_unsaved_changes';
   static const cancel = 'product_cancel';
 
   static const productCreated = 'product_created';
   static const productUpdated = 'product_updated';
   static const productDeleted = 'product_deleted';
+  static const productEditSaved = 'product_edit_saved';
 
   static const productNotFound = 'product_not_found';
 
@@ -59,6 +72,10 @@ mixin ProductScreenLocale {
     editProduct: 'Edit Product',
     deleteProduct: 'Delete Product',
 
+    search: 'Search',
+    searchPlaceholder: 'Search by name, code or barcode',
+    searchNoResult: 'No matching products found',
+
     productName: 'Name',
     productNamePlaceholder: 'Enter product name',
     productNameError: 'Product name is required',
@@ -66,8 +83,13 @@ mixin ProductScreenLocale {
     productCode: 'Code',
     productCodePlaceholder: 'Enter product code',
 
-    barcode: 'Scan Barcode',
+    barcode: 'Barcode',
     barcodePlaceholder: 'Enter barcode',
+
+    barcodeScan: 'Scan Barcode',
+    barcodeScanning: 'Scanning barcode...',
+    barcodeScanSuccess: 'Barcode scanned successfully',
+    barcodeScanFailed: 'Failed to scan barcode',
 
     description: 'Description',
     descriptionPlaceholder: 'Enter product description',
@@ -92,11 +114,15 @@ mixin ProductScreenLocale {
     isActive: 'Active',
 
     save: 'Save',
+    saveEdit: 'Save Changes',
+    saving: 'Saving...',
+    unsavedChanges: 'You have unsaved changes',
     cancel: 'Cancel',
 
     productCreated: 'Product created successfully',
     productUpdated: 'Product updated successfully',
     productDeleted: 'Product deleted successfully',
+    productEditSaved: 'Product changes saved successfully',
 
     productNotFound: 'Product not found',
   };
@@ -111,6 +137,10 @@ mixin ProductScreenLocale {
     editProduct: 'ကုန်ပစ္စည်း ပြင်ဆင်မည်',
     deleteProduct: 'ကုန်ပစ္စည်း ဖျက်မည်',
 
+    search: 'ရှာဖွေရန်.....',
+    searchPlaceholder: 'အမည်၊ ကုဒ် သို့မဟုတ် ဘားကုဒ်ဖြင့် ရှာဖွေပါ',
+    searchNoResult: 'ကိုက်ညီသော ကုန်ပစ္စည်း မတွေ့ပါ',
+
     productName: 'အမည်',
     productNamePlaceholder: 'ကုန်ပစ္စည်းအမည် ထည့်ပါ',
     productNameError: 'ကုန်ပစ္စည်းအမည် လိုအပ်ပါသည်',
@@ -118,8 +148,13 @@ mixin ProductScreenLocale {
     productCode: 'ကုဒ်',
     productCodePlaceholder: 'ကုန်ပစ္စည်း ကုဒ် ထည့်ပါ',
 
-    barcode: 'ဘားကုဒ် စကင်မယ်',
+    barcode: 'ဘားကုဒ်',
     barcodePlaceholder: 'ဘားကုဒ် ထည့်ပါ',
+
+    barcodeScan: 'ဘားကုဒ် စကင်ဖတ်မည်',
+    barcodeScanning: 'ဘားကုဒ် စကင်ဖတ်နေသည်...',
+    barcodeScanSuccess: 'ဘားကုဒ်ကို အောင်မြင်စွာ စကင်ဖတ်ပြီးပါပြီ',
+    barcodeScanFailed: 'ဘားကုဒ် စကင်ဖတ်၍ မအောင်မြင်ပါ',
 
     description: 'ဖော်ပြချက်',
     descriptionPlaceholder: 'ကုန်ပစ္စည်း ဖော်ပြချက် ထည့်ပါ',
@@ -144,11 +179,16 @@ mixin ProductScreenLocale {
     isActive: 'အသုံးပြုနေသည်',
 
     save: 'သိမ်းမည်',
+    saveEdit: 'ပြောင်းလဲမှုများကို သိမ်းမည်',
+    saving: 'သိမ်းဆည်းနေသည်...',
+    unsavedChanges: 'မသိမ်းရသေးသော ပြောင်းလဲမှုများ ရှိပါသည်',
     cancel: 'မလုပ်တော့ပါ',
 
     productCreated: 'ကုန်ပစ္စည်း အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
     productUpdated: 'ကုန်ပစ္စည်း အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ',
     productDeleted: 'ကုန်ပစ္စည်း ဖျက်ပြီးပါပြီ',
+    productEditSaved:
+        'ကုန်ပစ္စည်း ပြောင်းလဲမှုများကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ',
 
     productNotFound: 'ကုန်ပစ္စည်း မတွေ့ပါ',
   };

@@ -57,6 +57,9 @@ class DebtAndRepayVoucherListComponent extends StatelessWidget {
                         textColor: textColor,
                         subColor: subColor,
                         hasDebt: hasDebt,
+                        hasDiscount:
+                            (voucher.discountAmount > 0 ||
+                            voucher.discountPercent > 0),
                       ),
                       const SizedBox(height: 12),
                       const Divider(height: 1),

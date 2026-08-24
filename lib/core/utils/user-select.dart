@@ -52,6 +52,7 @@ class _UserSelectState extends ConsumerState<UserSelect> {
             options: shadOptions,
             placeholder: Text(GeneralScreenLocale.all.getString(context)),
             onChanged: (value) {
+              print("user select is: ${value}");
               setState(() {
                 selectedValue = value;
               });

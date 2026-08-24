@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/models/refund.dart';
 
 class RefundAsyncNotifier extends AsyncNotifier<List<Refund>> {
-  final DioService _dio = DioService();
+  late DioService _dio;
 
   @override
   Future<List<Refund>> build() async {
+    _dio = ref.watch(dioServiceProvider);
     return await fetchRefunds();
   }
 

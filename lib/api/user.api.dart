@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/models/user.dart';
 
 class UserAsyncNotifier extends AsyncNotifier<User> {
-  final DioService _dio = DioService();
+  late DioService _dio;
 
   @override
   Future<User> build() async {
+    _dio = ref.watch(dioServiceProvider);
     return getUserById();
   }
 
@@ -84,6 +86,23 @@ class UserAsyncNotifier extends AsyncNotifier<User> {
     }
 
     throw Exception("Failed to search users");
+  }
+
+  ///create notification device token
+  Future<bool> createorUpdateNotificationDeviceToken({
+    required String deviceToken,
+  }) async {
+    final response = await _dio.post(
+      "v1/users/save-token",
+      data: {"deviceToken": deviceToken},
+    );
+    final data = response.data as Map<String, dynamic>;
+
+    if (data["success"] == true) {
+      return true;
+    }
+
+    throw Exception("Failed to create notification device token");
   }
 }
 

@@ -3,6 +3,8 @@ mixin DrawerScreenLocale {
   static const drawerCategory = 'drawer_category';
   static const drawerCompany = 'drawer_company';
   static const drawerProduct = 'drawer_product';
+  static const drawerAddProduct = 'drawer_add_product';
+  static const drawerViewProducts = 'drawer_view_products';
   static const drawerIncome = 'drawer_income';
   static const drawerExpense = 'drawer_general_expense';
   static const drawerProfit = 'drawer_profit';
@@ -20,15 +22,17 @@ mixin DrawerScreenLocale {
   static const drawerRepay = 'drawer_repay';
   static const drawerHrRule = 'drawer_hr_rule';
 
-  // ✅ NEW ITEMS
+  // ✅ Management
   static const drawerEmployee = 'drawer_employee';
   static const drawerAttendance = 'drawer_attendance';
-  static const drawerLeave = 'drawer_leave'; // ✅ ADDED
+  static const drawerLeave = 'drawer_leave';
   static const drawerRefund = 'drawer_refund';
   static const drawerDebt = 'drawer_debt';
   static const drawerExpireItems = 'drawer_expire_items';
   static const drawerRequestItems = 'drawer_request_items';
+  static const drawerPurchaseItems = 'drawer_purchase_items';
   static const drawerEmployeeSalary = 'drawer_employee_salary';
+
   static const drawerUpgrade = 'drawer_upgrade';
   static const drawerUpgradeSuggestion = 'drawer_upgrade_suggestion';
   static const drawerBankAccount = 'drawer_account';
@@ -41,6 +45,8 @@ mixin DrawerScreenLocale {
     drawerCategory: 'Categories',
     drawerCompany: 'Register Company',
     drawerProduct: 'Products',
+    drawerAddProduct: 'Add Product',
+    drawerViewProducts: 'View Products',
     drawerIncome: 'Income',
     drawerExpense: 'General Expenses',
     drawerProfit: 'Profit',
@@ -51,23 +57,25 @@ mixin DrawerScreenLocale {
     drawerEnglish: 'English',
     drawerMyanmar: 'Myanmar',
     drawerSaleReport: 'Sale Report',
-    drawerLight: "Light",
-    drawerDark: "Dark",
+    drawerLight: 'Light',
+    drawerDark: 'Dark',
     drawerPosSystem: 'POS System',
     drawerPosManagement: 'Management Dashboard',
     drawerUpgrade: 'Upgrade Plan',
     drawerUpgradeSuggestion: 'Business Upgrade Suggestion',
 
-    // ✅ Added
+    // Management
     drawerEmployee: 'Employees',
     drawerAttendance: 'Attendance',
-    drawerLeave: 'Leave', // ✅ ADDED
+    drawerLeave: 'Leave',
     drawerHrRule: 'HR Rules',
     drawerRefund: 'Refund',
     drawerDebt: 'Debt',
     drawerExpireItems: 'Expire Items',
     drawerRequestItems: 'Request Items',
+    drawerPurchaseItems: 'Purchase Items',
     drawerEmployeeSalary: 'Employee Salary',
+
     drawerBankAccount: 'Payment Account',
     drawerRepay: 'Repayment',
     drawerCreate: 'Create',
@@ -80,6 +88,8 @@ mixin DrawerScreenLocale {
     drawerCategory: 'အမျိုးအစားများ',
     drawerCompany: 'ကုမ္ပဏီမှတ်ပုံတင်ခြင်း',
     drawerProduct: 'ကုန်ပစ္စည်းများ',
+    drawerAddProduct: 'ကုန်ပစ္စည်း ထည့်ရန်',
+    drawerViewProducts: 'ကုန်ပစ္စည်း ကြည့်ရန်',
     drawerIncome: 'ဝင်ငွေ',
     drawerExpense: 'အထွေထွေ အသုံးစရိတ်များ',
     drawerProfit: 'အမြတ်အစွန်း',
@@ -90,13 +100,13 @@ mixin DrawerScreenLocale {
     drawerEnglish: 'အင်္ဂလိပ်',
     drawerMyanmar: 'မြန်မာ',
     drawerSaleReport: 'ရောင်းအားအစီရင်ခံစာ',
-    drawerLight: "အလင်း",
-    drawerDark: "အမှောင်",
+    drawerLight: 'အလင်း',
+    drawerDark: 'အမှောင်',
     drawerPosSystem: 'အရောင်းစနစ်',
     drawerPosManagement: 'စီမံဒက်စ်ဘုတ်',
     drawerHrRule: 'HR စည်းမျဉ်းများ',
 
-    // ✅ Added
+    // Management
     drawerEmployee: 'ဝန်ထမ်းများ',
     drawerAttendance: 'တက်ရောက်မှု',
     drawerLeave: 'ခွင့်ယူမှု',
@@ -104,10 +114,12 @@ mixin DrawerScreenLocale {
     drawerDebt: 'ကြွေးမြီ',
     drawerExpireItems: 'သက်တမ်းကုန်ပစ္စည်းများ',
     drawerRequestItems: 'ပစ္စည်းတောင်းခံမှု',
+    drawerPurchaseItems: 'ဝယ်ယူထားသောပစ္စည်းများ',
     drawerEmployeeSalary: 'ဝန်ထမ်းလစာ',
+
     drawerUpgrade: 'ပလန် အဆင့်မြှင့်ရန်',
     drawerUpgradeSuggestion: 'စီးပွားရေး အဆင့်မြှင့် အကြံပြုချက်',
-    drawerBankAccount: 'အကောင့်',
+    drawerBankAccount: 'ငွေပေးချေမှုအကောင့်',
     drawerRepay: 'အကြွေးပေးချေမှု',
     drawerCreate: 'ဖန်တီးမည်',
     drawerLogout: 'ထွက်ရန်',

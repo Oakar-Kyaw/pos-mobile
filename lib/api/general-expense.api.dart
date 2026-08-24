@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/models/general-expense.dart';
 
 class GeneralExpenseAsyncNotifier extends AsyncNotifier<List<GeneralExpense>> {
-  final DioService _dio = DioService();
+  late DioService _dio;
 
   @override
   Future<List<GeneralExpense>> build() async {
+    _dio = ref.watch(dioServiceProvider);
     return await fetchExpenses();
   }
 

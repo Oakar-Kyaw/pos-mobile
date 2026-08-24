@@ -38,12 +38,14 @@ class VoucherPayment {
     int? paymentDataId,
     double? amount,
     String? type,
+    PaymentData? paymentData,
   }) {
     return VoucherPayment(
       id: id ?? this.id,
       paymentDataId: paymentDataId ?? this.paymentDataId,
       amount: amount ?? this.amount,
       type: type ?? this.type,
+      paymentData: paymentData ?? this.paymentData,
     );
   }
 }
@@ -119,6 +121,8 @@ class VoucherDetailModel {
   double subTotal;
   double totalPaymentAmount;
   double deliveryFee;
+  double discountPercent;
+  double discountAmount;
   double remainingPaymentAmount;
   double total;
   double tax;
@@ -129,14 +133,16 @@ class VoucherDetailModel {
 
   VoucherDetailModel({
     required this.id,
-    this.voucherCode, // ✅ NEW
-    this.createdAt, // ✅ NEW
+    this.voucherCode,
+    this.createdAt,
     required this.items,
     required this.payments,
     this.company,
     this.totalPaymentAmount = 0,
     this.deliveryFee = 0,
     this.remainingPaymentAmount = 0,
+    this.discountAmount = 0,
+    this.discountPercent = 0,
     this.total = 0,
     this.subTotal = 0,
     this.tax = 0,
@@ -146,7 +152,7 @@ class VoucherDetailModel {
     required this.type,
   });
 
-  // ✅ CopyWith
+  // CopyWith
   VoucherDetailModel copyWith({
     int? id,
     List<ItemModel>? items,
@@ -154,6 +160,8 @@ class VoucherDetailModel {
     double? total,
     double? totalPaymentAmount,
     double? deliveryFee,
+    double? discountPercent,
+    double? discountAmount,
     double? remainingPaymentAmount,
     double? subTotal,
     double? tax,
@@ -170,6 +178,8 @@ class VoucherDetailModel {
       total: total ?? this.total,
       totalPaymentAmount: totalPaymentAmount ?? this.totalPaymentAmount,
       deliveryFee: deliveryFee ?? this.deliveryFee,
+      discountAmount: discountAmount ?? this.discountAmount,
+      discountPercent: discountPercent ?? this.discountPercent,
       remainingPaymentAmount:
           remainingPaymentAmount ?? this.remainingPaymentAmount,
       tax: tax ?? this.tax,
@@ -181,8 +191,9 @@ class VoucherDetailModel {
     );
   }
 
-  // ✅ From JSON
+  // From JSON
   factory VoucherDetailModel.fromJson(Map<String, dynamic> json) {
+    //print("voucher detail model $json");
     return VoucherDetailModel(
       id: json['id'],
       voucherCode: json['voucherCode'] ?? "",
@@ -199,6 +210,8 @@ class VoucherDetailModel {
       tax: double.parse(json['tax'].toString()),
       totalPaymentAmount: double.parse(json['totalPaymentAmount'].toString()),
       deliveryFee: double.parse(json['deliveryFee'].toString()),
+      discountAmount: double.parse(json["discountAmount"].toString()),
+      discountPercent: double.parse(json["discountPercent"].toString()),
       remainingPaymentAmount: double.parse(
         json['remainingPaymentAmount'].toString(),
       ),
@@ -217,7 +230,7 @@ class VoucherDetailModel {
     );
   }
 
-  // ✅ To JSON
+  // To JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,

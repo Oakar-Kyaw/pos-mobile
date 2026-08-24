@@ -1,19 +1,21 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
+import 'package:pos/core/provider.dart';
 import 'package:pos/models/inventory-management.dart';
 import 'package:pos/models/product.dart';
 
 class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
-  final DioService _dio = DioService();
+  late DioService _dio;
 
   @override
   Future<List<Product>> build() async {
     // Provide default values or initial values
-    return await getProductByUserId("1", "20");
+    _dio = ref.watch(dioServiceProvider);
+    return await getProductLists("1", "20");
   }
 
-  Future<List<Product>> getProductByUserId(
+  Future<List<Product>> getProductLists(
     String page,
     String limit, {
     String? search,
@@ -26,13 +28,14 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
         query: {"page": page, "limit": limit, "search": search},
       );
       final Map<String, dynamic> data = response.data;
-      //print("data 👨‍🏭 $data");
+      print("data 👨‍🏭 $data");
       if (data["success"] == true) {
         final items = data["data"] as List;
         List<Product> products = items
             .map((e) => Product.fromJson(Map<String, dynamic>.from(e)))
             .toList();
         state = AsyncData(products);
+
         return products;
       } else {
         state = AsyncError("Failed to fetch products", StackTrace.current);
@@ -48,9 +51,10 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
   Future<bool> postProduct(FormData json) async {
     final url = "v1/products";
     _dio.setContentType("multipart/form-data");
+    // print("Post Product is 🐹 $json");
     final response = await _dio.post(url, data: json);
     final Map<String, dynamic> data = response.data;
-    print("🤩 data is $data");
+    // print("🤩 data is $data");
 
     if (data["success"] == true) {
       // Optionally refresh the product list after posting
@@ -61,14 +65,54 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
     throw Exception("Failed to post product");
   }
 
+  Future<bool> editProductById(int id, FormData json) async {
+    final url = "v1/products/$id";
+    _dio.setContentType("multipart/form-data");
+    // for (final field in json.fields) {
+    //   print("${field.key}: ${field.value}");
+    // }
+
+    // for (final file in json.files) {
+    //   print("${file.key}: ${file.value.filename}, ${file.value.contentType}");
+    // }
+    final response = await _dio.patch(url, data: json);
+    final Map<String, dynamic> data = response.data;
+    // print("🤩 data is $data");
+
+    if (data["success"] == true) {
+      // Optionally refresh the product list after posting
+      ref.invalidateSelf();
+      return true;
+    }
+
+    throw Exception("Failed to edit product");
+  }
+
   Future<void> searchProducts({required String search}) async {
     state = const AsyncLoading();
 
     try {
-      final proudct = await getProductByUserId("1", "20", search: search);
+      final proudct = await getProductLists("1", "20", search: search);
       state = AsyncData(proudct);
     } catch (e, s) {
       state = AsyncError(e, s);
+    }
+  }
+
+  Future<Product> searchProductsByBarcode({required String barcode}) async {
+    try {
+      final url = "v1/products/barcode/$barcode";
+
+      final response = await _dio.get(url);
+      final Map<String, dynamic> data = response.data;
+      print("product by barcode is 📱 $data");
+      if (data["success"] == true) {
+        return Product.fromJson(Map<String, dynamic>.from(data["data"]));
+      }
+
+      throw Exception(data["message"] ?? "Product not found");
+    } catch (e) {
+      throw Exception("Failed to fetch product: $e");
     }
   }
 
@@ -76,7 +120,7 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
     state = const AsyncLoading();
 
     try {
-      final products = await getProductByUserId("1", "20");
+      final products = await getProductLists("1", "20");
       state = AsyncData(products);
     } catch (e, s) {
       state = AsyncError(e, s);

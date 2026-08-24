@@ -1,12 +1,23 @@
+import 'dart:async';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
 import 'package:pos/api/voucher.api.dart';
+import 'package:pos/core/database/printer-table-schema.dart';
+import 'package:pos/features/printer/data/datasource/printer-local-datasource.dart';
+import 'package:pos/features/printer/domain/entites/printer-device.dart';
+import 'package:pos/features/printer/domain/enums/printer-type.dart';
+import 'package:pos/features/printer/presentation/provider/printer-provider.dart';
 import 'package:pos/localization/company-local.dart';
 import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/localization/payment-local.dart';
 import 'package:pos/utils/font-size.dart';
+import 'package:pos/utils/formatAmount.dart';
+import 'package:pos/utils/receipt-generator.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 final voucherByIdProvider = FutureProvider.family<VoucherDetailModel, int>((
@@ -17,23 +28,67 @@ final voucherByIdProvider = FutureProvider.family<VoucherDetailModel, int>((
   return await notifier.getVoucherById(id);
 });
 
-class ReceiptPage extends ConsumerWidget {
+class ReceiptPage extends ConsumerStatefulWidget {
   final int id;
 
   const ReceiptPage({super.key, required this.id});
 
-  /// Helper: format price/amount
-  String formatAmount(double value) {
-    if (value % 1 == 0) {
-      return value.toInt().toString(); // hide .00
-    } else {
-      return value.toStringAsFixed(2);
-    }
+  @override
+  ConsumerState<ReceiptPage> createState() => _ReceiptPageState();
+}
+
+class _ReceiptPageState extends ConsumerState<ReceiptPage> {
+  final datasource = PrinterLocalDatabaseSource();
+  List<PrinterTableItem> listOfPrinters = [];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getSavedPrinters();
+    });
+  }
+
+  Future<void> _getSavedPrinters() async {
+    try {
+      final printers = await datasource.getAll();
+      final initialPrinter = printers.firstWhereOrNull((e) => e.setDefault);
+
+      print("printers are: ${initialPrinter} ");
+      setState(() {
+        listOfPrinters = printers;
+      });
+      if (initialPrinter == null) return;
+      ref
+          .read(printerProvider.notifier)
+          .connect(
+            initialPrinter.type.toDomain(),
+            PrinterDevice(
+              id: initialPrinter.id.toString(),
+              name: initialPrinter.name,
+              type: initialPrinter.type.toDomain(),
+              paperSize: initialPrinter.paperSize,
+              address: initialPrinter.address,
+              setDefault: initialPrinter.setDefault,
+              isConnected: initialPrinter.isConnected,
+            ),
+          );
+    } catch (e) {}
+  }
+
+  Future<void> printReceipt(
+    VoucherDetailModel voucher, {
+    Duration scanTimeout = const Duration(seconds: 5),
+  }) async {
+    final bytes = await generateReceiptBytes(context, voucher, PaperSize.mm58);
+    await ref
+        .read(printerProvider.notifier)
+        .printTest(PrinterType.bluetooth, bytes);
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final voucherAsync = ref.watch(voucherByIdProvider(id));
+  Widget build(BuildContext context) {
+    final voucherAsync = ref.watch(voucherByIdProvider(widget.id));
 
     return SafeArea(
       child: Scaffold(
@@ -41,6 +96,7 @@ class ReceiptPage extends ConsumerWidget {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (err, _) => Center(child: Text("Error: $err")),
           data: (voucher) {
+            print("receipt voucher is ${voucher.discountPercent}");
             return LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
@@ -196,6 +252,24 @@ class ReceiptPage extends ConsumerWidget {
                               ),
                               voucher.deliveryFee,
                             ),
+                            voucher.discountAmount > 0
+                                ? _receiptRow(
+                                    context,
+                                    PaymentScreenLocale
+                                        .paymentVoucherDiscountAmount
+                                        .getString(context),
+
+                                    voucher.discountAmount,
+                                  )
+                                : _receiptRow(
+                                    context,
+                                    PaymentScreenLocale
+                                        .paymentVoucherDiscountPercent
+                                        .getString(context),
+
+                                    voucher.discountPercent,
+                                    existPercent: true,
+                                  ),
                             const Divider(),
                             _receiptRow(
                               context,
@@ -227,7 +301,7 @@ class ReceiptPage extends ConsumerWidget {
 
                             /// ================= PRINT BUTTON =================
                             ShadButton(
-                              onPressed: () {},
+                              onPressed: () => printReceipt(voucher),
                               child: Text(
                                 VoucherScreenLocale.printReceipt.getString(
                                   context,
@@ -271,6 +345,7 @@ class ReceiptPage extends ConsumerWidget {
     String label,
     double value, {
     bool isBold = false,
+    bool existPercent = false,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -291,6 +366,7 @@ class ReceiptPage extends ConsumerWidget {
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
             ),
           ),
+          if (existPercent) ...[const Text("%")],
         ],
       ),
     );

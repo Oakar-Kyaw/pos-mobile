@@ -33,7 +33,12 @@ List<MenuItem> menuListByAdmin(BuildContext context) => [
   ),
   MenuItem(
     icon: LucideIcons.packageOpen,
-    label: DrawerScreenLocale.drawerProduct.getString(context),
+    label: DrawerScreenLocale.drawerViewProducts.getString(context),
+    route: AppRoute.productList,
+  ),
+  MenuItem(
+    icon: LucideIcons.packagePlus,
+    label: DrawerScreenLocale.drawerAddProduct.getString(context),
     route: AppRoute.product,
   ),
 
@@ -87,28 +92,33 @@ List<MenuItem> menuListByAdmin(BuildContext context) => [
     label: DrawerScreenLocale.drawerEmployee.getString(context),
     route: AppRoute.employee,
   ),
-  MenuItem(
-    icon: LucideIcons.calendarCheck,
-    label: DrawerScreenLocale.drawerAttendance.getString(context),
-    route: AppRoute.attendance,
-  ),
-  MenuItem(
-    icon: Icons.event_busy,
-    label: DrawerScreenLocale.drawerLeave.getString(context),
-    route: AppRoute.leave,
-  ),
-  MenuItem(
-    icon: LucideIcons.banknote,
-    label: DrawerScreenLocale.drawerEmployeeSalary.getString(context),
-    route: AppRoute.payroll,
-  ),
-  MenuItem(
-    icon: LucideIcons.clipboardCheck,
-    label: DrawerScreenLocale.drawerHrRule.getString(context),
-    route: AppRoute.hrRule,
-  ),
+  // MenuItem(
+  //   icon: LucideIcons.calendarCheck,
+  //   label: DrawerScreenLocale.drawerAttendance.getString(context),
+  //   route: AppRoute.attendance,
+  // ),
+  // MenuItem(
+  //   icon: Icons.event_busy,
+  //   label: DrawerScreenLocale.drawerLeave.getString(context),
+  //   route: AppRoute.leave,
+  // ),
+  // MenuItem(
+  //   icon: LucideIcons.banknote,
+  //   label: DrawerScreenLocale.drawerEmployeeSalary.getString(context),
+  //   route: AppRoute.payroll,
+  // ),
+  // MenuItem(
+  //   icon: LucideIcons.clipboardCheck,
+  //   label: DrawerScreenLocale.drawerHrRule.getString(context),
+  //   route: AppRoute.hrRule,
+  // ),
 
   // ───────── INVENTORY CONTROL ─────────
+  MenuItem(
+    icon: LucideIcons.shoppingCart,
+    label: DrawerScreenLocale.drawerPurchaseItems.getString(context),
+    route: AppRoute.purchaseHistory,
+  ),
   MenuItem(
     icon: LucideIcons.triangle,
     label: DrawerScreenLocale.drawerExpireItems.getString(context),

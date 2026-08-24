@@ -14,12 +14,14 @@ class HeaderSection extends StatelessWidget {
     required this.textColor,
     required this.subColor,
     required this.hasDebt,
+    required this.hasDiscount,
   });
 
   final VoucherDetailModel voucher;
   final Color textColor;
   final Color subColor;
   final bool hasDebt;
+  final bool hasDiscount;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +45,14 @@ class HeaderSection extends StatelessWidget {
                       label: VoucherScreenLocale.hasDebt.getString(context),
                       color: Colors.red,
                       icon: LucideIcons.wallet,
+                    ),
+                  ],
+                  if (hasDiscount) ...[
+                    const SizedBox(width: 6),
+                    BadgeWidget(
+                      label: VoucherScreenLocale.hasDiscount.getString(context),
+                      color: Colors.green,
+                      icon: LucideIcons.badgePercent,
                     ),
                   ],
                 ],

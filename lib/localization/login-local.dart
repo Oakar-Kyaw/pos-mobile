@@ -19,9 +19,13 @@ mixin LoginScreenLocale {
 
   static const signIn = 'login_sign_in';
 
-  // 👇 NEW (Register section)
+  // Register
   static const newToPos = 'login_new_to_pos';
   static const register = 'login_register';
+
+  // Session
+  static const sessionExpired = 'session_expired';
+  static const sessionExpiredDescription = 'session_expired_description';
 
   // ===== English =====
   static const EN = {
@@ -46,6 +50,9 @@ mixin LoginScreenLocale {
 
     newToPos: 'New to POS Master',
     register: 'Register',
+
+    sessionExpired: 'Session Expired',
+    sessionExpiredDescription: 'Your session has expired. Please login again.',
   };
 
   // ===== Burmese (Myanmar) =====
@@ -71,5 +78,9 @@ mixin LoginScreenLocale {
 
     newToPos: 'POS Master အသုံးပြုသူ အသစ်လား',
     register: 'စာရင်းသွင်းမည်',
+
+    sessionExpired: 'Session သက်တမ်းကုန်ဆုံးပါပြီ',
+    sessionExpiredDescription:
+        'သင်၏ Session သက်တမ်းကုန်ဆုံးသွားပါပြီ။ ကျေးဇူးပြု၍ ထပ်မံလော့ဂ်အင်ဝင်ပါ။',
   };
 }

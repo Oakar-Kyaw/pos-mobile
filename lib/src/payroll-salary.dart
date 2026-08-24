@@ -3,7 +3,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/component/user-select.dart';
+import 'package:pos/core/utils/user-select.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/payroll-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';

@@ -14,6 +14,12 @@ mixin PaymentScreenLocale {
   static const paymentButton = 'payment_button';
   static const paymentCancel = 'payment_cancel';
   static const paymentSuccess = 'payment_success';
+  static const paymentDiscount = 'payment_discount';
+  static const paymentDiscountPercent = 'payment_discount_percent';
+  static const paymentDiscountAmount = 'payment_discount_amount';
+  static const paymentVoucherDiscountPercent =
+      'payment_voucher_discount_percent';
+  static const paymentVoucherDiscountAmount = 'payment_voucher_discount_amount';
   static const paymentError = 'payment_error';
   static const paymentAmountError = 'payment_amount_error';
   static const selectPaymentMethod = 'select_payment_method';
@@ -39,27 +45,38 @@ mixin PaymentScreenLocale {
   static const EN = {
     paymentTitle: 'Payment',
     paymentDescription: 'Choose Payment Method',
-    paymentCard: "Credit Card",
-    paymentEWallet: "E-Wallet (Pay)",
-    paymentBank: "Bank Account",
-    paymentCash: "Cash",
+    paymentCard: 'Credit Card',
+    paymentEWallet: 'E-Wallet (Pay)',
+    paymentBank: 'Bank Account',
+    paymentCash: 'Cash',
     paymentMethod: 'Payment Method',
     paymentAmount: 'Amount',
     paymentTotalAmount: 'Payment Amount',
     paymentRemainingAmount: 'Remaining Amount',
+
+    paymentDiscount: 'Discount',
+    paymentDiscountAmount: 'Amount',
+    paymentDiscountPercent: 'Percent',
+    paymentVoucherDiscountAmount: 'Discount Amount',
+    paymentVoucherDiscountPercent: 'Discount Percent',
+
     paymentAmountPlaceholder: 'Enter payment amount',
     paymentButton: 'Save',
     paymentCancel: 'Cancel',
+
     paymentSuccess: 'Payment completed successfully',
     paymentError: 'Payment failed. Please try again.',
     paymentAmountError: 'Please enter a valid amount',
+
     selectPaymentMethod: 'Please select a payment method',
     selectPaymentAccount: 'Select Payment Account',
-    paymentAmountExceedError: "Pay Amount can't exceed total Amount",
-    noPayment: 'No payment',
+
+    paymentAmountExceedError: "Payment amount can't exceed the total amount.",
+
+    noPayment: 'No Payment',
     paidAmount: 'Paid Amount',
     deliveryFee: 'Delivery Fee',
-    cancel: "Cancel",
+    cancel: 'Cancel',
 
     paymentPhoto: 'Payment Photo (Optional)',
     uploadPhoto: 'Upload Photo',
@@ -71,39 +88,77 @@ mixin PaymentScreenLocale {
     deletePaymentFailed: 'Failed to delete payment account.',
   };
 
-  // ===== Burmese =====
+  // ===== Myanmar =====
   static const MM = {
     paymentTitle: 'ငွေပေးချေမှု',
-    paymentDescription: 'ငွေပေးချေမှုအမျိုးအစားအား ရွေးချယ်ပါ',
+
+    paymentDescription: 'ငွေပေးချေမှုနည်းလမ်းကို ရွေးချယ်ပါ',
+
+    paymentCard: 'ခရက်ဒစ်ကတ်',
+
+    paymentEWallet: 'ဒစ်ဂျစ်တယ်ပိုက်ဆံအိတ် (Pay)',
+
+    paymentBank: 'ဘဏ်အကောင့်',
+
+    paymentCash: 'ငွေသား',
+
     paymentMethod: 'ငွေပေးချေနည်းလမ်း',
+
     paymentAmount: 'ငွေပမာဏ',
+
     paymentTotalAmount: 'ပေးချေရမည့် ငွေပမာဏ',
-    paymentRemainingAmount: 'ကျန်ရှိသည့် ပမာဏ',
-    paymentCard: "ခရက်ဒစ်ကတ်",
-    paymentEWallet: "ဒစ်ဂျစ်တယ် ပိုက်ဆံအိတ် (Pay)",
-    paymentBank: "ဘဏ်အကောင့်",
-    paymentCash: "ငွေသား",
+
+    paymentRemainingAmount: 'ကျန်ရှိသော ငွေပမာဏ',
+
+    paymentDiscount: 'လျှော့ဈေး',
+
+    paymentDiscountAmount: 'လျှော့ဈေး ပမာဏ',
+
+    paymentDiscountPercent: 'လျှော့ဈေး ရာခိုင်နှုန်း',
+
+    paymentVoucherDiscountAmount: 'ဘောက်ချာ လျှော့ဈေး ပမာဏ',
+
+    paymentVoucherDiscountPercent: 'ဘောက်ချာ လျှော့ဈေး ရာခိုင်နှုန်း',
+
     paymentAmountPlaceholder: 'ငွေပမာဏ ထည့်ပါ',
-    paymentButton: 'သိမ်းရန်',
-    paymentCancel: 'ပယ်ဖျက်ရန်',
+
+    paymentButton: 'သိမ်းမည်',
+
+    paymentCancel: 'ပယ်ဖျက်မည်',
+
     paymentSuccess: 'ငွေပေးချေမှု အောင်မြင်စွာ ပြီးမြောက်ပါပြီ',
+
     paymentError: 'ငွေပေးချေမှု မအောင်မြင်ပါ။ ထပ်မံကြိုးစားပါ။',
-    paymentAmountError: 'မှန်ကန်သော ငွေပမာဏ ထည့်ပါ',
-    selectPaymentMethod: 'ငွေပေးချေနည်းလမ်း ရွေးပါ',
-    selectPaymentAccount: 'အကောင့် ရွေးချယ်ပါ',
-    paymentAmountExceedError: 'ပေးရန် ငွေပမာဏသည် စုစုပေါင်းကိုကျော်၍မရပါ',
+
+    paymentAmountError: 'မှန်ကန်သော ငွေပမာဏကို ထည့်ပါ',
+
+    selectPaymentMethod: 'ငွေပေးချေနည်းလမ်းကို ရွေးချယ်ပါ',
+
+    selectPaymentAccount: 'ငွေပေးချေမှုအကောင့်ကို ရွေးချယ်ပါ',
+
+    paymentAmountExceedError:
+        'ပေးချေသည့် ငွေပမာဏသည် စုစုပေါင်းပမာဏထက် မကျော်လွန်ရပါ။',
+
     noPayment: 'ငွေပေးချေမှု မရှိပါ',
-    paidAmount: 'ပေးချေထားသည့် ပမာဏ',
+
+    paidAmount: 'ပေးချေပြီးသော ငွေပမာဏ',
+
     deliveryFee: 'ပို့ဆောင်ခ',
-    cancel: "ပယ်ဖျက်သည်",
 
-    paymentPhoto: 'ငွေပေးချေမှု ဓာတ်ပုံ (မတင်လည်း ရ)',
-    uploadPhoto: 'ဓာတ်ပုံ တင်ရန်',
-    viewPhoto: 'ဓာတ်ပုံ ကြည့်ရန်',
-    removePhoto: 'ဓာတ်ပုံ ဖယ်ရှားရန်',
+    cancel: 'ပယ်ဖျက်မည်',
 
-    deletePaymentAccountConfirm: 'ဤငွေပေးချေမှု အကောင့်ကို ဖျက်လိုပါသလား?',
-    deletePaymentSuccess: 'ငွေပေးချေမှု အကောင့်ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။',
-    deletePaymentFailed: 'ငွေပေးချေမှု အကောင့် ဖျက်ရာတွင် မအောင်မြင်ပါ။',
+    paymentPhoto: 'ငွေပေးချေမှု ဓာတ်ပုံ (မဖြစ်မနေ မဟုတ်ပါ)',
+
+    uploadPhoto: 'ဓာတ်ပုံ တင်မည်',
+
+    viewPhoto: 'ဓာတ်ပုံ ကြည့်မည်',
+
+    removePhoto: 'ဓာတ်ပုံ ဖယ်ရှားမည်',
+
+    deletePaymentAccountConfirm: 'ဤငွေပေးချေမှုအကောင့်ကို ဖျက်လိုပါသလား?',
+
+    deletePaymentSuccess: 'ငွေပေးချေမှုအကောင့်ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။',
+
+    deletePaymentFailed: 'ငွေပေးချေမှုအကောင့်ကို ဖျက်ရာတွင် မအောင်မြင်ပါ။',
   };
 }

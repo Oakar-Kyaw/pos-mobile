@@ -4,7 +4,7 @@ class Responsive {
   static bool isMobile(BuildContext context) =>
       MediaQuery.of(context).size.width < 650;
 
-  static bool isCardt(BuildContext context) =>
+  static bool isTablet(BuildContext context) =>
       MediaQuery.of(context).size.width >= 650 &&
       MediaQuery.of(context).size.width < 1100;
 
