@@ -112,7 +112,6 @@ class PurchaseAsyncNotifier extends AsyncNotifier<List<Purchase>> {
     final data = response.data;
 
     if (data["success"] == true) {
-      ref.invalidateSelf();
       return true;
     }
 

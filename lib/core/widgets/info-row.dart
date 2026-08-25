@@ -25,13 +25,6 @@ Widget infoRowSupplier(
             initialValue: initialValue,
             allSupplier: false,
             onChanged: onChanged,
-            // (value) {
-            //   print("create purchase item 👨‍🏭 $value");
-            //   if (value == null) return;
-            //   setState(() {
-            //     supplierId = int.tryParse(value);
-            //   });
-            // },
           ),
         ),
       ],
@@ -43,6 +36,7 @@ Widget infoRowSelectDate(
   String title,
   Color textColor,
   Color subColor, {
+  DateTime? selectedDate,
   required ValueChanged<DateTime?> onChanged,
 }) {
   return Padding(
@@ -56,7 +50,9 @@ Widget infoRowSelectDate(
 
         Expanded(
           flex: 5,
+
           child: DateSelect(
+            value: selectedDate,
             onChanged: onChanged,
             // (value) {
             //   if (value == null) return;
@@ -75,6 +71,7 @@ Widget infoRowSelectPurchaseStatus(
   String title,
   Color textColor,
   Color subColor, {
+  PurchaseStatus? initialValue,
   required ValueChanged<PurchaseStatus?> onChanged,
 }) {
   return Padding(
@@ -89,6 +86,7 @@ Widget infoRowSelectPurchaseStatus(
         Expanded(
           flex: 5,
           child: PurchaseStatusSelect(
+            value: initialValue,
             onChanged: onChanged,
             // (value) {
             //   if (value == null) return;

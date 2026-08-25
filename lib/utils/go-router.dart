@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/features/account-upgrade/presentation/pages/account-upgrade.dart';
 import 'package:pos/features/create-voucher/presentation/pages/create-voucher.dart';
+import 'package:pos/features/customer/presentation/page/customer.dart';
 import 'package:pos/features/expire-item/presentation/page/expire-item.dart';
 import 'package:pos/features/leave/presentation/pages/leave-create-page.dart';
 import 'package:pos/features/leave/presentation/pages/leave-pages.dart';
@@ -14,7 +15,7 @@ import 'package:pos/features/purchase-history/presentation/page/create-purchase-
 import 'package:pos/features/purchase-history/presentation/page/purchase-detail.dart';
 import 'package:pos/features/purchase-history/presentation/page/purchase-edit.dart';
 import 'package:pos/features/purchase-history/presentation/page/purchase-history.dart';
-import 'package:pos/features/supplier/data/model/supplier.dart';
+import 'package:pos/features/supplier/presentation/page/supplier.dart';
 import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/src/account.dart';
 import 'package:pos/src/attendance.dart';
@@ -240,6 +241,19 @@ final routeProvider = Provider<GoRouter>((ref) {
         name: AppRoute.purchaseCreate,
         builder: (context, state) => PurchaseCreatePage(),
       ),
+
+      GoRoute(
+        path: AppRoute.supplier,
+        name: AppRoute.supplier,
+        builder: (context, state) => SupplierPage(),
+      ),
+
+      GoRoute(
+        path: AppRoute.customer,
+        name: AppRoute.customer,
+        builder: (context, state) => const CustomerPage(),
+      ),
+
       GoRoute(
         path: AppRoute.requestItem,
         name: AppRoute.requestItem,

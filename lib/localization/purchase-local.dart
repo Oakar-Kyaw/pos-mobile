@@ -6,6 +6,8 @@ mixin PurchaseLocale {
   static const purchaseCreate = 'purchase_create';
   static const purchaseEdit = 'purchase_edit';
   static const purchaseUpdate = 'purchase_update';
+  static const purchaseDelete = 'purchase_delete';
+  static const purchaseCancel = 'purchase_cancel';
   static const purchaseDetail = 'purchase_detail';
 
   static const purchaseSupplier = 'purchase_supplier';
@@ -48,6 +50,7 @@ mixin PurchaseLocale {
   static const purchaseError = 'purchase_error';
 
   static const purchaseSuccess = 'purchase_success';
+  static const purchaseCreateSuccess = 'purchase_create_success';
   static const purchaseUpdateSuccess = 'purchase_update_success';
   static const purchaseDeleteSuccess = 'purchase_delete_success';
 
@@ -59,12 +62,12 @@ mixin PurchaseLocale {
 
   // Validation messages
   static const purchaseSupplierRequired = 'purchase_supplier_required';
-  static const purchaseStatusRequired = 'purchase_status_required';
-  static const purchaseOrderDateRequired = 'purchase_order_date_required';
-  static const purchaseItemRequired = 'purchase_item_required';
 
-  // Success message
-  static const purchaseCreateSuccess = 'purchase_create_success';
+  static const purchaseStatusRequired = 'purchase_status_required';
+
+  static const purchaseOrderDateRequired = 'purchase_order_date_required';
+
+  static const purchaseItemRequired = 'purchase_item_required';
 
   // 🇺🇸 English
   static const EN = {
@@ -74,6 +77,8 @@ mixin PurchaseLocale {
     purchaseCreate: 'Create Purchase',
     purchaseEdit: 'Edit',
     purchaseUpdate: 'Update Purchase',
+    purchaseDelete: 'Delete Purchase',
+    purchaseCancel: 'Cancel',
     purchaseDetail: 'Detail',
 
     purchaseSupplier: 'Supplier',
@@ -116,20 +121,28 @@ mixin PurchaseLocale {
     purchaseError: 'Something went wrong',
 
     purchaseSuccess: 'Purchase record created successfully',
+
     purchaseCreateSuccess: 'Purchase created successfully',
+
     purchaseUpdateSuccess: 'Purchase record updated successfully',
+
     purchaseDeleteSuccess: 'Purchase record deleted successfully',
 
     purchaseUpdateFail: 'Failed to update purchase record',
+
     purchaseDeleteFail: 'Failed to delete purchase record',
 
     purchaseUpdateConfirm: 'Do you want to update this purchase record?',
+
     purchaseDeleteConfirm: 'Do you want to delete this purchase record?',
 
     // Validation
     purchaseSupplierRequired: 'Please select a supplier',
+
     purchaseStatusRequired: 'Please select a purchase status',
+
     purchaseOrderDateRequired: 'Please select an order date',
+
     purchaseItemRequired: 'Please add at least one item',
   };
 
@@ -138,44 +151,71 @@ mixin PurchaseLocale {
     purchaseManagementTitle: 'အဝယ်စီမံခန့်ခွဲမှု',
 
     purchaseList: 'အဝယ်မှတ်တမ်းများ',
-    purchaseCreate: 'အဝယ်အသစ်ဖန်တီးရန်',
-    purchaseEdit: 'အဝယ်မှတ်တမ်း ပြင်ဆင်ရန်',
-    purchaseUpdate: 'အဝယ်မှတ်တမ်း ပြင်ဆင်ရန်',
-    purchaseDetail: 'အဝယ်အသေးစိတ်',
+
+    purchaseCreate: 'ဖန်တီးရန်',
+
+    purchaseEdit: 'ပြင်ဆင်ရန်',
+
+    purchaseUpdate: 'ပြင်ဆင်ရန်',
+
+    purchaseDelete: 'ဖျက်ရန်',
+
+    purchaseCancel: 'ပယ်ဖျက်ရန်',
+
+    purchaseDetail: 'အသေးစိတ်',
 
     purchaseSupplier: 'ပေးသွင်းသူ',
+
     purchaseSupplierStatus: 'ပေးသွင်းသူ အခြေအနေ',
+
     purchaseSelectSupplier: 'ပေးသွင်းသူ ရွေးချယ်ပါ',
 
     purchaseOrderDate: 'မှာယူသည့်ရက်',
+
     purchaseReceivedDate: 'လက်ခံရရှိသည့်ရက်',
+
     purchaseStatus: 'အဝယ်အခြေအနေ',
 
     purchaseQuantity: 'အရေအတွက်',
+
     purchasePrice: 'ဈေးနှုန်း',
+
     purchaseUnitPrice: 'တစ်ခုချင်းဈေးနှုန်း',
+
     purchaseSubtotal: 'စုစုပေါင်းတန်ဖိုး',
+
     purchaseItemTotal: 'ပစ္စည်းစုစုပေါင်း',
+
     purchaseGrandTotal: 'နောက်ဆုံးစုစုပေါင်း',
 
     purchaseTax: 'အခွန်',
+
     purchaseDiscount: 'လျှော့စျေး',
+
     purchaseDiscountPercent: 'လျှော့စျေး ရာခိုင်နှုန်း',
+
     purchaseDeliveryFee: 'ပို့ဆောင်ခ',
+
     purchaseDeliveryPercent: 'ပို့ဆောင်ခ ရာခိုင်နှုန်း',
+
     purchasePackagingFee: 'ထုပ်ပိုးခ',
+
     purchaseTotalAmount: 'စုစုပေါင်းကျသင့်ငွေ',
 
     purchaseAddItem: 'ပစ္စည်းထည့်ရန်',
+
     purchaseSubmit: 'တင်သွင်းမည်',
 
     purchasePending: 'စောင့်ဆိုင်းနေသည်',
+
     purchaseReceived: 'လက်ခံရရှိပြီး',
+
     purchaseCancelled: 'ပယ်ဖျက်ပြီး',
 
     purchaseNote: 'မှတ်ချက်',
 
     purchaseCard: 'အဝယ်မှတ်တမ်းများ',
+
     purchaseItemCard: 'အဝယ်ပစ္စည်းများ',
 
     purchaseGoToInventory: 'Inventory သို့ သွားမည်',
@@ -183,20 +223,28 @@ mixin PurchaseLocale {
     purchaseError: 'အမှားတစ်ခုဖြစ်ပွားခဲ့သည်',
 
     purchaseSuccess: 'အဝယ်မှတ်တမ်းကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
+
     purchaseCreateSuccess: 'အဝယ်ကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
+
     purchaseUpdateSuccess: 'အဝယ်မှတ်တမ်းကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ',
+
     purchaseDeleteSuccess: 'အဝယ်မှတ်တမ်းကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
 
     purchaseUpdateFail: 'အဝယ်မှတ်တမ်း ပြင်ဆင်ရန် မအောင်မြင်ပါ',
+
     purchaseDeleteFail: 'အဝယ်မှတ်တမ်း ဖျက်ရန် မအောင်မြင်ပါ',
 
     purchaseUpdateConfirm: 'ဤအဝယ်မှတ်တမ်းကို ပြင်ဆင်လိုပါသလား?',
+
     purchaseDeleteConfirm: 'ဤအဝယ်မှတ်တမ်းကို ဖျက်လိုပါသလား?',
 
     // Validation
     purchaseSupplierRequired: 'ကျေးဇူးပြု၍ ပေးသွင်းသူကို ရွေးချယ်ပါ',
+
     purchaseStatusRequired: 'ကျေးဇူးပြု၍ အဝယ်အခြေအနေကို ရွေးချယ်ပါ',
+
     purchaseOrderDateRequired: 'ကျေးဇူးပြု၍ မှာယူသည့်ရက်ကို ရွေးချယ်ပါ',
+
     purchaseItemRequired: 'အနည်းဆုံး ပစ္စည်းတစ်ခု ထည့်ပါ',
   };
 }

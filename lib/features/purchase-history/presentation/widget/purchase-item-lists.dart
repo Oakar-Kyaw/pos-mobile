@@ -3,15 +3,12 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:pos/api/product.api.dart';
-import 'package:pos/component/delete-dialog.dart';
 import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/no-item-found-widget.dart';
 import 'package:pos/features/purchase-history/data/model/purchase.dart';
 import 'package:pos/features/purchase-history/presentation/provider/purchase.api.dart';
 import 'package:pos/features/purchase-history/presentation/widget/purchase-card.dart';
-import 'package:pos/localization/inventory-management-local.dart';
-import 'package:pos/models/inventory-management.dart';
+import 'package:pos/localization/purchase-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/route-constant.dart';
@@ -105,9 +102,77 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
     );
   }
 
+  Future<void> _onDelete(int index) async {
+    if (!mounted) return;
+    try {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(PurchaseLocale.purchaseDelete.getString(context)),
+            content: Text(
+              PurchaseLocale.purchaseDeleteConfirm.getString(context),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+                child: Text(PurchaseLocale.purchaseCancel.getString(context)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: Text(
+                  PurchaseLocale.purchaseDelete.getString(context),
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (confirmed != true) return;
+
+      debugPrint("Deleting purchase: $index");
+
+      final success = await ref
+          .read(purchaseProvider.notifier)
+          .deletePurchase(index);
+
+      if (success) {
+        ShowToast(
+          context,
+          description: Text(
+            PurchaseLocale.purchaseDeleteSuccess.getString(context),
+            style: TextStyle(color: kGreen),
+          ),
+          borderColor: kGreen,
+        );
+        _pagingController.refresh();
+      }
+    } catch (e, stackTrace) {
+      debugPrint("Error deleting purchase: $e");
+
+      debugPrintStack(stackTrace: stackTrace);
+
+      if (!mounted) return;
+
+      ShowToast(
+        context,
+        description: Text(e.toString(), style: TextStyle(color: kRed)),
+        borderColor: kRed,
+        isError: true,
+      );
+    }
+  }
+
   @override
   void dispose() {
     _pagingController.dispose();
+
     super.dispose();
   }
 
@@ -127,46 +192,6 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
           ? Colors.white.withOpacity(0.02)
           : Colors.black.withOpacity(0.01)),
       border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
-    );
-  }
-
-  void _delete(InventoryManagement inventory, bool isDark) {
-    showDeleteDialog(
-      context,
-      title: InventoryManagementLocale.inventoryDeleteConfirm.getString(
-        context,
-      ),
-      isDark: isDark,
-      submit: () async {
-        await ref
-            .read(productProvider.notifier)
-            .deleteInventoryManagement(inventory.id!)
-            .then((data) {
-              if (data) {
-                ShowToast(
-                  context,
-                  description: Text(
-                    InventoryManagementLocale.inventoryDeleteSuccess.getString(
-                      context,
-                    ),
-                  ),
-                );
-                context.pop();
-                _pagingController.refresh();
-              }
-            })
-            .catchError((err) {
-              ShowToast(
-                context,
-                description: Text(
-                  InventoryManagementLocale.inventoryDeleteFail.getString(
-                    context,
-                  ),
-                ),
-                isError: true,
-              );
-            });
-      },
     );
   }
 
@@ -202,6 +227,7 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
                 // padding: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: containerDecoration,
                 child: PurchaseCard(
+                  onDelete: () => _onDelete(purchaseItem.id),
                   purchase: purchaseItem,
                   textColor: textColor,
                   subColor: subColor,

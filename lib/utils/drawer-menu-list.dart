@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:pos/localization/customer-local.dart';
 import 'package:pos/localization/drawer-local.dart';
+import 'package:pos/localization/supplier-local.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -131,6 +133,18 @@ List<MenuItem> menuListByAdmin(BuildContext context) => [
   ),
 
   MenuItem(
+    icon: LucideIcons.truck,
+    label: SupplierLocale.supplierManagementTitle.getString(context),
+    route: AppRoute.supplier,
+  ),
+
+  MenuItem(
+    icon: LucideIcons.users,
+    label: CustomerLocale.customerManagementTitle.getString(context),
+    route: AppRoute.customer,
+  ),
+
+  MenuItem(
     icon: LucideIcons.rocket,
     label: DrawerScreenLocale.drawerUpgrade.getString(context),
     route: AppRoute.accountUpgrade,
@@ -248,6 +262,12 @@ List<MenuItem> menuListByManager(BuildContext context) => [
     icon: LucideIcons.clipboardPlus,
     label: DrawerScreenLocale.drawerRequestItems.getString(context),
     route: AppRoute.requestItem,
+  ),
+
+  MenuItem(
+    icon: LucideIcons.truck,
+    label: SupplierLocale.supplierManagementTitle.getString(context),
+    route: AppRoute.supplier,
   ),
 
   MenuItem(

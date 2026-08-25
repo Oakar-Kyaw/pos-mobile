@@ -42,4 +42,8 @@ class AppRoute {
   static const String purchaseCreate = '/purchase-create';
   static const String purchaseEdit = '/purchase-edit';
   static const String purchaseDetail = '/purchase-item-detail';
+  static const String supplier = '/supplier-history';
+  static const String supplierCreate = '/supplier-create';
+  static const String customer = '/customer-history';
+  static const String customerCreate = '/customer-create';
 }

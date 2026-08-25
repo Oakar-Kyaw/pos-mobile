@@ -6,7 +6,6 @@ import 'package:pos/component/app-bar.dart';
 import 'package:pos/core/utils/date-range-select.dart';
 import 'package:pos/core/utils/supplier-select.dart';
 import 'package:pos/features/purchase-history/presentation/widget/purchase-item-lists.dart';
-import 'package:pos/features/supplier/data/model/supplier.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
@@ -25,14 +24,22 @@ class PurchaseItemPage extends ConsumerStatefulWidget {
 }
 
 class _PurchaseItemPageState extends ConsumerState<PurchaseItemPage> {
+  late final SelectedDataNotifier _selectedDataNotifier;
+
   @override
-  void dispose() {
-    _clearSelectedData();
-    super.dispose();
+  void initState() {
+    super.initState();
+
+    _selectedDataNotifier = ref.read(selectedDataStateProvider.notifier);
   }
 
-  void _clearSelectedData() {
-    ref.read(selectedDataStateProvider.notifier).clear();
+  @override
+  void dispose() {
+    debugPrint("PurchaseItemPage disposed 🤩");
+
+    _selectedDataNotifier.clear();
+
+    super.dispose();
   }
 
   @override
@@ -44,6 +51,7 @@ class _PurchaseItemPageState extends ConsumerState<PurchaseItemPage> {
     final user = ref.watch(userStateProvider);
     final config = InventoryActionConfig('Purchase', context);
     final selectedData = ref.watch(selectedDataStateProvider);
+    print("selected data is: 💽 ${selectedData?.supplierId}");
 
     return Scaffold(
       backgroundColor: bgColor,

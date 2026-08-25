@@ -3,16 +3,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/core/widgets/info-row.dart';
 import 'package:pos/features/create-voucher/presentation/widgets/calculation-search-field.dart';
 import 'package:pos/features/purchase-history/data/model/purchase-item.dart';
 import 'package:pos/features/purchase-history/data/model/purchase.dart';
+import 'package:pos/features/purchase-history/presentation/provider/purchase.api.dart';
 import 'package:pos/features/purchase-history/presentation/widget/purchase-status-select.dart';
 import 'package:pos/localization/purchase-local.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
+import 'package:pos/utils/route-constant.dart';
+import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class PurchaseEditPage extends ConsumerStatefulWidget {
@@ -28,10 +31,13 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
   final _formKey = GlobalKey<ShadFormState>();
 
   Timer? _debounce;
+
   bool showAddField = false;
+
   int? supplierId;
   String? status;
   DateTime? orderDate;
+
   final TextEditingController searchController = TextEditingController();
 
   late List<TextEditingController> qtyControllers;
@@ -39,10 +45,9 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
   late TextEditingController discountController;
   late TextEditingController discountPercentController;
-
   late TextEditingController taxController;
   late TextEditingController deliveryFeeController;
-
+  late TextEditingController packagingFeeController;
   late TextEditingController noteController;
 
   late Purchase purchaseData;
@@ -56,12 +61,13 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
           .map((item) => item.copyWith())
           .toList(),
     );
+
     qtyControllers = purchaseData.purchaseItems
-        .map((e) => TextEditingController(text: e.quantity.toString()))
+        .map((item) => TextEditingController(text: item.quantity.toString()))
         .toList();
 
     priceControllers = purchaseData.purchaseItems
-        .map((e) => TextEditingController(text: e.price.toString()))
+        .map((item) => TextEditingController(text: item.price.toString()))
         .toList();
 
     discountController = TextEditingController(
@@ -78,12 +84,21 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
       text: purchaseData.deliveryFee.toString(),
     );
 
+    packagingFeeController = TextEditingController(
+      text: purchaseData.packagingFee.toString(),
+    );
+
     noteController = TextEditingController(text: purchaseData.note ?? '');
+
+    supplierId = purchaseData.supplierId;
+    status = purchaseData.status;
+    orderDate = purchaseData.orderDate;
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
+
     searchController.dispose();
 
     for (final controller in qtyControllers) {
@@ -95,18 +110,23 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
     }
 
     discountController.dispose();
+    discountPercentController.dispose();
     taxController.dispose();
     deliveryFeeController.dispose();
+    packagingFeeController.dispose();
     noteController.dispose();
 
     super.dispose();
   }
 
   void onSearchChanged(String value) {
-    print("value is 👨‍🏭 $value");
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    if (_debounce?.isActive ?? false) {
+      _debounce!.cancel();
+    }
+
     _debounce = Timer(const Duration(milliseconds: 500), () {
       if (!mounted) return;
+
       ref
           .read(productProvider.notifier)
           .getProductLists("10", "10", search: value);
@@ -116,6 +136,7 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
   double get totalAmount {
     double total = 0;
 
+    // Calculate item total
     for (int i = 0; i < qtyControllers.length; i++) {
       final qty = int.tryParse(qtyControllers[i].text) ?? 0;
       final price = double.tryParse(priceControllers[i].text) ?? 0;
@@ -123,37 +144,134 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
       total += qty * price;
     }
 
+    // Add tax and delivery fee
     total += double.tryParse(taxController.text) ?? 0;
     total += double.tryParse(deliveryFeeController.text) ?? 0;
-    total -= double.tryParse(discountController.text) ?? 0;
+    total += double.tryParse(packagingFeeController.text) ?? 0;
 
-    return total;
+    // Fixed discount
+    final discount = double.tryParse(discountController.text) ?? 0;
+
+    // Percentage discount
+    final discountPercent =
+        double.tryParse(discountPercentController.text) ?? 0;
+
+    final percentageDiscount = total * (discountPercent / 100);
+
+    total -= discount;
+    total -= percentageDiscount;
+
+    return total < 0 ? 0 : total;
   }
 
-  void updatePurchase() {
-    print("update data is ");
-    final items = List.generate(
-      purchaseData.purchaseItems.length,
-      (index) => {
-        "id": purchaseData.purchaseItems[index].id,
-        "productId": purchaseData.purchaseItems[index].productId,
-        "quantity": int.tryParse(qtyControllers[index].text) ?? 0,
-        "price": double.tryParse(priceControllers[index].text) ?? 0,
-      },
-    );
+  void addProduct(product) {
+    setState(() {
+      final tempId = -DateTime.now().microsecondsSinceEpoch;
 
-    final payload = {
-      "note": noteController.text,
-      "discount": discountController.text,
-      "tax": taxController.text,
-      "deliveryFee": deliveryFeeController.text,
-      "purchaseItems": items,
-    };
+      final item = PurchaseItem(
+        id: tempId,
+        product: product,
+        productId: product.id,
 
-    debugPrint("payload for purchase is ${payload.toString()}");
+        // This is the purchase ID,
+        // NOT the product ID.
+        purchaseId: purchaseData.id,
 
-    /// call api here
-    /// ref.read(purchaseProvider.notifier).updatePurchase(...)
+        quantity: 1,
+        price: product.price,
+      );
+
+      purchaseData.purchaseItems.add(item);
+
+      qtyControllers.add(TextEditingController(text: '1'));
+
+      priceControllers.add(
+        TextEditingController(text: product.price.toString()),
+      );
+    });
+  }
+
+  void updatePurchase() async {
+    try {
+      final items = List.generate(purchaseData.purchaseItems.length, (index) {
+        final item = purchaseData.purchaseItems[index];
+
+        return {
+          "productId": item.productId,
+          "quantity": int.tryParse(qtyControllers[index].text) ?? 0,
+          "price": double.tryParse(priceControllers[index].text) ?? 0,
+        };
+      });
+
+      final payload = {
+        "supplierId": supplierId,
+        "orderDate": orderDate!.toIso8601String(),
+        "status": status!.toUpperCase(),
+        "note": noteController.text,
+
+        "discount": double.tryParse(discountController.text) ?? 0,
+
+        "tax": double.tryParse(taxController.text) ?? 0,
+
+        "deliveryFee": double.tryParse(deliveryFeeController.text) ?? 0,
+
+        "discountPercent": double.tryParse(discountPercentController.text) ?? 0,
+
+        "packagingFee": double.tryParse(packagingFeeController.text) ?? 0,
+
+        "purchaseItems": items,
+      };
+
+      debugPrint("payload for purchase is $payload");
+      if (!mounted) return;
+
+      // API call
+      //
+      final success = await ref
+          .read(purchaseProvider.notifier)
+          .updatePurchase(purchaseData.id, payload);
+
+      if (success) {
+        if (success) {
+          ShowToast(
+            context,
+            description: Text(
+              PurchaseLocale.purchaseUpdateSuccess.getString(context),
+              style: TextStyle(color: kGreen),
+            ),
+            borderColor: kGreen,
+          );
+          context.pushNamed(AppRoute.purchaseHistory);
+        }
+      }
+    } catch (e, stackTrace) {
+      debugPrint("Error creating purchase: $e");
+      debugPrintStack(stackTrace: stackTrace);
+      ShowToast(
+        context,
+        description: Text(
+          PurchaseLocale.purchaseUpdateFail.getString(context),
+          style: TextStyle(color: kRed),
+        ),
+        borderColor: kRed,
+        isError: true,
+      );
+    }
+  }
+
+  void _onremoveItem(int index) {
+    setState(() {
+      // Dispose controllers first
+      qtyControllers[index].dispose();
+      priceControllers[index].dispose();
+
+      // Remove controllers
+      qtyControllers.removeAt(index);
+      priceControllers.removeAt(index);
+
+      // Remove purchase item
+      purchaseData.purchaseItems.removeAt(index);
+    });
   }
 
   @override
@@ -161,12 +279,16 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
 
     final bgColor = isDark ? kBgDark : kBgLight;
+
     final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
+
     final textColor = isDark ? kTextDark : kTextLight;
+
     final subColor = isDark ? kTextSubDark : kTextSubLight;
 
     return Scaffold(
       backgroundColor: bgColor,
+
       appBar: AppBar(
         backgroundColor: bgColor,
         foregroundColor: textColor,
@@ -175,24 +297,34 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
           style: TextStyle(color: textColor),
         ),
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
+
         child: ShadForm(
           key: _formKey,
+
           child: Column(
             children: [
+              // ============================
+              // SUPPLIER / STATUS / DATE
+              // ============================
               ShadCard(
                 backgroundColor: surfaceColor,
+
                 child: Column(
                   children: [
                     infoRowSupplier(
                       PurchaseLocale.purchaseSupplier.getString(context),
+
                       textColor,
                       subColor,
-                      initialValue: purchaseData.supplier?.id.toString() ?? "-",
+
+                      initialValue: supplierId?.toString(),
+
                       onChanged: (value) {
-                        print("create purchase item 👨‍🏭 $value");
                         if (value == null) return;
+
                         setState(() {
                           supplierId = int.tryParse(value);
                         });
@@ -201,45 +333,52 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
                     infoRowSelectPurchaseStatus(
                       PurchaseLocale.purchaseStatus.getString(context),
+
                       textColor,
                       subColor,
+
+                      initialValue: changePurchaseStatus(status!),
+
                       onChanged: (value) {
                         if (value == null) return;
+
                         setState(() {
                           status = statusLabel(value);
                         });
                       },
                     ),
+
                     infoRowSelectDate(
                       PurchaseLocale.purchaseOrderDate.getString(context),
+
                       textColor,
                       subColor,
+
+                      selectedDate: orderDate,
+
                       onChanged: (value) {
                         if (value == null) return;
+
                         setState(() {
                           orderDate = value;
                         });
                       },
                     ),
-
-                    // _infoRow(
-                    //   PurchaseLocale.purchaseReceived.getString(context),
-                    //   DateFormat(
-                    //     'yyyy-MM-dd E HH:mm',
-                    //   ).format(purchase.receivedDate.toLocal()),
-                    //   textColor,
-                    //   subColor,
-                    // ),
                   ],
                 ),
               ),
 
               const SizedBox(height: 16),
 
+              // ============================
+              // ADD PRODUCT
+              // ============================
               Align(
                 alignment: Alignment.centerLeft,
+
                 child: Text(
                   PurchaseLocale.purchaseAddItem.getString(context),
+
                   style: Theme.of(
                     context,
                   ).textTheme.titleMedium?.copyWith(color: textColor),
@@ -257,30 +396,17 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
                 subColor,
                 setState,
                 showAddField,
+
                 onSearchChanged: onSearchChanged,
-                onAddProduct: (product) {
-                  setState(() {
-                    purchaseData.purchaseItems.add(
-                      PurchaseItem(
-                        id: product.id,
-                        product: product,
-                        productId: product.id,
-                        purchaseId: product.id,
-                        quantity: 1,
-                        price: product.price,
-                        // costPrice: product.costPrice ?? 0,
-                      ),
-                    );
-                    qtyControllers.add(TextEditingController(text: '0'));
-                    priceControllers.add(
-                      TextEditingController(text: product.price.toString()),
-                    );
-                  });
-                },
+
+                onAddProduct: addProduct,
               ),
 
               const SizedBox(height: 12),
 
+              // ============================
+              // PURCHASE ITEMS
+              // ============================
               ...List.generate(purchaseData.purchaseItems.length, (index) {
                 final item = purchaseData.purchaseItems[index];
 
@@ -290,19 +416,38 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
                     backgroundColor: surfaceColor,
                     child: Column(
                       children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            item.product?.name ?? '',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: textColor,
+                        // ==========================
+                        // PRODUCT NAME + DELETE
+                        // ==========================
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item.product?.name ?? '',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor,
+                                ),
+                              ),
                             ),
-                          ),
+
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
+                                size: 25,
+                              ),
+                              tooltip: 'Delete',
+                              onPressed: () => _onremoveItem(index),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: 12),
 
+                        // ==========================
+                        // QUANTITY + PRICE
+                        // ==========================
                         Row(
                           children: [
                             Expanded(
@@ -328,7 +473,10 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
                               child: ShadInputFormField(
                                 id: 'price_$index',
                                 controller: priceControllers[index],
-                                keyboardType: TextInputType.number,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
                                 label: Text(
                                   PurchaseLocale.purchasePrice.getString(
                                     context,
@@ -350,14 +498,24 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
               const SizedBox(height: 16),
 
+              // ============================
+              // DISCOUNT
+              // ============================
               ShadInputFormField(
                 id: 'discount',
+
                 controller: discountController,
-                keyboardType: TextInputType.number,
+
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+
                 label: Text(
                   PurchaseLocale.purchaseDiscount.getString(context),
+
                   style: TextStyle(color: subColor),
                 ),
+
                 onChanged: (_) {
                   setState(() {});
                 },
@@ -365,14 +523,24 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
               const SizedBox(height: 12),
 
+              // ============================
+              // DISCOUNT %
+              // ============================
               ShadInputFormField(
                 id: 'discountPercent',
+
                 controller: discountPercentController,
-                keyboardType: TextInputType.number,
+
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+
                 label: Text(
                   PurchaseLocale.purchaseDiscountPercent.getString(context),
+
                   style: TextStyle(color: subColor),
                 ),
+
                 onChanged: (_) {
                   setState(() {});
                 },
@@ -380,14 +548,24 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
               const SizedBox(height: 12),
 
+              // ============================
+              // TAX
+              // ============================
               ShadInputFormField(
                 id: 'tax',
+
                 controller: taxController,
-                keyboardType: TextInputType.number,
+
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+
                 label: Text(
                   PurchaseLocale.purchaseTax.getString(context),
+
                   style: TextStyle(color: subColor),
                 ),
+
                 onChanged: (_) {
                   setState(() {});
                 },
@@ -395,14 +573,24 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
               const SizedBox(height: 12),
 
+              // ============================
+              // DELIVERY FEE
+              // ============================
               ShadInputFormField(
                 id: 'deliveryFee',
+
                 controller: deliveryFeeController,
-                keyboardType: TextInputType.number,
+
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+
                 label: Text(
                   PurchaseLocale.purchaseDeliveryFee.getString(context),
+
                   style: TextStyle(color: subColor),
                 ),
+
                 onChanged: (_) {
                   setState(() {});
                 },
@@ -410,29 +598,73 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
               const SizedBox(height: 12),
 
+              // ============================
+              // PACKAGING FEE
+              // ============================
               ShadInputFormField(
-                id: 'note',
-                controller: noteController,
-                maxLines: 3,
+                id: 'packagingFee',
+
+                controller: packagingFeeController,
+
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+
                 label: Text(
-                  PurchaseLocale.purchaseNote.getString(context),
+                  PurchaseLocale.purchasePackagingFee.getString(context),
+
                   style: TextStyle(color: subColor),
                 ),
+
+                onChanged: (_) {
+                  setState(() {});
+                },
+              ),
+
+              const SizedBox(height: 12),
+
+              // ============================
+              // NOTE
+              // ============================
+              ShadInputFormField(
+                id: 'note',
+
+                controller: noteController,
+
+                maxLines: 3,
+
+                label: Text(
+                  PurchaseLocale.purchaseNote.getString(context),
+
+                  style: TextStyle(color: subColor),
+                ),
+
+                onChanged: (_) {
+                  setState(() {});
+                },
               ),
 
               const SizedBox(height: 20),
 
+              // ============================
+              // TOTAL
+              // ============================
               ShadCard(
                 backgroundColor: surfaceColor,
+
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                   children: [
                     Text(
                       PurchaseLocale.purchaseTotalAmount.getString(context),
+
                       style: TextStyle(color: textColor),
                     ),
+
                     Text(
                       totalAmount.toStringAsFixed(0),
+
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -445,36 +677,19 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
               const SizedBox(height: 24),
 
+              // ============================
+              // UPDATE
+              // ============================
               GradientSubmitButton(
                 onPressed: updatePurchase,
+
                 text: PurchaseLocale.purchaseUpdate.getString(context),
+
                 width: double.infinity,
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _infoRow(String title, String value, Color textColor, Color subColor) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(title, style: TextStyle(color: subColor)),
-          ),
-          Expanded(
-            flex: 5,
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: TextStyle(color: textColor),
-            ),
-          ),
-        ],
       ),
     );
   }

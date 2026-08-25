@@ -224,7 +224,7 @@ class PurchaseCard extends ConsumerWidget {
                   subColor: subColor,
                   totalAmount: DateFormat(
                     'yyyy-MM-dd HH:mm',
-                  ).format(purchase.orderDate.toLocal()),
+                  ).format(purchase.orderDate),
                   accent: accent,
                 ),
 
@@ -250,13 +250,13 @@ class PurchaseCard extends ConsumerWidget {
                 Row(
                   children: [
                     GradientSubmitButton(
-                      width: 100,
+                      width: 150,
                       onPressed: onDetail ?? () {},
                       text: PurchaseLocale.purchaseDetail.getString(context),
                     ),
                     const SizedBox(width: 10),
                     GradientSubmitButton(
-                      width: 100,
+                      width: 150,
                       onPressed: onEdit ?? () {},
                       text: PurchaseLocale.purchaseEdit.getString(context),
                     ),

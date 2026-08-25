@@ -36,6 +36,25 @@ class _SupplierSelectState extends ConsumerState<SupplierSelect> {
   }
 
   @override
+  void didUpdateWidget(covariant SupplierSelect oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.initialValue != widget.initialValue) {
+      setState(() {
+        selectedValue = widget.initialValue;
+      });
+    }
+  }
+
+  void _onChanged(String? value) {
+    setState(() {
+      selectedValue = value;
+    });
+
+    widget.onChanged.call(value);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final supplierAsync = ref.watch(supplierProvider);
 
@@ -62,7 +81,7 @@ class _SupplierSelectState extends ConsumerState<SupplierSelect> {
           placeholder: Text(
             PurchaseLocale.purchaseSelectSupplier.getString(context),
           ),
-          onChanged: widget.onChanged,
+          onChanged: _onChanged,
           selectedOptionBuilder: (context, value) {
             final option = shadOptions.firstWhere(
               (o) => o.value == value,

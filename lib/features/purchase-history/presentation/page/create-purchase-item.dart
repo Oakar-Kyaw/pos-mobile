@@ -12,6 +12,7 @@ import 'package:pos/features/purchase-history/data/model/purchase-item.dart';
 import 'package:pos/features/purchase-history/presentation/provider/purchase.api.dart';
 import 'package:pos/features/purchase-history/presentation/widget/purchase-status-select.dart';
 import 'package:pos/localization/purchase-local.dart';
+import 'package:pos/models/product.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/route-constant.dart';
@@ -104,6 +105,7 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
     // Add tax and delivery fee
     total += double.tryParse(taxController.text) ?? 0;
     total += double.tryParse(deliveryFeeController.text) ?? 0;
+    total += double.tryParse(packagingFeeController.text) ?? 0;
 
     // Fixed discount
     final discount = double.tryParse(discountController.text) ?? 0;
@@ -227,12 +229,52 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
           ),
           borderColor: kGreen,
         );
-        context.push(AppRoute.purchaseHistory);
+        context.pushNamed(AppRoute.purchaseHistory);
       }
     } catch (e, stackTrace) {
       debugPrint("Error creating purchase: $e");
       debugPrintStack(stackTrace: stackTrace);
     }
+  }
+
+  void addProduct(Product product) {
+    setState(() {
+      final tempId = -DateTime.now().microsecondsSinceEpoch;
+
+      final item = PurchaseItem(
+        id: tempId,
+        product: product,
+        productId: product.id,
+
+        purchaseId: product.id,
+
+        quantity: 1,
+        price: product.price,
+      );
+
+      purchaseItems.add(item);
+
+      qtyControllers.add(TextEditingController(text: '1'));
+
+      priceControllers.add(
+        TextEditingController(text: product.price.toString()),
+      );
+    });
+  }
+
+  void _onremoveItem(int index) {
+    setState(() {
+      // Dispose controllers first
+      qtyControllers[index].dispose();
+      priceControllers[index].dispose();
+
+      // Remove controllers
+      qtyControllers.removeAt(index);
+      priceControllers.removeAt(index);
+
+      // Remove purchase item
+      purchaseItems.removeAt(index);
+    });
   }
 
   @override
@@ -311,25 +353,7 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
                 setState,
                 showAddField,
                 onSearchChanged: onSearchChanged,
-                onAddProduct: (product) {
-                  setState(() {
-                    purchaseItems.add(
-                      PurchaseItem(
-                        id: product.id,
-                        product: product,
-                        productId: product.id,
-                        purchaseId: product.id,
-                        quantity: 1,
-                        price: product.price,
-                        // costPrice: product.costPrice ?? 0,
-                      ),
-                    );
-                    qtyControllers.add(TextEditingController(text: '1'));
-                    priceControllers.add(
-                      TextEditingController(text: product.price.toString()),
-                    );
-                  });
-                },
+                onAddProduct: addProduct,
               ),
 
               const SizedBox(height: 12),
@@ -343,19 +367,38 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
                     backgroundColor: surfaceColor,
                     child: Column(
                       children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            item.product?.name ?? '',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: textColor,
+                        // ==========================
+                        // PRODUCT NAME + DELETE
+                        // ==========================
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item.product?.name ?? '',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor,
+                                ),
+                              ),
                             ),
-                          ),
+
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
+                                size: 25,
+                              ),
+                              tooltip: 'Delete',
+                              onPressed: () => _onremoveItem(index),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: 12),
 
+                        // ==========================
+                        // QUANTITY + PRICE
+                        // ==========================
                         Row(
                           children: [
                             Expanded(
@@ -381,7 +424,10 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
                               child: ShadInputFormField(
                                 id: 'price_$index',
                                 controller: priceControllers[index],
-                                keyboardType: TextInputType.number,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
                                 label: Text(
                                   PurchaseLocale.purchasePrice.getString(
                                     context,
@@ -400,6 +446,7 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
                   ),
                 );
               }),
+
               const SizedBox(height: 16),
 
               ShadInputFormField(
