@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:pos/component/accent-bar.dart';
-import 'package:pos/component/delete-icon.dart';
+import 'package:pos/core/widgets/delete-icon.dart';
 import 'package:pos/localization/attendance-local.dart';
 import 'package:pos/models/attendance.dart';
 import 'package:pos/utils/app-theme.dart';

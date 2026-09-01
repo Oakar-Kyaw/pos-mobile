@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/features/supplier/presentation/page/supplier-list.dart';
@@ -10,6 +11,8 @@ import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+
+final editingSupplierIdProvider = StateProvider<int?>((ref) => null);
 
 class SupplierPage extends ConsumerStatefulWidget {
   const SupplierPage({super.key});

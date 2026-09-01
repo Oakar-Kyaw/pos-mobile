@@ -88,6 +88,8 @@ class _ProductBarcodeScanPageState
           .addItem(
             ItemModel(
               id: item.id,
+              productId: item.id,
+              product: item,
               name: item.name,
               quantity: 1,
               price: item.price,

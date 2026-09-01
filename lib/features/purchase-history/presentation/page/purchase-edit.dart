@@ -5,13 +5,17 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/product.api.dart';
+import 'package:pos/core/utils/payment-row.dart';
+import 'package:pos/core/utils/payment-select.dart';
 import 'package:pos/core/widgets/info-row.dart';
 import 'package:pos/features/create-voucher/presentation/widgets/calculation-search-field.dart';
 import 'package:pos/features/purchase-history/data/model/purchase-item.dart';
+import 'package:pos/features/purchase-history/data/model/purchase-payment.dart';
 import 'package:pos/features/purchase-history/data/model/purchase.dart';
 import 'package:pos/features/purchase-history/presentation/provider/purchase.api.dart';
 import 'package:pos/features/purchase-history/presentation/widget/purchase-status-select.dart';
 import 'package:pos/localization/purchase-local.dart';
+import 'package:pos/models/payment-data.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/route-constant.dart';
@@ -51,6 +55,9 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
   late TextEditingController noteController;
 
   late Purchase purchaseData;
+  late List<TextEditingController> paymentAmountController;
+  List<PurchasePayment> purchasePayment = [];
+  double totalPaidAmount = 0.0;
 
   @override
   void initState() {
@@ -93,6 +100,12 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
     supplierId = purchaseData.supplierId;
     status = purchaseData.status;
     orderDate = purchaseData.orderDate;
+
+    purchasePayment = purchaseData.purchasePayments;
+
+    paymentAmountController = purchasePayment
+        .map((e) => TextEditingController(text: e.amount.toString()))
+        .toList();
   }
 
   @override
@@ -107,6 +120,10 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
     for (final controller in priceControllers) {
       controller.dispose();
+    }
+
+    for (final p in paymentAmountController) {
+      p.dispose();
     }
 
     discountController.dispose();
@@ -191,8 +208,38 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
     });
   }
 
+  void _addPayment(PaymentData v) {
+    setState(() {
+      final exists = purchasePayment.any((p) => p.paymentDataId == v.id);
+      if (exists) return;
+
+      purchasePayment.add(
+        PurchasePayment(
+          id: v.id,
+          purchaseId: v.id,
+          paymentDataId: v.id,
+          amount: 0,
+          type: v.accountType,
+          paymentData: v,
+        ),
+      );
+      paymentAmountController.add(TextEditingController(text: '0'));
+    });
+  }
+
   void updatePurchase() async {
     try {
+      if (purchasePayment.isEmpty) throw AddPurchasePaymentError();
+
+      final purchasePayments = List.generate(
+        purchasePayment.length,
+        (index) => {
+          "paymentDataId": purchasePayment[index].paymentData!.id,
+          "amount": double.tryParse(paymentAmountController[index].text) ?? 0,
+          "type": purchasePayment[index].type,
+        },
+      );
+
       final items = List.generate(purchaseData.purchaseItems.length, (index) {
         final item = purchaseData.purchaseItems[index];
 
@@ -220,6 +267,8 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
         "packagingFee": double.tryParse(packagingFeeController.text) ?? 0,
 
         "purchaseItems": items,
+
+        'purchasePayment': purchasePayments,
       };
 
       debugPrint("payload for purchase is $payload");
@@ -244,6 +293,17 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
           context.pushNamed(AppRoute.purchaseHistory);
         }
       }
+    } on AddPurchasePaymentError {
+      print("error in add purchase");
+      ShowToast(
+        context,
+        isError: true,
+        description: Text(
+          PurchaseLocale.purchaseAddPayment.getString(context),
+          style: TextStyle(color: kRed),
+        ),
+        borderColor: kRed,
+      );
     } catch (e, stackTrace) {
       debugPrint("Error creating purchase: $e");
       debugPrintStack(stackTrace: stackTrace);
@@ -272,6 +332,21 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
       // Remove purchase item
       purchaseData.purchaseItems.removeAt(index);
     });
+  }
+
+  void _removePayment(int index) {
+    setState(() {
+      paymentAmountController[index].dispose();
+      paymentAmountController.removeAt(index);
+      purchasePayment.removeAt(index);
+    });
+  }
+
+  double _calculateTotalPaidAmount() {
+    return paymentAmountController.fold<double>(
+      0.0,
+      (sum, controller) => sum + (double.tryParse(controller.text) ?? 0.0),
+    );
   }
 
   @override
@@ -621,7 +696,39 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
                 },
               ),
 
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: PaymentSelect(
+                  allPayment: false,
+                  onChanged: (PaymentData v) => _addPayment(v),
+                ),
+              ),
+
               const SizedBox(height: 12),
+
+              ...List.generate(purchasePayment.length, (index) {
+                final payment = purchasePayment[index];
+                return PaymentRow(
+                  index: index,
+                  accountName: payment.paymentData!.accountName,
+                  controller: paymentAmountController[index],
+                  validator: (v) {
+                    if (v.isEmpty || v == '0') {
+                      return PurchaseLocale.purchaseInvalidAmount.getString(
+                        context,
+                      );
+                    }
+                    return null;
+                  },
+                  onAmountChanged: (_) {
+                    setState(() {
+                      totalPaidAmount = _calculateTotalPaidAmount();
+                    });
+                  },
+                  onRemove: () => _removePayment(index),
+                );
+              }),
 
               // ============================
               // NOTE

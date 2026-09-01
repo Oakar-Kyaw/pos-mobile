@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/component/accent-bar.dart';
-import 'package:pos/component/delete-icon.dart';
 import 'package:pos/component/voucher-body.dart';
 import 'package:pos/component/voucher-header.dart';
+import 'package:pos/core/widgets/delete-icon.dart';
 import 'package:pos/models/voucher-detail.dart';
 
 class DebtAndRepayVoucherListComponent extends StatelessWidget {

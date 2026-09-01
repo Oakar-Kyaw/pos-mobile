@@ -16,6 +16,7 @@ import 'package:pos/riverpod/voucher-detail.dart';
 import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/riverpod/company.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/button.dart';
 import 'package:pos/utils/drawer.dart';
 import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
@@ -147,6 +148,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               selectedItems(
                                 ItemModel(
                                   id: item.id,
+                                  productId: item.id,
+                                  product: item,
                                   name: item.name,
                                   quantity: 1,
                                   price: item.price,
@@ -203,24 +206,24 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Save button
-                        customButton(
-                          label: HomeScreenLocale.save.getString(context),
-                          isDark: isDark,
-                          gradient: false,
-                          onTap: () {},
-                        ),
+                        // customButton(
+                        //   label: HomeScreenLocale.save.getString(context),
+                        //   isDark: isDark,
+                        //   gradient: false,
+                        //   onTap: () {},
+                        // ),
 
-                        const SizedBox(width: 8),
+                        // const SizedBox(width: 8),
 
                         // Create Voucher button — gradient
-                        customButton(
-                          label: HomeScreenLocale.createVoucher.getString(
+                        GradientSubmitButton(
+                          onPressed: () =>
+                              context.pushNamed(AppRoute.createVoucher),
+                          text: HomeScreenLocale.createVoucher.getString(
                             context,
                           ),
-                          isDark: isDark,
-                          gradient: true,
-                          onTap: () =>
-                              context.pushNamed(AppRoute.createVoucher),
+                          width: 200,
+                          circularNo: 20,
                         ),
                       ],
                     ),

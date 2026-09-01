@@ -1,4 +1,5 @@
 import 'package:pos/features/purchase-history/data/model/purchase-item.dart';
+import 'package:pos/features/purchase-history/data/model/purchase-payment.dart';
 
 import '../../../supplier/data/model/supplier.dart';
 
@@ -26,6 +27,7 @@ class Purchase {
   final Supplier? supplier;
 
   final List<PurchaseItem> purchaseItems;
+  List<PurchasePayment> purchasePayments;
 
   Purchase({
     required this.id,
@@ -47,6 +49,7 @@ class Purchase {
     required this.createdBy,
     required this.supplier,
     required this.purchaseItems,
+    required this.purchasePayments,
   });
 
   factory Purchase.fromJson(Map<String, dynamic> json) {
@@ -83,6 +86,10 @@ class Purchase {
       purchaseItems: (json['purchaseItems'] as List? ?? [])
           .map((e) => PurchaseItem.fromJson(e))
           .toList(),
+
+      purchasePayments: (json['purchasePayments'] as List? ?? [])
+          .map((e) => PurchasePayment.fromJson(e))
+          .toList(),
     );
   }
 
@@ -106,6 +113,7 @@ class Purchase {
     int? createdBy,
     Supplier? supplier,
     List<PurchaseItem>? purchaseItems,
+    List<PurchasePayment>? purchasePayments,
   }) {
     return Purchase(
       id: id ?? this.id,
@@ -127,6 +135,7 @@ class Purchase {
       createdBy: createdBy ?? this.createdBy,
       supplier: supplier ?? this.supplier,
       purchaseItems: purchaseItems ?? this.purchaseItems,
+      purchasePayments: purchasePayments ?? this.purchasePayments,
     );
   }
 

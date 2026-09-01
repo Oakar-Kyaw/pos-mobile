@@ -1,5 +1,6 @@
 import 'package:pos/models/company.dart';
 import 'package:pos/models/payment-data.dart';
+import 'package:pos/models/product.dart';
 
 class VoucherPayment {
   String? id;
@@ -52,59 +53,78 @@ class VoucherPayment {
 
 class ItemModel {
   final int id;
-  // final int itemId;
+  final int productId;
+  final Product? product; // ← nullable ပြောင်းပါ
   final String name;
   final String? photoUrl;
   int quantity;
   double price;
+  double costPrice;
+  double avgCostPrice;
 
   ItemModel({
     required this.id,
-    // required this.itemId,
+    required this.productId,
+    this.product, // ← required မလုပ်တော့ဘူး
     required this.name,
     this.photoUrl,
     this.quantity = 0,
     this.price = 0,
+    this.costPrice = 0,
+    this.avgCostPrice = 0,
   });
 
-  // CopyWith method
   ItemModel copyWith({
     int? id,
-    // int? itemId,
     String? name,
     String? photoUrl,
     int? quantity,
     double? price,
+    double? costPrice,
+    double? avgCostPrice,
+    int? productId,
+    Product? product,
   }) {
     return ItemModel(
       id: id ?? this.id,
-      // itemId: itemId ?? this.itemId,
       name: name ?? this.name,
       photoUrl: photoUrl ?? this.photoUrl,
       quantity: quantity ?? this.quantity,
       price: price ?? this.price,
+      costPrice: costPrice ?? this.costPrice,
+      avgCostPrice: avgCostPrice ?? this.avgCostPrice,
+      productId: productId ?? this.productId,
+      product: product ?? this.product,
     );
   }
 
-  // Convert JSON map to ItemModel
   factory ItemModel.fromJson(Map<String, dynamic> json) {
     return ItemModel(
       id: (json['id'] as num).toInt(),
-      name: json['name'],
-      photoUrl: json['photoUrl'],
-      quantity: json['quantity'],
-      price: double.parse(json['price'].toString()),
+      productId: (json['productId'] as num).toInt(),
+      product: json['product'] != null
+          ? Product.fromJson(json['product'] as Map<String, dynamic>)
+          : null, // ← key မပါရင် null ထားလိုက်
+      name: json['name'] as String,
+      photoUrl: json['photoUrl'] as String?,
+      quantity: (json['quantity'] as num?)?.toInt() ?? 0,
+      price: double.tryParse(json['price'].toString()) ?? 0,
+      costPrice: double.tryParse(json['costPrice'].toString()) ?? 0,
+      avgCostPrice: double.tryParse(json['avgCostPrice'].toString()) ?? 0,
     );
   }
 
-  // Convert ItemModel to JSON map
   Map<String, dynamic> toJson() {
     return {
-      'itemId': id,
+      'id': id,
       'name': name,
       'photoUrl': photoUrl,
       'quantity': quantity,
       'price': price,
+      'costPrice': costPrice,
+      'avgCostPrice': avgCostPrice,
+      'productId': productId,
+      'itemId': productId,
     };
   }
 }
@@ -193,7 +213,7 @@ class VoucherDetailModel {
 
   // From JSON
   factory VoucherDetailModel.fromJson(Map<String, dynamic> json) {
-    //print("voucher detail model $json");
+    // print("voucher detail model $json");
     return VoucherDetailModel(
       id: json['id'],
       voucherCode: json['voucherCode'] ?? "",

@@ -66,12 +66,15 @@ class SupplierAsyncNotifier extends AsyncNotifier<List<Supplier>> {
 
   Future<bool> updateSupplier(int id, Map<String, dynamic> body) async {
     try {
+      print("dataof suppplier edit ✍️ ${body}");
       final response = await _dio.patch("v1/suppliers/$id", data: body);
 
       final data = response.data;
 
+      print("dataof suppplier edit ✍️ ${data}");
+
       if (data["success"] == true) {
-        ref.invalidateSelf();
+        // ref.invalidateSelf();
         return true;
       }
 

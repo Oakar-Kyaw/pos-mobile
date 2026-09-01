@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:pos/component/delete-icon.dart';
+import 'package:pos/core/widgets/delete-icon.dart';
 import 'package:pos/core/widgets/left-green-bar.dart';
 import 'package:pos/localization/debt-local.dart';
 import 'package:pos/localization/repay-local.dart';

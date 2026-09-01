@@ -7,9 +7,9 @@ import 'package:intl/intl.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/features/purchase-history/data/model/purchase-item.dart';
 import 'package:pos/features/purchase-history/data/model/purchase.dart';
-import 'package:pos/features/supplier/presentation/provider/supplier-provider.dart';
 import 'package:pos/localization/purchase-local.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/font-size.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class PurchaseDetailPage extends ConsumerStatefulWidget {
@@ -135,32 +135,6 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
     total -= double.tryParse(discountController.text) ?? 0;
 
     return total;
-  }
-
-  void updatePurchase() {
-    print("update data is ");
-    final items = List.generate(
-      purchaseItems.length,
-      (index) => {
-        "id": purchase.purchaseItems[index].id,
-        "productId": purchase.purchaseItems[index].productId,
-        "quantity": int.tryParse(qtyControllers[index].text) ?? 0,
-        "price": double.tryParse(priceControllers[index].text) ?? 0,
-      },
-    );
-
-    final payload = {
-      "note": noteController.text,
-      "discount": discountController.text,
-      "tax": taxController.text,
-      "deliveryFee": deliveryFeeController.text,
-      "purchaseItems": items,
-    };
-
-    debugPrint("payload for purchase is ${payload.toString()}");
-
-    /// call api here
-    /// ref.read(purchaseProvider.notifier).updatePurchase(...)
   }
 
   @override
@@ -391,6 +365,35 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
               ),
 
               const SizedBox(height: 12),
+
+              const SizedBox(height: 6),
+              ...purchase.purchasePayments.map(
+                (payment) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          payment.paymentData?.accountName ?? payment.type,
+                          style: TextStyle(
+                            fontSize: FontSizeConfig.body(context),
+                            color: textColor,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        payment.amount.toStringAsFixed(0),
+                        style: TextStyle(
+                          fontSize: FontSizeConfig.body(context),
+                          color: textColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
 
               ShadInputFormField(
                 id: 'note',

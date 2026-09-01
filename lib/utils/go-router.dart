@@ -2,11 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/features/account-upgrade/presentation/pages/account-upgrade.dart';
+import 'package:pos/features/category/presentation/page/category.dart';
 import 'package:pos/features/create-voucher/presentation/pages/create-voucher.dart';
+import 'package:pos/features/customer/presentation/page/create-customer.dart';
 import 'package:pos/features/customer/presentation/page/customer.dart';
 import 'package:pos/features/expire-item/presentation/page/expire-item.dart';
+import 'package:pos/features/general-expense/data/model/general-expense.dart';
+import 'package:pos/features/general-expense/presentation/page/general-expense-create.dart';
+import 'package:pos/features/general-expense/presentation/page/general-expense-edit.dart';
+import 'package:pos/features/general-expense/presentation/page/general-expense.dart';
+import 'package:pos/features/income/presentation/page/income.dart';
 import 'package:pos/features/leave/presentation/pages/leave-create-page.dart';
 import 'package:pos/features/leave/presentation/pages/leave-pages.dart';
+import 'package:pos/features/payment-list/presentation/page/payment-list.dart';
 import 'package:pos/features/printer/presentation/page/printer.page.dart';
 import 'package:pos/features/product/presentation/page/product-bar-code-scan.dart';
 import 'package:pos/features/product/presentation/page/product-list-page.dart';
@@ -15,28 +23,26 @@ import 'package:pos/features/purchase-history/presentation/page/create-purchase-
 import 'package:pos/features/purchase-history/presentation/page/purchase-detail.dart';
 import 'package:pos/features/purchase-history/presentation/page/purchase-edit.dart';
 import 'package:pos/features/purchase-history/presentation/page/purchase-history.dart';
+import 'package:pos/features/refund/data/model/refund.dart';
+import 'package:pos/features/refund/presentation/page/refund-create.dart';
+import 'package:pos/features/refund/presentation/page/refund-edit.dart';
+import 'package:pos/features/refund/presentation/page/refund.dart';
+import 'package:pos/features/supplier/presentation/page/create-supplier.dart';
 import 'package:pos/features/supplier/presentation/page/supplier.dart';
 import 'package:pos/riverpod/login-check.dart';
-import 'package:pos/src/account.dart';
 import 'package:pos/src/attendance.dart';
 import 'package:pos/src/attendance-create.dart';
-import 'package:pos/src/category.dart';
 import 'package:pos/src/company-profile.dart';
 import 'package:pos/src/debt-voucher.dart';
 import 'package:pos/src/employee.dart';
-import 'package:pos/src/general-expense.dart';
-import 'package:pos/src/general-expense-create.dart';
 import 'package:pos/src/home.dart';
 import 'package:pos/src/hr-rule.dart';
-import 'package:pos/src/income.dart';
 import 'package:pos/src/inventory-items.dart';
 import 'package:pos/src/login.dart';
 import 'package:pos/src/payroll-create.dart';
 import 'package:pos/src/payroll-payslip.dart';
 import 'package:pos/src/product.dart';
 import 'package:pos/src/receipt.dart';
-import 'package:pos/src/refund.dart';
-import 'package:pos/src/refund-create.dart';
 import 'package:pos/src/repay.dart';
 import 'package:pos/src/request-item.dart';
 import 'package:pos/src/payroll-salary.dart';
@@ -176,6 +182,14 @@ final routeProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const GeneralExpenseCreatePage(),
       ),
       GoRoute(
+        path: AppRoute.generalExpenseEdit,
+        name: AppRoute.generalExpenseEdit,
+        builder: (context, state) {
+          GeneralExpense expense = state.extra as GeneralExpense;
+          return GeneralExpenseEditPage(expense: expense);
+        },
+      ),
+      GoRoute(
         path: AppRoute.refund,
         name: AppRoute.refund,
         builder: (context, state) => const RefundPage(),
@@ -184,6 +198,14 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.refundCreate,
         name: AppRoute.refundCreate,
         builder: (context, state) => const RefundCreatePage(),
+      ),
+      GoRoute(
+        path: AppRoute.refundUpdate,
+        name: AppRoute.refundUpdate,
+        builder: (context, state) {
+          final refund = state.extra as Refund;
+          return RefundEditPage(refund: refund);
+        },
       ),
       GoRoute(
         path: AppRoute.debt,
@@ -252,6 +274,18 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.customer,
         name: AppRoute.customer,
         builder: (context, state) => const CustomerPage(),
+      ),
+
+      GoRoute(
+        path: AppRoute.customerCreate,
+        name: AppRoute.customerCreate,
+        builder: (context, state) => const CreateCustomerPage(),
+      ),
+
+      GoRoute(
+        path: AppRoute.supplierCreate,
+        name: AppRoute.supplierCreate,
+        builder: (context, state) => const CreateSupplierPage(),
       ),
 
       GoRoute(

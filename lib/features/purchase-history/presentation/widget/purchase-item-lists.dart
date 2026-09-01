@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/no-item-found-widget.dart';
+import 'package:pos/core/utils/confirm-dialog.dart';
 import 'package:pos/features/purchase-history/data/model/purchase.dart';
 import 'package:pos/features/purchase-history/presentation/provider/purchase.api.dart';
 import 'package:pos/features/purchase-history/presentation/widget/purchase-card.dart';
@@ -105,35 +106,13 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
   Future<void> _onDelete(int index) async {
     if (!mounted) return;
     try {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(PurchaseLocale.purchaseDelete.getString(context)),
-            content: Text(
-              PurchaseLocale.purchaseDeleteConfirm.getString(context),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
-                child: Text(PurchaseLocale.purchaseCancel.getString(context)),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-                child: Text(
-                  PurchaseLocale.purchaseDelete.getString(context),
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-            ],
-          );
-        },
+      final confirmed = await showConfirmDialog(
+        context,
+        title: PurchaseLocale.purchaseDelete.getString(context),
+        content: PurchaseLocale.purchaseDeleteConfirm.getString(context),
+        confirmLabel: PurchaseLocale.purchaseDelete.getString(context),
+        cancelLabel: PurchaseLocale.purchaseCancel.getString(context),
       );
-
       if (confirmed != true) return;
 
       debugPrint("Deleting purchase: $index");
@@ -231,6 +210,7 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
                   purchase: purchaseItem,
                   textColor: textColor,
                   subColor: subColor,
+
                   onEdit: () => context.pushNamed(
                     AppRoute.purchaseEdit,
                     extra: purchaseItem,

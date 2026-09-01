@@ -17,6 +17,8 @@ void addProduct(
       .addItem(
         ItemModel(
           id: product.id,
+          productId: product.id,
+          product: product,
           name: product.name,
           quantity: 1,
           price: product.price,

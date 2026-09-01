@@ -81,7 +81,8 @@ class CustomerDrawer {
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [kPrimary, kSecondary],
+                        colors: [kGreen, kGreenSecondary],
+                        // colors: [kPrimary, kSecondary],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -166,12 +167,14 @@ class CustomerDrawer {
                             leading: Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: kPrimary.withOpacity(0.1),
+                                color: kGreen.withOpacity(0.1),
+                                // color: kPrimary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
                                 isDark ? LucideIcons.sun : LucideIcons.moon,
-                                color: kPrimary,
+                                color: kGreen,
+                                // color: kPrimary,
                                 size: 16,
                               ),
                             ),
@@ -217,7 +220,8 @@ class CustomerDrawer {
                                 ),
                                 child: const Icon(
                                   LucideIcons.globe,
-                                  color: kPrimary,
+                                  color: kGreen,
+                                  // color: kPrimary,
                                   size: 16,
                                 ),
                               ),
@@ -315,7 +319,8 @@ class CustomerDrawer {
                     margin: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [kPrimary, kSecondary],
+                        colors: [kGreen, kGreenSecondary],
+                        // colors: [kPrimary, kSecondary],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ),
@@ -378,10 +383,12 @@ class CustomerDrawer {
         leading: Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: kPrimary.withOpacity(0.1),
+            color: kGreen.withOpacity(0.1),
+            // color: kPrimary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(item.icon, color: kPrimary, size: 16),
+          child: Icon(item.icon, color: kGreen, size: 16),
+          // child: Icon(item.icon, color: kPrimary, size: 16),
         ),
         title: Text(
           item.label,
@@ -395,7 +402,8 @@ class CustomerDrawer {
           Navigator.pop(context);
           context.pushNamed(item.route);
         },
-        hoverColor: kPrimary.withOpacity(0.06),
+        hoverColor: kGreen.withOpacity(0.06),
+        // hoverColor: kPrimary.withOpacity(0.06),
       ),
     );
   }

@@ -179,6 +179,7 @@ class _CustomerListsState extends ConsumerState<CustomerLists> {
                       index,
                     ),
                     child: CustomerCard(
+                      key: ValueKey(customer.id),
                       customer: customer,
                       textColor: textColor,
                       subColor: subColor,

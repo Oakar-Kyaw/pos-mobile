@@ -224,6 +224,7 @@ class _SupplierItemListsState extends ConsumerState<SupplierItemLists> {
                     decoration: containerDecoration,
 
                     child: SupplierCard(
+                      key: ValueKey(supplier.id),
                       supplier: supplier,
 
                       textColor: textColor,

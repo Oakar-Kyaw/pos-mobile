@@ -27,11 +27,14 @@ mixin SupplierLocale {
   static const supplierError = 'supplier_error';
 
   static const supplierSuccess = 'supplier_success';
+
   static const supplierCreateSuccess = 'supplier_create_success';
+  static const supplierEditSuccess = 'supplier_edit_success';
   static const supplierUpdateSuccess = 'supplier_update_success';
   static const supplierDeleteSuccess = 'supplier_delete_success';
 
   static const supplierCreateFail = 'supplier_create_fail';
+  static const supplierEditFail = 'supplier_edit_fail';
   static const supplierUpdateFail = 'supplier_update_fail';
   static const supplierDeleteFail = 'supplier_delete_fail';
 
@@ -77,15 +80,13 @@ mixin SupplierLocale {
     supplierSuccess: 'Supplier operation completed successfully',
 
     supplierCreateSuccess: 'Supplier created successfully',
-
+    supplierEditSuccess: 'Supplier updated successfully',
     supplierUpdateSuccess: 'Supplier updated successfully',
-
     supplierDeleteSuccess: 'Supplier deleted successfully',
 
     supplierCreateFail: 'Failed to create supplier',
-
+    supplierEditFail: 'Failed to update supplier',
     supplierUpdateFail: 'Failed to update supplier',
-
     supplierDeleteFail: 'Failed to delete supplier',
 
     supplierUpdateConfirm: 'Do you want to update this supplier record?',
@@ -132,11 +133,15 @@ mixin SupplierLocale {
 
     supplierCreateSuccess: 'ပေးသွင်းသူကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
 
+    supplierEditSuccess: 'ပေးသွင်းသူကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ',
+
     supplierUpdateSuccess: 'ပေးသွင်းသူကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ',
 
     supplierDeleteSuccess: 'ပေးသွင်းသူကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
 
     supplierCreateFail: 'ပေးသွင်းသူ ဖန်တီးရန် မအောင်မြင်ပါ',
+
+    supplierEditFail: 'ပေးသွင်းသူ ပြင်ဆင်ရန် မအောင်မြင်ပါ',
 
     supplierUpdateFail: 'ပေးသွင်းသူ ပြင်ဆင်ရန် မအောင်မြင်ပါ',
 

@@ -1,2 +1,6 @@
-String formatAmount(double value) =>
-    value % 1 == 0 ? value.toInt().toString() : value.toStringAsFixed(2);
+import 'package:intl/intl.dart';
+
+String formatAmount(double value) {
+  final formatter = NumberFormat('#,##0.##');
+  return formatter.format(value);
+}

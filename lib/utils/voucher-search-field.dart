@@ -3,16 +3,19 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/voucher.api.dart';
 import 'package:pos/localization/voucher-local.dart';
+import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class VoucherSearchField extends ConsumerStatefulWidget {
+  final TextEditingController controller;
   final Function(String) onSearchChanged;
-  final Function(int) onVoucherSelected;
+  final Function(VoucherDetailModel voucher) onVoucherSelected;
 
   const VoucherSearchField({
     super.key,
+    required this.controller,
     required this.onSearchChanged,
     required this.onVoucherSelected,
   });
@@ -22,18 +25,11 @@ class VoucherSearchField extends ConsumerStatefulWidget {
 }
 
 class _VoucherSearchFieldState extends ConsumerState<VoucherSearchField> {
-  late final TextEditingController searchController;
   bool showSuggestions = false;
 
   @override
-  void initState() {
-    super.initState();
-    searchController = TextEditingController();
-  }
-
-  @override
   void dispose() {
-    searchController.dispose();
+    widget.controller.dispose();
     super.dispose();
   }
 
@@ -49,7 +45,7 @@ class _VoucherSearchFieldState extends ConsumerState<VoucherSearchField> {
     return Column(
       children: [
         ShadInputFormField(
-          controller: searchController,
+          controller: widget.controller,
           decoration: const ShadDecoration(
             secondaryFocusedBorder: ShadBorder.none,
           ),
@@ -79,40 +75,45 @@ class _VoucherSearchFieldState extends ConsumerState<VoucherSearchField> {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: kPrimary.withOpacity(0.2)),
                         ),
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: items.length,
-                          itemBuilder: (context, index) {
-                            final voucher = items[index];
-
-                            return ListTile(
-                              title: Text(
-                                voucher.voucherCode ?? '',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: FontSizeConfig.body(context),
-                                ),
-                              ),
-                              subtitle: Text(
-                                voucher.createdAt != null
-                                    ? DateFormat(
-                                        'yyyy-MM-dd E',
-                                      ).format(voucher.createdAt!)
-                                    : '-',
-                                style: TextStyle(color: subColor),
-                              ),
-                              onTap: () {
-                                searchController.text =
-                                    voucher.voucherCode ?? '';
-                                widget.onVoucherSelected.call(voucher.id);
-                                setState(() {
-                                  showSuggestions = false;
-                                });
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Material(
+                            type: MaterialType.transparency,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: items.length,
+                              itemBuilder: (context, index) {
+                                final voucher = items[index];
+                                return ListTile(
+                                  title: Text(
+                                    voucher.voucherCode ?? '',
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: FontSizeConfig.body(context),
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    voucher.createdAt != null
+                                        ? DateFormat(
+                                            'yyyy-MM-dd E',
+                                          ).format(voucher.createdAt!)
+                                        : '-',
+                                    style: TextStyle(color: subColor),
+                                  ),
+                                  onTap: () {
+                                    widget.controller.text =
+                                        voucher.voucherCode ?? '';
+                                    widget.onVoucherSelected.call(voucher);
+                                    setState(() {
+                                      showSuggestions = false;
+                                    });
+                                  },
+                                );
                               },
-                            );
-                          },
+                            ),
+                          ),
                         ),
                       );
                     },

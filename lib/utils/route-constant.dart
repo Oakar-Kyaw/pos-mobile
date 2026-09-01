@@ -14,9 +14,11 @@ class AppRoute {
   static const String saleReports = "/sale-reports";
   static const String generalExpense = "/general-expenses";
   static const String generalExpenseCreate = "/general-expenses/create";
+  static const String generalExpenseEdit = "/general-expenses/edit";
   static const String account = "/bank-account";
   static const String refund = "/refund";
   static const String refundCreate = "/refund/create";
+  static const String refundUpdate = "/refund/update";
   static const String debt = "/debt";
   static const String repay = "/repay";
   static const String expireItem = "/expire-items";

@@ -56,28 +56,13 @@ class DateSelectorCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 14),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  SaleReportLocale.saleReportDate.getString(context),
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: textColor,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  formattedDate,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
-                ),
-              ],
+            Text(
+              formattedDate,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
             ),
             const Spacer(),
             Container(

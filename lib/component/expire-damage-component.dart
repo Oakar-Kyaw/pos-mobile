@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/component/delete-icon.dart';
+import 'package:pos/core/widgets/delete-icon.dart';
 import 'package:pos/localization/inventory-management-local.dart';
 import 'package:pos/models/inventory-management.dart';
 import 'package:pos/utils/app-theme.dart';

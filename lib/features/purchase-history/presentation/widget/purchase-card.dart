@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/component/delete-icon.dart';
+import 'package:pos/core/widgets/delete-icon.dart';
 import 'package:pos/features/purchase-history/data/model/purchase.dart';
 import 'package:pos/localization/purchase-local.dart';
 import 'package:pos/utils/app-theme.dart';

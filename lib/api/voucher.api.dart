@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
 import 'package:pos/core/provider.dart';
@@ -138,11 +139,13 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
 
   Future<void> searchVoucher({required String search}) async {
     state = const AsyncLoading();
-
+    // print("search voucher");
     try {
       final voucher = await getVouchers(page: 0, limit: 20, search: search);
+      // debugPrint("voucher resulte is ${voucher}");
       state = AsyncData(voucher);
     } catch (e, s) {
+      // debugPrint("Error of search is $e");
       state = AsyncError(e, s);
     }
   }

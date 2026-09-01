@@ -6,12 +6,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/core/utils/date-select.dart';
+import 'package:pos/core/utils/payment-row.dart';
+import 'package:pos/core/utils/payment-select.dart';
 import 'package:pos/core/utils/supplier-select.dart';
 import 'package:pos/features/create-voucher/presentation/widgets/calculation-search-field.dart';
 import 'package:pos/features/purchase-history/data/model/purchase-item.dart';
+import 'package:pos/features/purchase-history/data/model/purchase-payment.dart';
 import 'package:pos/features/purchase-history/presentation/provider/purchase.api.dart';
 import 'package:pos/features/purchase-history/presentation/widget/purchase-status-select.dart';
 import 'package:pos/localization/purchase-local.dart';
+import 'package:pos/models/payment-data.dart';
 import 'package:pos/models/product.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
@@ -45,7 +49,9 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
 
   late List<TextEditingController> qtyControllers;
   late List<TextEditingController> priceControllers;
-
+  late List<TextEditingController> paymentAmountController;
+  List<PurchasePayment> purchasePayment = [];
+  double totalPaidAmount = 0.0;
   @override
   void initState() {
     super.initState();
@@ -56,6 +62,10 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
 
     priceControllers = purchaseItems
         .map((e) => TextEditingController(text: e.price.toString()))
+        .toList();
+
+    paymentAmountController = purchasePayment
+        .map((e) => TextEditingController(text: e.amount.toString()))
         .toList();
   }
 
@@ -70,6 +80,10 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
 
     for (final controller in priceControllers) {
       controller.dispose();
+    }
+
+    for (final p in paymentAmountController) {
+      p.dispose();
     }
 
     discountController.dispose();
@@ -126,6 +140,17 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
     try {
       debugPrint("Creating purchase...");
       if (!mounted) return;
+
+      if (purchasePayment.isEmpty) throw AddPurchasePaymentError();
+
+      final purchasePayments = List.generate(
+        purchasePayment.length,
+        (index) => {
+          "paymentDataId": purchasePayment[index].paymentData!.id,
+          "amount": double.tryParse(paymentAmountController[index].text) ?? 0,
+          "type": purchasePayment[index].type,
+        },
+      );
 
       if (supplierId == null) {
         debugPrint("Supplier is required");
@@ -212,6 +237,7 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
             ? 0
             : int.tryParse(packagingFeeController.text) ?? 0,
         "purchaseItems": items,
+        'purchasePayment': purchasePayments,
       };
 
       debugPrint("Payload for purchase: $payload");
@@ -231,6 +257,16 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
         );
         context.pushNamed(AppRoute.purchaseHistory);
       }
+    } on AddPurchasePaymentError {
+      ShowToast(
+        context,
+        isError: true,
+        description: Text(
+          PurchaseLocale.purchaseSuccess.getString(context),
+          style: TextStyle(color: kRed),
+        ),
+        borderColor: kRed,
+      );
     } catch (e, stackTrace) {
       debugPrint("Error creating purchase: $e");
       debugPrintStack(stackTrace: stackTrace);
@@ -262,6 +298,33 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
     });
   }
 
+  void _addPayment(PaymentData v) {
+    setState(() {
+      final exists = purchasePayment.any((p) => p.paymentDataId == v.id);
+      if (exists) return;
+
+      purchasePayment.add(
+        PurchasePayment(
+          id: v.id,
+          purchaseId: v.id,
+          paymentDataId: v.id,
+          amount: 0,
+          type: v.accountType,
+          paymentData: v,
+        ),
+      );
+      paymentAmountController.add(TextEditingController(text: '0'));
+    });
+  }
+
+  void _removePayment(int index) {
+    setState(() {
+      paymentAmountController[index].dispose();
+      paymentAmountController.removeAt(index);
+      purchasePayment.removeAt(index);
+    });
+  }
+
   void _onremoveItem(int index) {
     setState(() {
       // Dispose controllers first
@@ -275,6 +338,13 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
       // Remove purchase item
       purchaseItems.removeAt(index);
     });
+  }
+
+  double _calculateTotalPaidAmount() {
+    return paymentAmountController.fold<double>(
+      0.0,
+      (sum, controller) => sum + (double.tryParse(controller.text) ?? 0.0),
+    );
   }
 
   @override
@@ -521,8 +591,39 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
                   setState(() {});
                 },
               ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: PaymentSelect(
+                  allPayment: false,
+                  onChanged: (PaymentData v) => _addPayment(v),
+                ),
+              ),
 
               const SizedBox(height: 12),
+
+              ...List.generate(purchasePayment.length, (index) {
+                final payment = purchasePayment[index];
+                return PaymentRow(
+                  index: index,
+                  accountName: payment.paymentData!.accountName,
+                  controller: paymentAmountController[index],
+                  validator: (v) {
+                    if (v.isEmpty || v == '0') {
+                      return PurchaseLocale.purchaseInvalidAmount.getString(
+                        context,
+                      );
+                    }
+                    return null;
+                  },
+                  onAmountChanged: (_) {
+                    setState(() {
+                      totalPaidAmount = _calculateTotalPaidAmount();
+                    });
+                  },
+                  onRemove: () => _removePayment(index),
+                );
+              }),
 
               ShadInputFormField(
                 id: 'note',
