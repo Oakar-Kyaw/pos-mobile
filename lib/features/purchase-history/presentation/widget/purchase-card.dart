@@ -229,8 +229,8 @@ class PurchaseCard extends ConsumerWidget {
                   title: PurchaseLocale.purchaseOrderDate.getString(context),
                   subColor: subColor,
                   totalAmount: DateFormat(
-                    'yyyy-MM-dd HH:mm',
-                  ).format(purchase.orderDate),
+                    'yyyy-MM-dd',
+                  ).format(purchase.orderDate.toLocal()),
                   accent: accent,
                 ),
 

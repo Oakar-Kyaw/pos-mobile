@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/models/payment-data.dart';
-import 'package:pos/models/voucher-detail.dart';
 
 class Repay {
   final int id;

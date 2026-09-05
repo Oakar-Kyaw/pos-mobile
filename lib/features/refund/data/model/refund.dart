@@ -1,5 +1,5 @@
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/models/payment-data.dart';
-import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/features/refund/data/model/refund-item.dart';
 
 class Refund {

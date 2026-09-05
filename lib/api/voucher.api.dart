@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
 import 'package:pos/core/provider.dart';
 import 'package:pos/features/customer/data/model/customer-model.dart';
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/models/repayment.dart';
-import 'package:pos/models/voucher-detail.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
 

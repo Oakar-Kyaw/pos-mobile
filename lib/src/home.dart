@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,9 +10,9 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/core/widgets/custom-button.dart';
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/models/product.dart';
-import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/riverpod/voucher-detail.dart';
 import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/riverpod/company.riverpod.dart';
@@ -40,14 +41,45 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   final String limit = "40";
   final secureStorage = SecureStorage();
 
+  // ── Search state ─────────────────────────────
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+  String _searchQuery = '';
+
   late final PagingController<int, Product> _pagingController =
       PagingController<int, Product>(
         getNextPageKey: (state) =>
             state.lastPageIsEmpty ? null : state.nextIntPageKey,
         fetchPage: (pageKey) => ref
             .read(productProvider.notifier)
-            .getProductLists(pageKey.toString(), limit),
+            .getProductLists(
+              pageKey.toString(),
+              limit,
+              search: _searchQuery.isEmpty ? null : _searchQuery,
+            ),
       );
+
+  void _onSearchChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      setState(() {
+        _searchQuery = value.trim();
+      });
+      _pagingController.refresh();
+    });
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _isSearching = !_isSearching;
+      if (!_isSearching) {
+        _searchController.clear();
+        _searchQuery = '';
+        _pagingController.refresh();
+      }
+    });
+  }
 
   void setVoucher() {
     VoucherDetailModel voucherDetailModel = VoucherDetailModel(
@@ -71,6 +103,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   @override
   void dispose() {
     _pagingController.dispose();
+    _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -79,30 +113,55 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
     final company = ref.watch(companyStateProvider);
-    //print("comapny ${company!.photoUrl}");
-    // ref.watch(paymentDataProvider);
 
     return Scaffold(
       backgroundColor: bgColor,
       drawer: CustomerDrawer(
         isLoggedIn: ref.watch(checkLoginProvider),
       ).buildDrawer(context),
-      appBar: CustomAppBar(
-        title: company?.name ?? HomeScreenLocale.homeTitle.getString(context),
-        actions: [
-          IconButton(
-            onPressed: () => context.pushNamed(AppRoute.productBarcodeScan),
-            icon: Icon(LucideIcons.scanBarcode),
-          ),
-          IconButton(
-            onPressed: () {
-              //go to printer page
-              context.pushNamed(AppRoute.printer);
-            },
-            icon: Icon(LucideIcons.printer),
-          ),
-        ],
-      ),
+      appBar: _isSearching
+          ? AppBar(
+              backgroundColor: bgColor,
+              leading: IconButton(
+                onPressed: _toggleSearch,
+                icon: const Icon(LucideIcons.arrowLeft),
+              ),
+              title: TextField(
+                controller: _searchController,
+                autofocus: true,
+                onChanged: _onSearchChanged,
+                style: TextStyle(color: isDark ? kTextDark : Colors.black),
+                decoration: InputDecoration(
+                  hintText: 'Search products...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(
+                    color: isDark ? Colors.white54 : Colors.black45,
+                  ),
+                ),
+              ),
+            )
+          : CustomAppBar(
+              title:
+                  company?.name ??
+                  HomeScreenLocale.homeTitle.getString(context),
+              actions: [
+                IconButton(
+                  onPressed: _toggleSearch,
+                  icon: const Icon(LucideIcons.search),
+                ),
+                IconButton(
+                  onPressed: () =>
+                      context.pushNamed(AppRoute.productBarcodeScan),
+                  icon: const Icon(LucideIcons.scanBarcode),
+                ),
+                IconButton(
+                  onPressed: () {
+                    context.pushNamed(AppRoute.printer);
+                  },
+                  icon: const Icon(LucideIcons.printer),
+                ),
+              ],
+            ),
       body: Stack(
         children: [
           // ── Product Grid ─────────────────────────────
@@ -145,8 +204,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               if (ref.read(voucherDetailProvider) == null) {
                                 setVoucher();
                               }
-                              // debugPrint("home item: ${item.avgCostPrice}");
-                              //item select for creating voucher
                               selectedItems(
                                 ItemModel(
                                   id: item.id,
@@ -209,17 +266,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Save button
-                        // customButton(
-                        //   label: HomeScreenLocale.save.getString(context),
-                        //   isDark: isDark,
-                        //   gradient: false,
-                        //   onTap: () {},
-                        // ),
-
-                        // const SizedBox(width: 8),
-
-                        // Create Voucher button — gradient
                         GradientSubmitButton(
                           onPressed: () =>
                               context.pushNamed(AppRoute.createVoucher),
@@ -242,6 +288,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 }
 
+// _ProductCard class ကို မပြောင်းလဲထားပါ (အောက်မှာ ဆက်ထားပါ)
 // ─────────────────────────────────────────
 // Product Card
 // ─────────────────────────────────────────

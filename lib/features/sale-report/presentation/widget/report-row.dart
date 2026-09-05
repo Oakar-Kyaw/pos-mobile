@@ -2,8 +2,8 @@
 // 📊 Report Row
 // ─────────────────────────────────────────────
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
 
 class ReportRow extends StatelessWidget {
   final IconData icon;
@@ -15,6 +15,7 @@ class ReportRow extends StatelessWidget {
   final bool isDark;
 
   const ReportRow({
+    super.key,
     required this.icon,
     required this.iconColor,
     required this.label,
@@ -27,16 +28,25 @@ class ReportRow extends StatelessWidget {
   String _formatAmount(String raw) {
     final number = double.tryParse(raw);
     if (number == null) return raw;
-    return NumberFormat('#,##0.00').format(number);
+
+    // decimal ရှိရင် ပြမယ်၊ မရှိရင် (.0) ဖျောက်ပစ်မယ်
+    final isWhole = number == number.roundToDouble();
+    final pattern = isWhole ? '#,###' : '#,###.##';
+
+    return NumberFormat(pattern).format(number);
   }
 
   @override
   Widget build(BuildContext context) {
     final labelColor = isDark ? kTextDark : const Color(0xFF6B7280);
-    final amountColor = isDark ? kTextDark : const Color(0xFF111827);
+    final amountColor = isDark
+        ? kTextDark
+        : (isPositive ? const Color(0xFF059669) : const Color(0xFF111827));
+
+    final formatted = _formatAmount(amount);
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: highlight
           ? BoxDecoration(
               color: kPrimary.withOpacity(isDark ? 0.1 : 0.04),
@@ -53,10 +63,12 @@ class ReportRow extends StatelessWidget {
             ),
             child: Icon(icon, color: iconColor, size: 18),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 15),
           Expanded(
             child: Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 13,
                 color: labelColor,
@@ -64,12 +76,22 @@ class ReportRow extends StatelessWidget {
               ),
             ),
           ),
-          Text(
-            _formatAmount(amount),
-            style: TextStyle(
-              fontSize: highlight ? 17 : 15,
-              fontWeight: FontWeight.w700,
-              color: amountColor,
+          const SizedBox(width: 8),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 130),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: Text(
+                formatted,
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: highlight ? 17 : 15,
+                  fontWeight: FontWeight.w700,
+                  color: amountColor,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
             ),
           ),
         ],

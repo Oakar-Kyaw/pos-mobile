@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:pos/component/theme-divider.dart';
+import 'package:pos/features/sale-report/presentation/widget/report-row.dart';
 import 'package:pos/localization/payroll-local.dart';
 import 'package:pos/models/payroll.dart';
-import 'package:pos/src/report-row.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 

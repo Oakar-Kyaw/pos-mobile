@@ -3,9 +3,9 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/account.api.dart';
 import 'package:pos/component/loading-component.dart';
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/localization/payment-local.dart';
 import 'package:pos/models/payment-data.dart';
-import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/riverpod/voucher-detail.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 

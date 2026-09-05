@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:pos/features/customer/data/model/customer-model.dart';
 import 'package:pos/models/company.dart';
 import 'package:pos/models/payment-data.dart';
 import 'package:pos/models/product.dart';
@@ -133,10 +133,11 @@ class ItemModel {
 class VoucherDetailModel {
   final int id;
   String? voucherCode;
-  DateTime? createdAt; // ✅ NEW
+  DateTime? createdAt;
 
   List<ItemModel> items;
   List<VoucherPayment> payments;
+  Customer? customer;
   Company? company;
 
   double subTotal;
@@ -159,6 +160,7 @@ class VoucherDetailModel {
     this.createdAt,
     required this.items,
     required this.payments,
+    this.customer,
     this.company,
     this.totalPaymentAmount = 0,
     this.deliveryFee = 0,
@@ -180,6 +182,7 @@ class VoucherDetailModel {
     int? id,
     List<ItemModel>? items,
     List<VoucherPayment>? payments,
+    Customer? customer,
     double? total,
     double? totalPaymentAmount,
     double? deliveryFee,
@@ -198,6 +201,7 @@ class VoucherDetailModel {
       id: id ?? this.id,
       items: items ?? this.items,
       payments: payments ?? this.payments,
+      customer: customer ?? this.customer,
       subTotal: subTotal ?? this.subTotal,
       total: total ?? this.total,
       totalPaymentAmount: totalPaymentAmount ?? this.totalPaymentAmount,
@@ -218,7 +222,7 @@ class VoucherDetailModel {
 
   // From JSON
   factory VoucherDetailModel.fromJson(Map<String, dynamic> json) {
-    // print("voucher detail model $json");
+    // print("voucher detail model ${json['Customer']}, ${json['customer']}");
     return VoucherDetailModel(
       id: json['id'],
       voucherCode: json['voucherCode'] ?? "",
@@ -229,7 +233,9 @@ class VoucherDetailModel {
       items: (json['items'] as List<dynamic>)
           .map((item) => ItemModel.fromJson(item))
           .toList(),
-
+      customer: json['Customer'] != null
+          ? Customer.fromJson(json['Customer'])
+          : null,
       subTotal: double.parse(json['subTotal'].toString()),
       total: double.parse(json['total'].toString()),
       tax: double.parse(json['tax'].toString()),

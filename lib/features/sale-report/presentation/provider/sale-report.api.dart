@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
 import 'package:pos/core/provider.dart';
-import 'package:pos/models/sale-report.dart';
+import 'package:pos/features/sale-report/data/model/sale-report.dart';
 
 class SaleReportAsyncNotifier extends AsyncNotifier<SaleReport> {
   late DioService _dio;

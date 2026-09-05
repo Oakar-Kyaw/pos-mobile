@@ -11,8 +11,8 @@ import 'package:pos/features/printer/data/datasource/printer-local-datasource.da
 import 'package:pos/features/printer/domain/entites/printer-device.dart';
 import 'package:pos/features/printer/domain/enums/printer-type.dart';
 import 'package:pos/features/printer/presentation/provider/printer-provider.dart';
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/localization/company-local.dart';
-import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/localization/payment-local.dart';
 import 'package:pos/utils/font-size.dart';

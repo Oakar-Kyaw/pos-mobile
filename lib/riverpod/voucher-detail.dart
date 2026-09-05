@@ -1,6 +1,5 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/models/voucher-detail.dart';
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 
 class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
   @override

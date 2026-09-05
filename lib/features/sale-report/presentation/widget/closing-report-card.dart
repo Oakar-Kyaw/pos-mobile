@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/component/theme-divider.dart';
+import 'package:pos/features/sale-report/data/model/sale-report.dart';
+import 'package:pos/features/sale-report/presentation/widget/report-row.dart';
 import 'package:pos/localization/sale-report-local.dart';
 import 'package:pos/models/dashboard-stats.dart';
-import 'package:pos/models/sale-report.dart';
-import 'package:pos/src/report-row.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -27,13 +27,13 @@ class ClosingReportCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final openingAmount = report.openingAmount ?? 0;
     final closingAmount = report.closingAmount ?? 0;
+    final totalGeneralExpense = report.totalGeneralExpense ?? 0;
+    final totalPurchase = report.totalPurchase ?? 0;
     final todaySaleAmount = asyncIncome.maybeWhen(
       data: (income) => income.getTodaySale.total,
       orElse: () => 0,
     );
-    // print(
-    //   "Closing Amount: $openingAmount $closingAmount, Today's Sale: $todaySaleAmount",
-    // );
+
     final total =
         openingAmount +
         closingAmount +
@@ -62,7 +62,7 @@ class ClosingReportCard extends StatelessWidget {
             // ── Gradient header ──────────────────
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [kPrimary, kSecondary],
@@ -73,18 +73,18 @@ class ClosingReportCard extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
                       LucideIcons.clipboardList,
                       color: Colors.white,
-                      size: 22,
+                      size: 20,
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -94,7 +94,7 @@ class ClosingReportCard extends StatelessWidget {
                         ),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 17,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.3,
                         ),
@@ -107,7 +107,6 @@ class ClosingReportCard extends StatelessWidget {
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
-                          fontWeight: FontWeight.w400,
                         ),
                       ),
                     ],
@@ -115,11 +114,10 @@ class ClosingReportCard extends StatelessWidget {
                 ],
               ),
             ),
-
             // ── Body ─────────────────────────────
             Container(
               color: bodyColor,
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Column(
                 children: [
                   ReportRow(
@@ -144,6 +142,28 @@ class ClosingReportCard extends StatelessWidget {
                     isDark: isDark,
                   ),
                   ThemeDivider(color: dividerColor),
+                  ReportRow(
+                    icon: LucideIcons.receipt,
+                    iconColor: kRed,
+                    label: SaleReportLocale.saleReportGeneralExpense.getString(
+                      context,
+                    ),
+                    amount: totalGeneralExpense.toString(),
+                    isPositive: false,
+                    isDark: isDark,
+                  ),
+                  ThemeDivider(color: dividerColor),
+                  ReportRow(
+                    icon: LucideIcons.shoppingCart,
+                    iconColor: kAmber,
+                    label: SaleReportLocale.saleReportTotalPurchase.getString(
+                      context,
+                    ),
+                    amount: totalPurchase.toString(),
+                    isPositive: false,
+                    isDark: isDark,
+                  ),
+                  ThemeDivider(color: dividerColor),
                   asyncIncome.when(
                     data: (income) => ReportRow(
                       icon: LucideIcons.trendingUp,
@@ -157,11 +177,11 @@ class ClosingReportCard extends StatelessWidget {
                       isDark: isDark,
                     ),
                     loading: () => const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
+                      padding: EdgeInsets.symmetric(vertical: 10),
                       child: Center(
                         child: SizedBox(
-                          width: 22,
-                          height: 22,
+                          width: 20,
+                          height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             color: kPrimary,
@@ -169,12 +189,9 @@ class ClosingReportCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    error: (err, _) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Text(
-                        'Error: $err',
-                        style: const TextStyle(color: Colors.red),
-                      ),
+                    error: (err, _) => const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 6),
+                      child: Text('Error', style: TextStyle(color: Colors.red)),
                     ),
                   ),
                 ],

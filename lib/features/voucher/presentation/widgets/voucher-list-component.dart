@@ -6,8 +6,9 @@ import 'package:pos/component/accent-bar.dart';
 import 'package:pos/component/voucher-body.dart';
 import 'package:pos/component/voucher-header.dart';
 import 'package:pos/core/widgets/delete-icon.dart';
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
+import 'package:pos/localization/customer-local.dart';
 import 'package:pos/localization/payment-local.dart';
-import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/badge.dart';
 import 'package:pos/utils/route-constant.dart';
@@ -105,6 +106,23 @@ class VoucherComponent extends StatelessWidget {
                               ),
                             ),
                           ),
+
+                        if (voucher.customer != null) ...[
+                          Divider(),
+                          Text(CustomerLocale.customerName.getString(context)),
+                          Row(
+                            children: [
+                              Text(
+                                voucher.customer!.name,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                " (${voucher.customer!.phone})",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ],
                       ],
                     ),
                   ),

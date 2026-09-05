@@ -9,6 +9,8 @@ mixin SaleReportLocale {
 
   static const saleReportOpeningAmount = 'sale_report_opening_amount';
   static const saleReportClosingAmount = 'sale_report_closing_amount';
+  static const saleReportGeneralExpense = 'sale_report_general_expense';
+  static const saleReportTotalPurchase = 'sale_report_total_purchase';
   static const saleReportSave = 'sale_report_save';
   static const saleReportTransfer = 'sale_report_transfer';
   static const saleReportSaveFailed = 'sale_report_save_failed';
@@ -27,6 +29,8 @@ mixin SaleReportLocale {
 
     saleReportOpeningAmount: 'Opening Amount',
     saleReportClosingAmount: 'Closing Amount',
+    saleReportGeneralExpense: 'General Expense',
+    saleReportTotalPurchase: 'Total Purchase',
 
     saleReportSave: "Save",
     saleReportTransfer: "Transfer",
@@ -47,6 +51,8 @@ mixin SaleReportLocale {
 
     saleReportOpeningAmount: 'အစပိုငွေ',
     saleReportClosingAmount: 'အဆုံးပိုငွေ',
+    saleReportGeneralExpense: 'အထွေထွေအသုံးစရိတ်',
+    saleReportTotalPurchase: 'စုစုပေါင်းဝယ်ယူမှု',
 
     saleReportSave: "သိမ်းဆည်းပါ",
     saleReportTransfer: "ငွေလွှဲမည်",

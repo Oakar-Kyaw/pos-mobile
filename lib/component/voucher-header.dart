@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/localization/voucher-local.dart';
-import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/badge.dart';
 import 'package:pos/utils/font-size.dart';

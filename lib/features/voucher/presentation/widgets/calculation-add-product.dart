@@ -1,8 +1,8 @@
 // ── Add product ────────────────────────────────
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/models/product.dart';
-import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/riverpod/voucher-detail.dart';
 
 void addProduct(

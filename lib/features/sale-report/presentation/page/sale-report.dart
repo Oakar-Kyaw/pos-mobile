@@ -4,9 +4,9 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/income-dashboard.api.dart';
-import 'package:pos/api/sale-report.api.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/component/closing-report-card.dart';
+import 'package:pos/features/sale-report/presentation/provider/sale-report.api.dart';
+import 'package:pos/features/sale-report/presentation/widget/closing-report-card.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/sale-report-local.dart';
 import 'package:pos/utils/app-theme.dart';
@@ -95,7 +95,7 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
     final asyncReport = ref.watch(saleReportProvider);
     final asyncIncome = ref.watch(incomeProvider);
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
-    final formattedDate = DateFormat('EEE, dd MMM yyyy').format(selectedDate);
+    final formattedDate = DateFormat('dd MMM yyyy').format(selectedDate);
 
     return Scaffold(
       backgroundColor: isDark ? kBgDark : kBgLight,
@@ -109,10 +109,10 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
       body: asyncReport.when(
         loading: () =>
             const Center(child: CircularProgressIndicator(color: kPrimary)),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => Center(child: Text('Error')),
         data: (report) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(10),
             child: Column(
               children: [
                 DateSelectorCard(

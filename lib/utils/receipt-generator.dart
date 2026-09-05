@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/utils/myanmar-safe-printer.dart';
 import 'package:thermal_unicode_print/thermal_unicode_print.dart';
 import 'package:pos/localization/receipt-local.dart';
-import 'package:pos/models/voucher-detail.dart';
 
 Future<List<int>> generateReceiptBytes(
   BuildContext context,

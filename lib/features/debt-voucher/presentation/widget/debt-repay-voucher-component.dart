@@ -4,7 +4,7 @@ import 'package:pos/component/accent-bar.dart';
 import 'package:pos/component/voucher-body.dart';
 import 'package:pos/component/voucher-header.dart';
 import 'package:pos/core/widgets/delete-icon.dart';
-import 'package:pos/models/voucher-detail.dart';
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 
 class DebtAndRepayVoucherListComponent extends StatelessWidget {
   DebtAndRepayVoucherListComponent({
