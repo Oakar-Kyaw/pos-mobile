@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pos/core/widgets/delete-icon.dart';
+import 'package:pos/core/widgets/detail-icon.dart';
 import 'package:pos/models/inventory-management.dart';
 import 'package:pos/utils/badge.dart';
 import 'package:pos/utils/font-size.dart';
@@ -11,18 +13,21 @@ class VoucherHeader extends StatelessWidget {
     required IconData typeIcon,
     required this.inventory,
     required this.accent,
-    required this.isConfirmed,
+    this.isConfirmed,
     required this.textColor,
     required this.subColor,
+    this.onDelete,
+    this.onDetail,
   }) : _typeIcon = typeIcon;
 
   final IconData _typeIcon;
   final InventoryManagement inventory;
   final Color accent;
-  final bool isConfirmed;
+  final bool? isConfirmed;
   final Color textColor;
   final Color subColor;
-
+  final VoidCallback? onDelete;
+  final VoidCallback? onDetail;
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -42,15 +47,20 @@ class VoucherHeader extends StatelessWidget {
                     color: accent,
                   ),
                   const SizedBox(width: 6),
-                  BadgeWidget(
-                    icon: isConfirmed
-                        ? Icons.check_circle_rounded
-                        : Icons.pending_rounded,
-                    label: isConfirmed ? 'CONFIRMED' : 'PENDING',
-                    color: isConfirmed
-                        ? Colors.green.shade600
-                        : Colors.amber.shade700,
-                  ),
+                  isConfirmed == null
+                      ? const SizedBox()
+                      : BadgeWidget(
+                          icon: isConfirmed!
+                              ? Icons.check_circle_rounded
+                              : Icons.pending_rounded,
+                          label: isConfirmed! ? 'CONFIRMED' : 'PENDING',
+                          color: isConfirmed!
+                              ? Colors.green.shade600
+                              : Colors.amber.shade700,
+                        ),
+                  Spacer(),
+                  if (onDetail != null) DetailIcon(onDetail: onDetail),
+                  if (onDelete != null) DeleteIcon(onDelete: onDelete),
                 ],
               ),
               const SizedBox(height: 8),

@@ -28,6 +28,7 @@ mixin PaymentScreenLocale {
   static const noPayment = 'no_payment';
   static const paidAmount = 'paid_amount';
   static const deliveryFee = 'delivery_fee';
+  static const packagingFee = 'packaging_fee';
   static const cancel = 'cancel_payment';
 
   // Photo
@@ -76,6 +77,7 @@ mixin PaymentScreenLocale {
     noPayment: 'No Payment',
     paidAmount: 'Paid Amount',
     deliveryFee: 'Delivery Fee',
+    packagingFee: 'Packaging Fee',
     cancel: 'Cancel',
 
     paymentPhoto: 'Payment Photo (Optional)',
@@ -144,6 +146,8 @@ mixin PaymentScreenLocale {
     paidAmount: 'ပေးချေပြီးသော ငွေပမာဏ',
 
     deliveryFee: 'ပို့ဆောင်ခ',
+
+    packagingFee: 'ထုပ်ပိုးခ',
 
     cancel: 'ပယ်ဖျက်မည်',
 

@@ -181,8 +181,8 @@ class _RefundCard extends ConsumerWidget {
             textColor: textColor,
             subColor: subColor,
           ),
-          if (onDelete != null && (isAdmin(user!.role) || isManager(user.role)))
-            DeleteIcon(onDelete: onDelete, top: -10),
+          // if (onDelete != null && (isAdmin(user!.role) || isManager(user.role)))
+          // DeleteIcon(onDelete: onDelete, top: -10),
         ],
       ),
     );

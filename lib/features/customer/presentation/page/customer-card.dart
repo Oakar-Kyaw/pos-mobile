@@ -236,11 +236,11 @@ class _CustomerCardState extends ConsumerState<CustomerCard> {
           // ==================================================
           // DELETE
           // ==================================================
-          if (widget.onDelete != null)
-            DeleteIcon(
-              onDelete: isAnotherCustomerEditing ? null : widget.onDelete,
-              top: 12,
-            ),
+          // if (widget.onDelete != null)
+          //   DeleteIcon(
+          //     onDelete: isAnotherCustomerEditing ? null : widget.onDelete,
+          //     top: 12,
+          //   ),
 
           // ==================================================
           // CONTENT

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/models/voucher-detail.dart';
 
@@ -17,6 +18,7 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
     List<VoucherPayment>? payments,
     double? totalPaymentAmount,
     double? deliveryFee,
+    double? packagingFee,
     double? total,
     double? subTotal,
     double? tax,
@@ -36,6 +38,7 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
         payments: payments,
         totalPaymentAmount: totalPaymentAmount,
         deliveryFee: deliveryFee,
+        packagingFee: packagingFee,
         discountAmount: discountAmount,
         discountPercent: discountPercent,
       );
@@ -111,7 +114,11 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
         paymentTotal += payment.amount;
       }
 
-      double totalPrice = itemsTotal + state!.tax + state!.deliveryFee;
+      double totalPrice =
+          itemsTotal +
+          state!.tax +
+          state!.deliveryFee +
+          (state?.packagingFee ?? 0);
 
       // percentage-based discount, guarded against 0/negative
       double percentDiscountAmount = state!.discountPercent > 0

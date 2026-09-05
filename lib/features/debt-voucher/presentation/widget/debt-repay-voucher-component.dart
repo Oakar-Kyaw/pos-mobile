@@ -77,7 +77,8 @@ class DebtAndRepayVoucherListComponent extends StatelessWidget {
             ],
           ),
         ),
-        if (onDelete != null) DeleteIcon(onDelete: onDelete),
+        if (onDelete != null)
+          Positioned(right: 0, top: 10, child: DeleteIcon(onDelete: onDelete)),
       ],
     );
   }

@@ -6,12 +6,15 @@ const kPrimary = Color.fromARGB(255, 35, 145, 248);
 const kSecondary = Color.fromARGB(255, 22, 136, 178);
 // const kPrimary = Color(0xFF6366F1);
 // const kSecondary = Color(0xFF8B5CF6);
-const kGreen = Color.fromARGB(255, 35, 145, 248);
-const kGreenSecondary = Color.fromARGB(255, 22, 136, 178);
-// const kGreen = Color.fromARGB(255, 58, 151, 190);
-// const kGreenSecondary = Color.fromARGB(255, 84, 173, 229);
-// const kGreen = Color.fromARGB(255, 4, 179, 121);
-// const kGreenSecondary = Color.fromARGB(255, 33, 192, 134);
+// const kGreen = Color.fromARGB(255, 35, 145, 248);
+// const kGreenSecondary = Color.fromARGB(255, 22, 136, 178);
+
+const kGreen = Color.fromARGB(255, 4, 179, 121);
+const kGreenSecondary = Color.fromARGB(255, 33, 192, 134);
+
+const kBlue = Color.fromARGB(255, 35, 145, 248);
+const kBlueSecondary = Color.fromARGB(255, 22, 136, 178);
+
 const kAmber = Color(0xFFF59E0B);
 const kRed = Color.fromARGB(255, 234, 0, 0);
 

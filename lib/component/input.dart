@@ -11,20 +11,15 @@ Widget input(
   bool isNumber = false, // <-- Add this
   ValueChanged<String>? onChanged,
 }) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 10),
-    child: ShadInputFormField(
-      controller: controller,
-      label: Text(
-        label,
-        style: TextStyle(fontWeight: FontWeight.bold, color: labelColor),
-      ),
-      maxLines: maxLines,
-      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-      inputFormatters: isNumber
-          ? [FilteringTextInputFormatter.digitsOnly]
-          : null,
-      onChanged: onChanged,
+  return ShadInputFormField(
+    controller: controller,
+    label: Text(
+      label,
+      style: TextStyle(fontWeight: FontWeight.bold, color: labelColor),
     ),
+    maxLines: maxLines,
+    keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+    inputFormatters: isNumber ? [FilteringTextInputFormatter.digitsOnly] : null,
+    onChanged: onChanged,
   );
 }

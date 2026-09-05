@@ -8,7 +8,7 @@ import 'package:pos/api/product.api.dart';
 import 'package:pos/core/utils/payment-row.dart';
 import 'package:pos/core/utils/payment-select.dart';
 import 'package:pos/core/widgets/info-row.dart';
-import 'package:pos/features/create-voucher/presentation/widgets/calculation-search-field.dart';
+import 'package:pos/features/voucher/presentation/widgets/calculation-search-field.dart';
 import 'package:pos/features/purchase-history/data/model/purchase-item.dart';
 import 'package:pos/features/purchase-history/data/model/purchase-payment.dart';
 import 'package:pos/features/purchase-history/data/model/purchase.dart';

@@ -252,6 +252,14 @@ class _ReceiptPageState extends ConsumerState<ReceiptPage> {
                               ),
                               voucher.deliveryFee,
                             ),
+                            _receiptRow(
+                              context,
+                              PaymentScreenLocale.packagingFee.getString(
+                                context,
+                              ),
+                              voucher.packagingFee ?? 0,
+                            ),
+
                             voucher.discountAmount > 0
                                 ? _receiptRow(
                                     context,

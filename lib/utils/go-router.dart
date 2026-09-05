@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pos/core/utils/inventory/inventory-detail-page.dart';
+import 'package:pos/core/utils/inventory/inventory-edit.dart';
+import 'package:pos/core/utils/inventory/inventory-items-create.dart';
 import 'package:pos/features/account-upgrade/presentation/pages/account-upgrade.dart';
 import 'package:pos/features/category/presentation/page/category.dart';
-import 'package:pos/features/create-voucher/presentation/pages/create-voucher.dart';
+import 'package:pos/features/voucher/presentation/pages/create-voucher.dart';
 import 'package:pos/features/customer/presentation/page/create-customer.dart';
 import 'package:pos/features/customer/presentation/page/customer.dart';
+import 'package:pos/features/debt-voucher/presentation/page/debt-voucher.dart';
 import 'package:pos/features/expire-item/presentation/page/expire-item.dart';
 import 'package:pos/features/general-expense/data/model/general-expense.dart';
 import 'package:pos/features/general-expense/presentation/page/general-expense-create.dart';
@@ -27,24 +31,24 @@ import 'package:pos/features/refund/data/model/refund.dart';
 import 'package:pos/features/refund/presentation/page/refund-create.dart';
 import 'package:pos/features/refund/presentation/page/refund-edit.dart';
 import 'package:pos/features/refund/presentation/page/refund.dart';
+import 'package:pos/features/request-item/presentation/page/request-item.dart';
 import 'package:pos/features/supplier/presentation/page/create-supplier.dart';
 import 'package:pos/features/supplier/presentation/page/supplier.dart';
+import 'package:pos/models/inventory-management.dart';
 import 'package:pos/riverpod/login-check.dart';
+import 'package:pos/splash-screen.dart';
 import 'package:pos/src/attendance.dart';
 import 'package:pos/src/attendance-create.dart';
 import 'package:pos/src/company-profile.dart';
-import 'package:pos/src/debt-voucher.dart';
 import 'package:pos/src/employee.dart';
 import 'package:pos/src/home.dart';
 import 'package:pos/src/hr-rule.dart';
-import 'package:pos/src/inventory-items.dart';
 import 'package:pos/src/login.dart';
 import 'package:pos/src/payroll-create.dart';
 import 'package:pos/src/payroll-payslip.dart';
 import 'package:pos/src/product.dart';
 import 'package:pos/src/receipt.dart';
 import 'package:pos/src/repay.dart';
-import 'package:pos/src/request-item.dart';
 import 'package:pos/src/payroll-salary.dart';
 import 'package:pos/src/sale-report.dart';
 import 'package:pos/src/setting.dart';
@@ -72,7 +76,7 @@ final routeProvider = Provider<GoRouter>((ref) {
   ref.onDispose(() => authListener.dispose());
 
   return GoRouter(
-    initialLocation: AppRoute.home,
+    initialLocation: AppRoute.splash,
     navigatorKey: rootNavigatorKey,
     // D. Give the Bouncer the Radio
     // Now, when authStateListener updates, the redirect logic re-runs.
@@ -81,7 +85,12 @@ final routeProvider = Provider<GoRouter>((ref) {
       // E. The Bouncer checks the ORIGINAL list (Riverpod)
       final isLogined = ref.read(checkLoginProvider);
       final isLoggingIn = state.matchedLocation == AppRoute.login;
+      final isSplash = state.matchedLocation == AppRoute.splash;
       // 1. If NOT logged in and NOT trying to go to login page, force them to login.
+      //leave splash screen
+      if (isSplash) {
+        return null;
+      }
       if (!isLogined) {
         return isLoggingIn ? null : AppRoute.login;
       }
@@ -97,6 +106,11 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.home,
         name: AppRoute.home,
         builder: (context, state) => const MyHomePage(title: 'POS App'),
+      ),
+      GoRoute(
+        path: AppRoute.splash,
+        name: AppRoute.splash,
+        builder: (context, state) => SplashScreen(),
       ),
       GoRoute(
         path: AppRoute.settings,
@@ -218,18 +232,42 @@ final routeProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RepaymentHistoryPage(),
       ),
       GoRoute(
+        path: AppRoute.expireItem,
+        name: AppRoute.expireItem,
+        builder: (context, state) => ExpireItemsPage(),
+      ),
+      GoRoute(
+        path: AppRoute.requestItem,
+        name: AppRoute.requestItem,
+        builder: (context, state) => RequestItemPage(),
+      ),
+      GoRoute(
         path: AppRoute.inventoryItem,
         name: AppRoute.inventoryItem,
         builder: (context, state) {
-          //print("${state.extra} 🥸");
-          String inventoryType = state.extra as String;
+          final extra = state.extra as Map<String, dynamic>;
+          final inventoryType = extra['type'] as String;
           return InventoryItemPage(type: inventoryType);
         },
       ),
       GoRoute(
-        path: AppRoute.expireItem,
-        name: AppRoute.expireItem,
-        builder: (context, state) => ExpireItemsPage(),
+        path: AppRoute.inventoryEditItem,
+        name: AppRoute.inventoryEditItem,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          final inventoryType = extra['type'] as String;
+          final inv = extra['inv'] as InventoryManagement;
+          return InventoryEditPage(type: inventoryType, inventory: inv);
+        },
+      ),
+      GoRoute(
+        path: AppRoute.inventoryDetail,
+        name: AppRoute.inventoryDetail,
+        builder: (context, state) {
+          //print("${state.extra} 🥸");
+          InventoryManagement inventory = state.extra as InventoryManagement;
+          return InventoryDetailPage(inventory: inventory);
+        },
       ),
       GoRoute(
         path: AppRoute.employee,
@@ -286,12 +324,6 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.supplierCreate,
         name: AppRoute.supplierCreate,
         builder: (context, state) => const CreateSupplierPage(),
-      ),
-
-      GoRoute(
-        path: AppRoute.requestItem,
-        name: AppRoute.requestItem,
-        builder: (context, state) => RequestItemPage(),
       ),
       GoRoute(
         path: AppRoute.attendance,

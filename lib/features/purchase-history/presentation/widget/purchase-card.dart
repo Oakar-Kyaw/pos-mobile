@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/core/widgets/delete-icon.dart';
+import 'package:pos/core/widgets/detail-icon.dart';
 import 'package:pos/features/purchase-history/data/model/purchase.dart';
 import 'package:pos/localization/purchase-local.dart';
 import 'package:pos/utils/app-theme.dart';
@@ -19,6 +20,7 @@ class PurchaseCard extends ConsumerWidget {
     required this.subColor,
     this.onDelete,
     this.onEdit,
+    this.onSuccess,
     this.onDetail,
   });
 
@@ -27,6 +29,7 @@ class PurchaseCard extends ConsumerWidget {
   final Color subColor;
   final VoidCallback? onDelete;
   final VoidCallback? onEdit;
+  final VoidCallback? onSuccess;
   final VoidCallback? onDetail;
 
   Color get _accentColor {
@@ -63,6 +66,7 @@ class PurchaseCard extends ConsumerWidget {
       0,
       (sum, item) => sum + item.price * item.quantity,
     );
+    print("on success $onSuccess");
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
@@ -81,8 +85,6 @@ class PurchaseCard extends ConsumerWidget {
         children: [
           LeftAccentBar(accent: accent),
 
-          if (onDelete != null) DeleteIcon(onDelete: onDelete),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
             child: Column(
@@ -90,6 +92,7 @@ class PurchaseCard extends ConsumerWidget {
               children: [
                 /// Header
                 Row(
+                  // crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CircleAvatar(
                       radius: 18,
@@ -125,6 +128,9 @@ class PurchaseCard extends ConsumerWidget {
                         ],
                       ),
                     ),
+                    DetailIcon(onDetail: onDetail),
+
+                    if (onDelete != null) DeleteIcon(onDelete: onDelete),
                   ],
                 ),
 
@@ -249,17 +255,26 @@ class PurchaseCard extends ConsumerWidget {
 
                 Row(
                   children: [
-                    GradientSubmitButton(
-                      width: 150,
-                      onPressed: onDetail ?? () {},
-                      text: PurchaseLocale.purchaseDetail.getString(context),
-                    ),
+                    purchase.status.toUpperCase() == "SUCCESS"
+                        ? const SizedBox()
+                        : GradientSubmitButton(
+                            width: MediaQuery.of(context).size.width * 0.2,
+                            onPressed: onEdit ?? () {},
+                            text: PurchaseLocale.purchaseEdit.getString(
+                              context,
+                            ),
+                          ),
+
                     const SizedBox(width: 10),
-                    GradientSubmitButton(
-                      width: 150,
-                      onPressed: onEdit ?? () {},
-                      text: PurchaseLocale.purchaseEdit.getString(context),
-                    ),
+                    purchase.status.toUpperCase() == "SUCCESS"
+                        ? const SizedBox()
+                        : GradientSubmitButton(
+                            onPressed: onSuccess ?? () {},
+                            text: PurchaseLocale.purchaseSuccess.getString(
+                              context,
+                            ),
+                            width: MediaQuery.of(context).size.width * 0.4,
+                          ),
                   ],
                 ),
               ],

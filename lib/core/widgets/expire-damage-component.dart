@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/core/widgets/delete-icon.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:pos/api/product.api.dart';
 import 'package:pos/localization/inventory-management-local.dart';
 import 'package:pos/models/inventory-management.dart';
 import 'package:pos/utils/app-theme.dart';
@@ -9,23 +10,27 @@ import 'package:pos/utils/button.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/formatAmount.dart';
 import 'package:pos/utils/left-bar-accent.dart';
+import 'package:pos/utils/shad-toaster.dart';
 import 'package:pos/utils/voucher-header.dart';
 
 class ExpireDamageCard extends ConsumerWidget {
   const ExpireDamageCard({
     super.key,
+    required this.pagingController,
     required this.inventory,
     required this.textColor,
     required this.subColor,
+    this.onEdit,
     this.onDelete,
-    this.onTap,
+    this.onDetail,
   });
-
   final InventoryManagement inventory;
+  final PagingController pagingController;
   final Color textColor;
   final Color subColor;
+  final VoidCallback? onEdit;
   final VoidCallback? onDelete;
-  final VoidCallback? onTap;
+  final VoidCallback? onDetail;
 
   Color get _accentColor {
     switch (inventory.type.toLowerCase()) {
@@ -46,6 +51,44 @@ class ExpireDamageCard extends ConsumerWidget {
         return Icons.broken_image_rounded;
       default:
         return Icons.inventory_2_rounded;
+    }
+  }
+
+  void _onConfirm(int index, BuildContext context, WidgetRef ref) async {
+    try {
+      final success = await ref
+          .read(productProvider.notifier)
+          .confirmInventoryRecordItem(index: index);
+      if (success) {
+        pagingController.refresh();
+        ShowToast(
+          context,
+          description: Text(
+            InventoryManagementLocale.inventoryPurchaseConfirmSuccess.getString(
+              context,
+            ),
+            style: TextStyle(
+              fontSize: FontSizeConfig.title(context),
+              color: kGreen,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error is $e");
+      ShowToast(
+        context,
+        isError: true,
+        description: Text(
+          InventoryManagementLocale.inventoryPurchaseConfirmError.getString(
+            context,
+          ),
+          style: TextStyle(
+            fontSize: FontSizeConfig.title(context),
+            color: kRed,
+          ),
+        ),
+      );
     }
   }
 
@@ -71,86 +114,32 @@ class ExpireDamageCard extends ConsumerWidget {
         children: [
           LeftAccentBar(accent: accent),
 
-          if (onDelete != null) DeleteIcon(onDelete: onDelete),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                VoucherHeader(
-                  typeIcon: _typeIcon,
-                  inventory: inventory,
-                  accent: accent,
-                  isConfirmed: isConfirmed,
-                  textColor: textColor,
-                  subColor: subColor,
-                ),
+                inventory.type == "REQUESTED"
+                    ? VoucherHeader(
+                        typeIcon: _typeIcon,
+                        inventory: inventory,
+                        accent: accent,
+                        isConfirmed: isConfirmed,
+                        textColor: textColor,
+                        subColor: subColor,
+                        onDelete: onDelete,
+                        onDetail: onDetail,
+                      )
+                    : VoucherHeader(
+                        typeIcon: _typeIcon,
+                        inventory: inventory,
+                        accent: accent,
+                        textColor: textColor,
+                        subColor: subColor,
+                        onDelete: onDelete,
+                        onDetail: onDetail,
+                      ),
 
-                // if (inventory.reason != null || inventory.note != null) ...[
-                //   const Padding(
-                //     padding: EdgeInsets.only(top: 10),
-                //     child: Text("Reason / Note"),
-                //   ),
-                //   const SizedBox(height: 12),
-                //   Container(
-                //     width: double.infinity,
-                //     padding: const EdgeInsets.all(10),
-                //     decoration: BoxDecoration(
-                //       color: accent.withOpacity(0.04),
-                //       borderRadius: BorderRadius.circular(10),
-                //       border: Border.all(color: accent.withOpacity(0.12)),
-                //     ),
-                //     child: Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         if (inventory.reason != null) ...[
-                //           Row(
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               Icon(Icons.flag_rounded, size: 12, color: accent),
-                //               const SizedBox(width: 6),
-                //               Expanded(
-                //                 child: Text(
-                //                   inventory.reason!,
-                //                   style: TextStyle(
-                //                     fontSize: FontSizeConfig.body(context),
-                //                     color: textColor,
-                //                     fontWeight: FontWeight.w500,
-                //                   ),
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ],
-                //         if (inventory.reason != null && inventory.note != null)
-                //           const SizedBox(height: 6),
-                //         if (inventory.note != null) ...[
-                //           Row(
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               Icon(
-                //                 Icons.notes_rounded,
-                //                 size: 12,
-                //                 color: subColor,
-                //               ),
-                //               const SizedBox(width: 6),
-                //               Expanded(
-                //                 child: Text(
-                //                   inventory.note!,
-                //                   style: TextStyle(
-                //                     fontSize: FontSizeConfig.body(context),
-                //                     color: subColor,
-                //                   ),
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ],
-                //       ],
-                //     ),
-                //   ),
-                // ],
                 const SizedBox(height: 12),
 
                 Container(
@@ -228,23 +217,33 @@ class ExpireDamageCard extends ConsumerWidget {
                     ),
 
                 const SizedBox(height: 12),
-
-                GradientSubmitButton(
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  onPressed: () {
-                    print("detail se");
-                  },
-                  text: InventoryManagementLocale.inventoryDetail.getString(
-                    context,
+                //if edit
+                if (onEdit != null && !inventory.confirmed)
+                  GradientSubmitButton(
+                    onPressed: onEdit!,
+                    text: InventoryManagementLocale.editInventory.getString(
+                      context,
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.6,
                   ),
-                ),
                 const SizedBox(height: 12),
-                GradientSubmitButton(
-                  onPressed: () => {},
-                  text: InventoryManagementLocale.inventoryGoToPurchase
-                      .getString(context),
-                  width: MediaQuery.of(context).size.width * 0.6,
-                ),
+                //if type is request then show confirm button
+                if (inventory.type == 'REQUESTED' && !inventory.confirmed)
+                  GradientSubmitButton(
+                    onPressed: () => _onConfirm(inventory.id!, context, ref),
+                    text: InventoryManagementLocale.inventoryConfirm.getString(
+                      context,
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.6,
+                  ),
+                //if type is request then show
+                if (inventory.type == 'REQUESTED' && inventory.confirmed)
+                  GradientSubmitButton(
+                    onPressed: () => {},
+                    text: InventoryManagementLocale.inventoryGoToPurchase
+                        .getString(context),
+                    width: MediaQuery.of(context).size.width * 0.6,
+                  ),
               ],
             ),
           ),

@@ -44,6 +44,8 @@ mixin PurchaseLocale {
   static const purchasePending = 'purchase_pending';
   static const purchaseReceived = 'purchase_received';
   static const purchaseCancelled = 'purchase_cancelled';
+  static const purchaseDeliveredSuccessfully =
+      'purchase_delivered_successfully';
   static const purchaseNote = 'purchase_note';
   static const purchaseCard = 'purchase_card';
   static const purchaseItemCard = 'purchase_item_card';
@@ -107,12 +109,13 @@ mixin PurchaseLocale {
     purchasePending: 'Pending',
     purchaseReceived: 'Received',
     purchaseCancelled: 'Cancelled',
+    purchaseDeliveredSuccessfully: 'Purchase delivered successfully',
     purchaseNote: 'Note',
     purchaseCard: 'Purchase Records',
     purchaseItemCard: 'Purchase Items',
     purchaseGoToInventory: 'Go to Inventory',
     purchaseError: 'Something went wrong',
-    purchaseSuccess: 'Purchase record created successfully',
+    purchaseSuccess: 'Success',
     purchaseCreateSuccess: 'Purchase created successfully',
     purchaseUpdateSuccess: 'Purchase record updated successfully',
     purchaseDeleteSuccess: 'Purchase record deleted successfully',
@@ -171,12 +174,14 @@ mixin PurchaseLocale {
     purchasePending: 'စောင့်ဆိုင်းနေသည်',
     purchaseReceived: 'လက်ခံရရှိပြီး',
     purchaseCancelled: 'ပယ်ဖျက်ပြီး',
+    purchaseDeliveredSuccessfully:
+        'အဝယ်ပစ္စည်းများကို အောင်မြင်စွာ လက်ခံရရှိပြီးပါပြီ',
     purchaseNote: 'မှတ်ချက်',
     purchaseCard: 'အဝယ်မှတ်တမ်းများ',
     purchaseItemCard: 'အဝယ်ပစ္စည်းများ',
     purchaseGoToInventory: 'Inventory သို့ သွားမည်',
     purchaseError: 'အမှားတစ်ခုဖြစ်ပွားခဲ့သည်',
-    purchaseSuccess: 'အဝယ်မှတ်တမ်းကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
+    purchaseSuccess: 'အောင်မြင်ပါသည်',
     purchaseCreateSuccess: 'အဝယ်ကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
     purchaseUpdateSuccess: 'အဝယ်မှတ်တမ်းကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ',
     purchaseDeleteSuccess: 'အဝယ်မှတ်တမ်းကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',

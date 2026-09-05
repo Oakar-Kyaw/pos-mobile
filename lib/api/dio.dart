@@ -1,286 +1,7 @@
-// import 'dart:async';
-
-// import 'package:dio/dio.dart';
-// import 'package:flutter_dotenv/flutter_dotenv.dart';
-// import 'package:pos/core/session-navigation.dart';
-// import 'package:pos/localization/error-local.dart';
-// import 'package:pos/localization/login-local.dart';
-// import 'package:pos/utils/secure-storage.dart';
-// import 'package:pos/utils/time-util.dart';
-
-// class DioService {
-//   final Session session;
-//   static final DioService _instance = DioService._internal();
-//   factory DioService() => _instance;
-
-//   late Dio _dio;
-//   // If a refresh request is already running, //
-//   //other 401 requests will wait for the same refresh.
-//   Completer<String?>? _refreshCompleter;
-//   final _secureStorage = SecureStorage();
-
-//   DioService._internal() {
-//     final backendUrl = "${dotenv.env["BACKEND_URL"]}/api/";
-//     _dio = Dio(
-//       BaseOptions(
-//         baseUrl: backendUrl,
-//         connectTimeout: const Duration(seconds: 15),
-//         receiveTimeout: const Duration(seconds: 15),
-//         headers: {'Content-Type': 'application/json'},
-//       ),
-//     );
-
-//     _dio.interceptors.add(
-//       InterceptorsWrapper(
-//         onRequest: (options, handler) async {
-//           final secureStorage = SecureStorage();
-//           final tokens = await secureStorage.getAcessAndRefreshToken();
-//           final language = await secureStorage.getLanguageSetting();
-//           //print("langauge is 💁 $language");
-//           final timezone = await TimezoneUtil.getTimezone();
-
-//           final accessToken = tokens?['accessToken'];
-
-//           if (accessToken != null && accessToken.isNotEmpty) {
-//             options.headers['Authorization'] = 'Bearer $accessToken';
-//           }
-//           options.headers['Accept-Language'] = language;
-
-//           options.headers["x-timezone"] = timezone;
-//           //print("access token $accessToken");
-//           return handler.next(options);
-//         },
-//         onResponse: (response, handler) {
-//           return handler.next(response);
-//         },
-//         onError: (DioException e, handler) async {
-//           final errorMessage = _handleError(e);
-//           print("Error message or or qpi 🤣 is ${e.response?.statusCode}");
-//           if (e.response?.statusCode == 401) {
-//             print("unauthorized acces of expire jwt 📈");
-//             if (e.requestOptions.path.contains('/auth/refresh')) {
-//               final errorMessage = _handleError(e);
-//               return handler.reject(
-//                 DioException(
-//                   requestOptions: e.requestOptions,
-//                   response: e.response,
-//                   type: e.type,
-//                   error: errorMessage,
-//                   message: errorMessage.toString(),
-//                 ),
-//               );
-//             }
-//             try {
-//               // =================================================== // Get new access token // ===================================================
-//               final newAccessToken = await _refreshAccessToken();
-//               // =================================================== // Refresh failed // ===================================================
-//               if (newAccessToken == null || newAccessToken.isEmpty) {
-//                 print("Could not refresh access token.");
-//                 final errorMessage = _handleError(e);
-//                 return handler.reject(
-//                   DioException(
-//                     requestOptions: e.requestOptions,
-//                     response: e.response,
-//                     type: e.type,
-//                     error: errorMessage,
-//                     message: errorMessage.toString(),
-//                   ),
-//                 );
-//               }
-//               e.requestOptions.headers['Authorization'] =
-//                   'Bearer $newAccessToken';
-//               print(
-//                 "Retrying original request with new token 🔄 ${e.requestOptions}",
-//               );
-//               final response = await _dio.fetch(e.requestOptions);
-//               return handler.resolve(response);
-//             } catch (error) {
-//               print("Refresh/retry error: $error");
-
-//               final errorMessage = _handleError(e);
-//               return handler.reject(
-//                 DioException(
-//                   requestOptions: e.requestOptions,
-//                   response: e.response,
-//                   type: e.type,
-//                   error: errorMessage,
-//                   message: errorMessage.toString(),
-//                 ),
-//               );
-//             }
-//           }
-
-//           //Normal Error
-//           return handler.reject(
-//             DioException(
-//               requestOptions: e.requestOptions,
-//               response: e.response,
-//               type: e.type,
-//               error: errorMessage,
-//               message: errorMessage,
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-
-//   Future<String?> _refreshAccessToken() async {
-//     // =========================================================== // If another request is already refreshing, // wait for that request. // ===========================================================
-//     if (_refreshCompleter != null) {
-//       print("Refresh already running. Waiting for it...");
-//       return await _refreshCompleter!.future;
-//     }
-//     _refreshCompleter = Completer<String?>();
-//     try {
-//       final secureStorage = SecureStorage();
-//       final tokens = await secureStorage.getAcessAndRefreshToken();
-//       final refreshToken = tokens?['refreshToken'];
-//       // ========================================================= // No refresh token // =========================================================
-//       if (refreshToken == null || refreshToken.isEmpty) {
-//         print("Refresh token does not exist.");
-//         _refreshCompleter!.complete(null);
-//         return null;
-//       }
-//       print(
-//         "Refreshing access token 🔄",
-//       ); // ========================================================= // IMPORTANT // // Use a NEW Dio instance here. // // Otherwise /auth/refresh will go through the interceptor // and could create an infinite refresh loop. // =========================================================
-//       final refreshDio = Dio(
-//         BaseOptions(
-//           baseUrl: _dio.options.baseUrl,
-//           connectTimeout: const Duration(seconds: 15),
-//           receiveTimeout: const Duration(seconds: 15),
-//           headers: {
-//             'Content-Type': 'application/json',
-//             "Authorization": "Bearer $refreshToken",
-//           },
-//         ),
-//       ); // ========================================================= // Call refresh endpoint // =========================================================
-//       final response = await refreshDio.get('/auth/refresh');
-//       print("Refresh response: ${response.data}");
-//       final data = response.data;
-//       if (data is! Map) {
-//         print("Invalid refresh response.");
-//         _refreshCompleter!.complete(null);
-//         return null;
-//       }
-//       // ========================================================= // Get new tokens // =========================================================
-//       final newAccessToken = data['access_token']?.toString();
-//       final newRefreshToken = data['refresh_token']?.toString();
-//       if (newAccessToken == null || newAccessToken.isEmpty) {
-//         print("New access token was not returned.");
-//         _refreshCompleter!.complete(null);
-//         return null;
-//       }
-//       // ========================================================= // SAVE NEW TOKENS // =========================================================
-//       print("Access token refreshed successfully ✅");
-//       // ========================================================= // Let other waiting requests continue // =========================================================
-//       _refreshCompleter!.complete(newAccessToken);
-//       await _secureStorage.saveAcessAndRefreshToken(
-//         accessToken: newAccessToken,
-//         refreshToken: newRefreshToken!,
-//       );
-//       return newAccessToken;
-//     } catch (e) {
-//       print("Refresh token request failed: $e");
-//       final session = Session(secureStorage: _secureStorage);
-//       session.sessionExpired();
-//       if (_refreshCompleter != null && !_refreshCompleter!.isCompleted) {
-//         _refreshCompleter!.complete(null);
-//       }
-//       return null;
-//     } finally {
-//       _refreshCompleter = null;
-//     }
-//   }
-
-//   // ================= ERROR HANDLER =================
-
-//   _handleError(DioException e) {
-//     print("Exception is: ${e}");
-//     switch (e.type) {
-//       case DioExceptionType.connectionTimeout:
-//         return Exception("Connection timeout. Please try again.");
-
-//       case DioExceptionType.receiveTimeout:
-//         return Exception("Server is taking too long to respond.");
-
-//       case DioExceptionType.badResponse:
-//         final statusCode = e.response?.statusCode;
-//         final data = e.response?.data;
-//         String message = data is Map && data['message'] != null
-//             ? data['message']
-//             : "Bad Request";
-
-//         //print("status code is ${e.response?.data} 😍${e.response?.data}");
-//         if (statusCode == 400) {
-//           return message;
-//         } else if (statusCode == 401) {
-//           if (message == "Password was wrong.") {
-//             return LoginScreenLocale.passwordWrong;
-//           }
-//           return "Unauthorized. Please login again.";
-//         } else if (statusCode == 403) {
-//           return ErrorScreenLocale.unauthorized;
-//         } else if (statusCode == 404) {
-//           return LoginScreenLocale.emailNotFound;
-//         } else if (statusCode == 500) {
-//           return "Internal server error.";
-//         } else if (statusCode == 409) {
-//           return "Data already Exists";
-//         } else {
-//           return "Something went wrong.";
-//         }
-
-//       case DioExceptionType.unknown:
-//         return "No internet connection.";
-
-//       default:
-//         return "Unexpected error occurred.";
-//     }
-//   }
-
-//   // ================= HEADERS =================
-
-//   void setAuthorization(String token) {
-//     _dio.options.headers['Authorization'] = token;
-//   }
-
-//   void setContentType(String type) {
-//     _dio.options.headers['Content-Type'] = type;
-//   }
-
-//   // ================= REQUESTS =================
-
-//   Future<Response> get(String path, {Map<String, dynamic>? query}) async {
-//     return await _dio.get(path, queryParameters: query);
-//   }
-
-//   Future<Response> post(
-//     String path, {
-//     dynamic data,
-//     Map<String, dynamic>? query,
-//   }) async {
-//     print("path $path");
-//     return await _dio.post(path, data: data, queryParameters: query);
-//   }
-
-//   Future<Response> patch(
-//     String path, {
-//     dynamic data,
-//     Map<String, dynamic>? query,
-//   }) async {
-//     return await _dio.patch(path, data: data, queryParameters: query);
-//   }
-
-//   Future<Response> delete(String path, {dynamic data}) async {
-//     return await _dio.delete(path);
-//   }
-// }
-
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pos/core/session-navigation.dart';
 import 'package:pos/localization/error-local.dart';
@@ -400,7 +121,8 @@ class DioService {
           print(
             "Dio Error: "
             "$statusCode "
-            "${e.requestOptions.path}",
+            "${e.requestOptions.path} "
+            "${e.response}",
           );
 
           // =====================================================
@@ -471,7 +193,7 @@ class DioService {
 
           final errorMessage = _handleError(e);
 
-          print("API error: ${e.message}");
+          print("API error: ${e.response} ");
 
           return handler.reject(
             DioException(
@@ -725,10 +447,16 @@ class DioService {
 
         final data = e.response?.data;
 
+        debugPrint("🤬 dioexception ${data}");
+
         String message = data is Map && data['message'] != null
             ? data['message'].toString()
             : "Bad Request";
 
+        // if message exist
+        if (message.isNotEmpty) {
+          return message;
+        }
         // -------------------------------------------------------
         // 400
         // -------------------------------------------------------
@@ -788,7 +516,7 @@ class DioService {
       // =========================================================
 
       case DioExceptionType.unknown:
-        return "No internet connection.";
+        return "Server Error";
 
       // =========================================================
       // OTHER

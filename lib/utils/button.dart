@@ -23,8 +23,7 @@ class GradientSubmitButton extends StatelessWidget {
            decoration ??
            BoxDecoration(
              gradient: const LinearGradient(
-               colors: [kGreen, kGreenSecondary],
-               //  colors: [kPrimary, kSecondary],
+               colors: [kPrimary, kSecondary],
                begin: Alignment.centerLeft,
                end: Alignment.centerRight,
              ),

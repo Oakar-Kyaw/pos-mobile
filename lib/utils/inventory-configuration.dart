@@ -57,9 +57,9 @@ class InventoryActionConfig {
   }
 
   static String getTypeValue(String val) {
-    if (val == 'Damage') {
+    if (val == 'Damage' || val == 'DAMAGED') {
       return 'DAMAGED';
-    } else if (val == 'Expire') {
+    } else if (val == 'Expire' || val == 'EXPIRED') {
       return 'EXPIRED';
     } else {
       return 'REQUESTED';

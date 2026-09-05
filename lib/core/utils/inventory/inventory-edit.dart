@@ -2,23 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/ui/inventory-form.dart';
+import 'package:pos/core/utils/inventory/inventory-form.dart';
+import 'package:pos/models/inventory-management.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/description-widget.dart';
 import 'package:pos/utils/inventory-configuration.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-class InventoryItemPage extends ConsumerWidget {
+class InventoryEditPage extends ConsumerWidget {
   final String type;
+  final InventoryManagement inventory;
 
-  const InventoryItemPage({super.key, required this.type});
+  const InventoryEditPage({
+    super.key,
+    required this.type,
+    required this.inventory,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final config = InventoryActionConfig(type, context);
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
-    final subColor = isDark ? kTextSubDark : kTextSubLight;
     final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
     //print("type of item 🤬 is $type");
     return Scaffold(
@@ -34,23 +38,16 @@ class InventoryItemPage extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           children: [
-            // ── Description Banner ──────────────────
-            DescriptionWidget(
-              isDark: isDark,
-              description: config.description,
-              icon: config.icon,
-              subColor: subColor,
-            ),
-
-            const SizedBox(height: 20),
-
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: surfaceColor,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: InventoryManagementForm(inventoryType: type),
+              child: InventoryManagementForm(
+                inventoryType: type,
+                inventory: inventory,
+              ),
             ),
 
             const SizedBox(height: 25),

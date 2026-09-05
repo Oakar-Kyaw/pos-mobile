@@ -145,6 +145,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               if (ref.read(voucherDetailProvider) == null) {
                                 setVoucher();
                               }
+                              // debugPrint("home item: ${item.avgCostPrice}");
+                              //item select for creating voucher
                               selectedItems(
                                 ItemModel(
                                   id: item.id,
@@ -153,6 +155,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                   name: item.name,
                                   quantity: 1,
                                   price: item.price,
+                                  costPrice: item.costPrice ?? 0,
+                                  avgCostPrice: item.avgCostPrice,
                                   photoUrl: item.photoUrl,
                                 ),
                               );

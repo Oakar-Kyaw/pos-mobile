@@ -148,6 +148,42 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
     }
   }
 
+  Future<void> _onSuccess(int index) async {
+    if (!mounted) return;
+    try {
+      debugPrint("Success purchase: $index");
+
+      final success = await ref
+          .read(purchaseProvider.notifier)
+          .updateSucess(index);
+
+      if (success) {
+        ShowToast(
+          context,
+          description: Text(
+            PurchaseLocale.purchaseDeliveredSuccessfully.getString(context),
+            style: TextStyle(color: kGreen),
+          ),
+          borderColor: kGreen,
+        );
+        _pagingController.refresh();
+      }
+    } catch (e, stackTrace) {
+      debugPrint("Error delivering purchase: $e");
+
+      debugPrintStack(stackTrace: stackTrace);
+
+      if (!mounted) return;
+
+      ShowToast(
+        context,
+        description: Text(e.toString(), style: TextStyle(color: kRed)),
+        borderColor: kRed,
+        isError: true,
+      );
+    }
+  }
+
   @override
   void dispose() {
     _pagingController.dispose();
@@ -210,6 +246,8 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
                   purchase: purchaseItem,
                   textColor: textColor,
                   subColor: subColor,
+
+                  onSuccess: () => _onSuccess(purchaseItem.id),
 
                   onEdit: () => context.pushNamed(
                     AppRoute.purchaseEdit,

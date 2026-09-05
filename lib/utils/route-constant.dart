@@ -1,5 +1,6 @@
 class AppRoute {
   static const String home = '/home';
+  static const String splash = '/splash';
   static const String settings = '/settings';
   static const String profile = '/profile';
   static const String category = '/category';
@@ -26,6 +27,8 @@ class AppRoute {
   static const String requestItem = "/request-items";
   static const String requestItemCreate = "/request-items/create";
   static const String inventoryItem = '/inventory-items';
+  static const String inventoryDetail = '/inventory-detail';
+  static const String inventoryEditItem = '/edit-inventory-items';
   static const String employee = '/employee';
   static const String employeeCreate = '/employee-create';
   static const String attendance = '/attendance';

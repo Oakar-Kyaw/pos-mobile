@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
 import 'package:pos/core/provider.dart';
+import 'package:pos/features/customer/data/model/customer-model.dart';
 import 'package:pos/models/repayment.dart';
 import 'package:pos/models/voucher-detail.dart';
 import 'package:dio/dio.dart';
@@ -87,6 +88,8 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
   /// -------- CREATE VOUCHER WITH FILES --------
   Future<Map<String, dynamic>> postVoucher({
     required VoucherDetailModel voucher,
+    int? customerId,
+    Customer? customer,
     List<File>? files,
   }) async {
     final url = "v1/vouchers";
@@ -114,6 +117,7 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
       "subTotal": voucher.subTotal,
       "tax": voucher.tax,
       "deliveryFee": voucher.deliveryFee,
+      "packagingFee": voucher.packagingFee ?? 0,
       "remainingPaymentAmount": voucher.remainingPaymentAmount,
       "totalPaymentAmount": voucher.totalPaymentAmount,
       "total": voucher.total,
@@ -121,6 +125,9 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
       "discountAmount": voucher.discountAmount,
       "items": itemsJson,
       "payments": paymentsJson,
+      "customerId": customerId,
+      if (customer != null)
+        "customer": {"name": customer.name, "phone": customer.phone},
       if (multipartFiles.isNotEmpty) "files": multipartFiles,
     });
 

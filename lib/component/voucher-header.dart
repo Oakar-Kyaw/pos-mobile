@@ -23,6 +23,56 @@ class HeaderSection extends StatelessWidget {
   final bool hasDebt;
   final bool hasDiscount;
 
+  Widget _buildBadges(BuildContext context) {
+    final badges = <Widget>[
+      BadgeWidget(
+        label: VoucherScreenLocale.voucher.getString(context),
+        color: kPrimary,
+        icon: LucideIcons.ticket,
+      ),
+      if (hasDebt)
+        BadgeWidget(
+          label: VoucherScreenLocale.hasDebt.getString(context),
+          color: Colors.red,
+          icon: LucideIcons.wallet,
+        ),
+      if (hasDiscount)
+        BadgeWidget(
+          label: VoucherScreenLocale.hasDiscount.getString(context),
+          color: Colors.green,
+          icon: LucideIcons.badgePercent,
+        ),
+    ];
+
+    // 1 or 2 badges — all fit in a single row
+    if (badges.length <= 2) {
+      return Row(
+        children: [
+          for (int i = 0; i < badges.length; i++) ...[
+            if (i > 0) const SizedBox(width: 6),
+            Expanded(child: badges[i]),
+          ],
+        ],
+      );
+    }
+
+    // 3 badges — first two on top row, third goes below
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(child: badges[0]),
+            const SizedBox(width: 6),
+            Expanded(child: badges[1]),
+          ],
+        ),
+        const SizedBox(height: 6),
+        badges[2],
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -32,31 +82,7 @@ class HeaderSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  BadgeWidget(
-                    label: VoucherScreenLocale.voucher.getString(context),
-                    color: kPrimary,
-                    icon: LucideIcons.ticket,
-                  ),
-                  if (hasDebt) ...[
-                    const SizedBox(width: 6),
-                    BadgeWidget(
-                      label: VoucherScreenLocale.hasDebt.getString(context),
-                      color: Colors.red,
-                      icon: LucideIcons.wallet,
-                    ),
-                  ],
-                  if (hasDiscount) ...[
-                    const SizedBox(width: 6),
-                    BadgeWidget(
-                      label: VoucherScreenLocale.hasDiscount.getString(context),
-                      color: Colors.green,
-                      icon: LucideIcons.badgePercent,
-                    ),
-                  ],
-                ],
-              ),
+              _buildBadges(context),
               const SizedBox(height: 10),
               VoucherCardDescription(
                 voucher: voucher,

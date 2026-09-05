@@ -238,9 +238,8 @@ class _SupplierCardState extends ConsumerState<SupplierCard> {
           // ============================================================
           // DELETE
           // ============================================================
-          if (widget.onDelete != null && !disabled)
-            DeleteIcon(onDelete: widget.onDelete, top: 12),
-
+          // if (widget.onDelete != null && !disabled)
+          //   DeleteIcon(onDelete: widget.onDelete, top: 12),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
             child: Column(

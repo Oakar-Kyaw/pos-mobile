@@ -5,13 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/core/utils/date-range-select.dart';
 import 'package:pos/core/utils/user-select.dart';
+import 'package:pos/features/debt-voucher/presentation/page/debt-list.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
-import 'package:pos/ui/debt-list.dart';
 import 'package:pos/localization/debt-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/check-role.dart';
-import 'package:pos/utils/description-widget.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class DebtVoucherPage extends ConsumerStatefulWidget {
@@ -37,8 +36,6 @@ class _DebtVoucherPageState extends ConsumerState<DebtVoucherPage> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
     final textColor = isDark ? kTextDark : kTextLight;
-    final subColor = isDark ? kTextSubDark : kTextSubLight;
-    final user = ref.watch(userStateProvider);
     final selectedData = ref.watch(selectedDataStateProvider);
 
     return Scaffold(
@@ -53,19 +50,6 @@ class _DebtVoucherPageState extends ConsumerState<DebtVoucherPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (user != null && (isAdmin(user.role) || isManager(user.role)))
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: DescriptionWidget(
-                isDark: isDark,
-                description: DebtLocaleScreenLocale.debtDescription.getString(
-                  context,
-                ),
-                icon: LucideIcons.fileText,
-                subColor: subColor,
-              ),
-            ),
-          const SizedBox(height: 12),
           DebtLabel(textColor: textColor),
           const SizedBox(height: 12),
           // if (user != null && (isAdmin(user.role) || isManager(user.role)))

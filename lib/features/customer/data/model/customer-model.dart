@@ -4,7 +4,6 @@ class Customer {
   final String? email;
   final String? phone;
   final String? address;
-  final bool isDeleted;
 
   Customer({
     required this.id,
@@ -12,7 +11,6 @@ class Customer {
     this.email,
     this.phone,
     this.address,
-    required this.isDeleted,
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) {
@@ -22,7 +20,6 @@ class Customer {
       email: json['email'],
       phone: json['phone'],
       address: json['address'],
-      isDeleted: json['isDeleted'] ?? false,
     );
   }
 
@@ -37,7 +34,6 @@ class Customer {
       'email': email,
       'phone': phone,
       'address': address,
-      'isDeleted': isDeleted,
     };
   }
 }

@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/core/utils/date-range-select.dart';
 import 'package:pos/core/utils/user-select.dart';
 import 'package:pos/features/expire-item/presentation/widget/expire-item-list.dart';
 import 'package:pos/localization/drawer-local.dart';
-import 'package:pos/localization/inventory-management-local.dart';
+import 'package:pos/models/inventory-management.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
@@ -25,10 +27,47 @@ class ExpireItemsPage extends ConsumerStatefulWidget {
 }
 
 class _ExpireItemsPageState extends ConsumerState<ExpireItemsPage> {
+  late final PagingController<int, InventoryManagement> _pagingController;
+  final limit = 20;
+
+  @override
+  void initState() {
+    super.initState();
+    _pagingController = PagingController<int, InventoryManagement>(
+      getNextPageKey: (state) =>
+          state.lastPageIsEmpty ? null : state.nextIntPageKey,
+      fetchPage: (pageKey) {
+        final selectedData = ref.read(selectedDataStateProvider);
+        return ref
+            .read(productProvider.notifier)
+            .getExpireDamageRequestList(
+              page: pageKey,
+              limit: limit,
+              type: "EXPIRED",
+              userId: selectedData?.userId,
+              startDate: selectedData?.startDate,
+              endDate: selectedData?.endDate,
+            );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _clearSelectedData();
+    _pagingController.dispose();
     super.dispose();
+  }
+
+  void _onCreate() async {
+    final result = await context.pushNamed(
+      AppRoute.inventoryItem,
+      extra: {'type': 'Damage'},
+    );
+
+    if (result == true && mounted) {
+      _pagingController.refresh();
+    }
   }
 
   void _clearSelectedData() {
@@ -40,11 +79,10 @@ class _ExpireItemsPageState extends ConsumerState<ExpireItemsPage> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
     final textColor = isDark ? kTextDark : kTextLight;
-    // final subColor = isDark ? kTextSubDark : kTextSubLight;
     final user = ref.watch(userStateProvider);
     final selectedData = ref.watch(selectedDataStateProvider);
     final config = InventoryActionConfig('Damage', context);
-    //print("expire item is ${InventoryActionType.damaged}");
+
     return Scaffold(
       backgroundColor: bgColor,
       appBar: CustomAppBar(
@@ -59,18 +97,10 @@ class _ExpireItemsPageState extends ConsumerState<ExpireItemsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Description Banner ──────────────────
-            // DescriptionWidget(
-            //   isDark: isDark,
-            //   description: config.description,
-            //   icon: config.icon,
-            //   subColor: subColor,
-            // ),
             const SizedBox(height: 20),
 
             GradientSubmitButton(
-              onPressed: () =>
-                  context.pushNamed(AppRoute.inventoryItem, extra: 'Damage'),
+              onPressed: _onCreate,
               text: DrawerScreenLocale.drawerCreate.getString(context),
               width: 120,
             ),
@@ -84,7 +114,12 @@ class _ExpireItemsPageState extends ConsumerState<ExpireItemsPage> {
                 child: DateRangeSelect(),
               ),
 
-            Expanded(child: ExpireDamageLists(selectedData: selectedData)),
+            Expanded(
+              child: ExpireDamageLists(
+                pagingController: _pagingController,
+                selectedData: selectedData,
+              ),
+            ),
           ],
         ),
       ),
@@ -102,30 +137,7 @@ class ExpireLabel extends ConsumerWidget {
     final user = ref.watch(userStateProvider);
     return Row(
       children: [
-        Container(
-          width: 4,
-          height: 18,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [kPrimary, kSecondary],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          InventoryManagementLocale.inventoryCard.getString(context),
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: textColor,
-            letterSpacing: -0.2,
-          ),
-        ),
         if (user != null && (isAdmin(user.role) || isManager(user.role))) ...[
-          const Spacer(),
           const UserSelect(),
         ],
       ],

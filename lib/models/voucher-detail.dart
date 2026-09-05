@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:pos/models/company.dart';
 import 'package:pos/models/payment-data.dart';
 import 'package:pos/models/product.dart';
@@ -65,7 +66,7 @@ class ItemModel {
   ItemModel({
     required this.id,
     required this.productId,
-    this.product, // ← required မလုပ်တော့ဘူး
+    this.product,
     required this.name,
     this.photoUrl,
     this.quantity = 0,
@@ -144,6 +145,7 @@ class VoucherDetailModel {
   double discountPercent;
   double discountAmount;
   double remainingPaymentAmount;
+  double? packagingFee;
   double total;
   double tax;
   bool? existDebt;
@@ -160,6 +162,7 @@ class VoucherDetailModel {
     this.company,
     this.totalPaymentAmount = 0,
     this.deliveryFee = 0,
+    this.packagingFee = 0,
     this.remainingPaymentAmount = 0,
     this.discountAmount = 0,
     this.discountPercent = 0,
@@ -180,6 +183,7 @@ class VoucherDetailModel {
     double? total,
     double? totalPaymentAmount,
     double? deliveryFee,
+    double? packagingFee,
     double? discountPercent,
     double? discountAmount,
     double? remainingPaymentAmount,
@@ -198,6 +202,7 @@ class VoucherDetailModel {
       total: total ?? this.total,
       totalPaymentAmount: totalPaymentAmount ?? this.totalPaymentAmount,
       deliveryFee: deliveryFee ?? this.deliveryFee,
+      packagingFee: packagingFee ?? this.packagingFee,
       discountAmount: discountAmount ?? this.discountAmount,
       discountPercent: discountPercent ?? this.discountPercent,
       remainingPaymentAmount:
@@ -228,6 +233,7 @@ class VoucherDetailModel {
       subTotal: double.parse(json['subTotal'].toString()),
       total: double.parse(json['total'].toString()),
       tax: double.parse(json['tax'].toString()),
+
       totalPaymentAmount: double.parse(json['totalPaymentAmount'].toString()),
       deliveryFee: double.parse(json['deliveryFee'].toString()),
       discountAmount: double.parse(json["discountAmount"].toString()),

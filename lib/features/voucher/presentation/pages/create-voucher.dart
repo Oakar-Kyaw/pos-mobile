@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/features/create-voucher/presentation/pages/calculation.dart';
-import 'package:pos/features/create-voucher/presentation/widgets/calculation-add-product.dart';
-import 'package:pos/features/create-voucher/presentation/widgets/calculation-qty-button.dart';
-import 'package:pos/features/create-voucher/presentation/widgets/calculation-search-field.dart';
+import 'package:pos/features/voucher/presentation/pages/calculation.dart';
+import 'package:pos/features/voucher/presentation/widgets/calculation-add-product.dart';
+import 'package:pos/features/voucher/presentation/widgets/calculation-qty-button.dart';
+import 'package:pos/features/voucher/presentation/widgets/calculation-search-field.dart';
 import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/models/product.dart';
 import 'package:pos/riverpod/voucher-detail.dart';
@@ -141,8 +142,8 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
                               width: 50,
                               height: 50,
                               child: item.photoUrl != null
-                                  ? Image.network(
-                                      item.photoUrl!,
+                                  ? CachedNetworkImage(
+                                      imageUrl: item.photoUrl!,
                                       fit: BoxFit.cover,
                                     )
                                   : Image.asset(

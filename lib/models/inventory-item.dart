@@ -9,6 +9,8 @@ class InventoryItem {
   final int quantity;
   final double price;
   final double totalAmount;
+  final double costPrice;
+  final double avgCostPrice;
   final DateTime? createdAt;
 
   InventoryItem({
@@ -20,6 +22,8 @@ class InventoryItem {
     required this.quantity,
     required this.price,
     required this.totalAmount,
+    required this.costPrice,
+    required this.avgCostPrice,
     this.createdAt,
   });
 
@@ -32,6 +36,8 @@ class InventoryItem {
       photoUrl: json['photoUrl'],
       quantity: json['quantity'],
       price: double.parse(json['price'].toString()),
+      costPrice: double.parse(json['costPrice'].toString()),
+      avgCostPrice: double.parse(json['avgCostPrice'].toString()),
       totalAmount: double.parse(json['totalAmount'].toString()),
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
@@ -45,6 +51,8 @@ class InventoryItem {
       "photoUrl": photoUrl,
       "quantity": quantity,
       "price": price,
+      "costPrice": costPrice,
+      "avgCostPrice": avgCostPrice,
       "totalAmount": totalAmount,
     };
   }
@@ -58,6 +66,8 @@ class InventoryItem {
     int? quantity,
     double? price,
     double? totalAmount,
+    double? costPrice,
+    double? avgCostPrice,
     DateTime? createdAt,
   }) {
     return InventoryItem(
@@ -69,6 +79,8 @@ class InventoryItem {
       quantity: quantity ?? this.quantity,
       price: price ?? this.price,
       totalAmount: totalAmount ?? this.totalAmount,
+      costPrice: costPrice ?? this.costPrice,
+      avgCostPrice: avgCostPrice ?? this.avgCostPrice,
       createdAt: createdAt ?? this.createdAt,
     );
   }

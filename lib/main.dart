@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:pos/api/user.api.dart';
 import 'package:pos/core/service/firebase-service.dart';
 import 'package:pos/core/widgets/app-local-notification.dart';
@@ -19,9 +18,14 @@ import 'package:shorebird_code_push/shorebird_code_push.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterLocalization.instance.ensureInitialized();
+  // Only what's strictly needed for the FIRST FRAME goes here.
+  // Run them in parallel instead of sequential await.
+  await Future.wait([
+    FlutterLocalization.instance.ensureInitialized(),
+    dotenv.load(fileName: ".env"),
+  ]);
   initLocalization();
-  await dotenv.load(fileName: ".env");
+
   //Pre-load font so it's ready before any theme build
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
@@ -46,46 +50,51 @@ final _fontFamily = "NotoSerif";
 //final _fontFamily = GoogleFonts.notoSansMyanmar().fontFamily;
 
 class _MyAppState extends ConsumerState<MyApp> {
-  final _secureStorage = SecureStorage();
+  // final _secureStorage = SecureStorage();
 
   @override
   void initState() {
     super.initState();
-    _setupFirebaseNotification();
     localization.onTranslatedLanguage = (_) {
       setState(() {});
     };
     //add login status in this
-    _checkLogin();
-    _checkTheme();
-    _checkLanguage();
-    _checkForShorebirdUpdate();
+    // _checkLogin();
+    // _checkTheme();
+    // _checkLanguage();
+
+    // Non-critical for first frame — defer until AFTER first paint
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppLocalNotification.initialize();
+      _setupFirebaseNotification();
+      _checkForShorebirdUpdate();
+    });
   }
 
-  Future<void> _checkTheme() async {
-    final isDark = await _secureStorage.getTheme();
-    ref
-        .read(themeModeProvider.notifier)
-        .setTheme(isDark ? ThemeMode.dark : ThemeMode.light);
-  }
+  // Future<void> _checkTheme() async {
+  //   final isDark = await _secureStorage.getTheme();
+  //   ref
+  //       .read(themeModeProvider.notifier)
+  //       .setTheme(isDark ? ThemeMode.dark : ThemeMode.light);
+  // }
 
-  Future<void> _checkLogin() async {
-    final isLogin = await _secureStorage.getLogin();
+  // Future<void> _checkLogin() async {
+  //   final isLogin = await _secureStorage.getLogin();
 
-    if (!mounted) return; // VERY IMPORTANT
+  //   if (!mounted) return; // VERY IMPORTANT
 
-    if (isLogin) {
-      ref.read(checkLoginProvider.notifier).login();
-      await addToUserLocalStateWidget(ref);
-    } else {
-      ref.read(checkLoginProvider.notifier).logout();
-    }
-  }
+  //   if (isLogin) {
+  //     ref.read(checkLoginProvider.notifier).login();
+  //     await addToUserLocalStateWidget(ref);
+  //   } else {
+  //     ref.read(checkLoginProvider.notifier).logout();
+  //   }
+  // }
 
-  Future<void> _checkLanguage() async {
-    final languageCode = await _secureStorage.getLanguageSetting();
-    localization.translate(languageCode);
-  }
+  // Future<void> _checkLanguage() async {
+  //   final languageCode = await _secureStorage.getLanguageSetting();
+  //   localization.translate(languageCode);
+  // }
 
   Future<void> _checkForShorebirdUpdate() async {
     final updater = ShorebirdUpdater();

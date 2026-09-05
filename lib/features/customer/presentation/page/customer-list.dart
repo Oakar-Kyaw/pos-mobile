@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'package:pos/component/loading-component.dart';
@@ -11,7 +10,6 @@ import 'package:pos/features/customer/presentation/page/customer-card.dart';
 import 'package:pos/features/customer/presentation/provider/customer-provider.dart';
 import 'package:pos/localization/customer-local.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/shad-toaster.dart';
 
 class CustomerLists extends ConsumerStatefulWidget {

@@ -2,7 +2,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/features/create-voucher/presentation/widgets/calculation-suggestion.dart';
+import 'package:pos/features/voucher/presentation/widgets/calculation-suggestion.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/models/product.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';

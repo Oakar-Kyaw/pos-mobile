@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
 import 'package:pos/core/provider.dart';
@@ -176,6 +177,38 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
     }
 
     throw Exception("Failed to get inventory item");
+  }
+
+  /// -------- Get Expire / Damage / Request List --------
+  Future<bool> confirmInventoryRecordItem({required int index}) async {
+    final url = "v1/products/expire-items/$index/confirm";
+
+    final response = await _dio.patch(url);
+    final data = response.data;
+    if (data["success"] == true) {
+      // Refresh the list automatically
+      // ref.invalidateSelf();
+      return true;
+    }
+
+    throw Exception("Failed to confirm inventory item");
+  }
+
+  /// -------- UPDATE expire/damage and request --------
+  Future<Map<String, dynamic>> updateInventoryManagement({
+    required int id,
+    required Map<String, dynamic> body,
+  }) async {
+    final url = "v1/products/expire-items/$id";
+
+    final response = await _dio.patch(url, data: body);
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      return {"success": true, "id": data["data"]["id"]};
+    }
+
+    throw Exception(data["message"] ?? "Failed to update inventory item");
   }
 
   /// -------- Delete Expire / Damage / Request --------

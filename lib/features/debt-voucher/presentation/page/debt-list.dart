@@ -1,53 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:pos/api/product.api.dart';
+import 'package:pos/api/voucher.api.dart';
 import 'package:pos/component/delete-dialog.dart';
-import 'package:pos/component/expire-damage-component.dart';
 import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/no-item-found-widget.dart';
-import 'package:pos/localization/inventory-management-local.dart';
-import 'package:pos/models/inventory-management.dart';
+import 'package:pos/features/debt-voucher/presentation/widget/debt-repay-voucher-component.dart';
+import 'package:pos/localization/general-local.dart';
+import 'package:pos/localization/voucher-local.dart';
+import 'package:pos/models/voucher-detail.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/check-role.dart';
 import 'package:pos/utils/shad-toaster.dart';
 
-class RequestItemLists extends ConsumerStatefulWidget {
-  const RequestItemLists({
-    super.key,
-    this.userId,
-    this.startDate,
-    this.endDate,
-  });
+class DebtListTile extends ConsumerStatefulWidget {
+  const DebtListTile({super.key, this.userId, this.startDate, this.endDate});
 
   final int? userId;
   final DateTime? startDate;
   final DateTime? endDate;
 
   @override
-  ConsumerState<RequestItemLists> createState() => _ExpireDamageListsState();
+  ConsumerState<DebtListTile> createState() => _DebtListTileState();
 }
 
-class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
-  late final PagingController<int, InventoryManagement> _pagingController;
+class _DebtListTileState extends ConsumerState<DebtListTile> {
+  late final PagingController<int, VoucherDetailModel> _pagingController;
   final int limit = 20;
 
   @override
   void initState() {
     super.initState();
-    _pagingController = PagingController<int, InventoryManagement>(
+    _pagingController = PagingController<int, VoucherDetailModel>(
       getNextPageKey: (state) =>
           state.lastPageIsEmpty ? null : state.nextIntPageKey,
       fetchPage: (pageKey) => ref
-          .read(productProvider.notifier)
-          .getExpireDamageRequestList(
+          .read(voucherProvider.notifier)
+          .getVouchers(
             page: pageKey,
             limit: limit,
-            type: "REQUESTED",
+            existDebt: true,
             userId: widget.userId,
             startDate: widget.startDate,
             endDate: widget.endDate,
@@ -59,6 +55,11 @@ class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
   void dispose() {
     super.dispose();
     _pagingController.dispose();
+    _clearSelectedData();
+  }
+
+  void _clearSelectedData() {
+    ref.read(selectedDataStateProvider.notifier).clear();
   }
 
   BoxDecoration getContainerBoxDecorationByEven(Color dividerColor) {
@@ -80,25 +81,21 @@ class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
     );
   }
 
-  void _delete(InventoryManagement inventory, bool isDark) {
+  void _delete(VoucherDetailModel voucher, bool isDark) {
     showDeleteDialog(
       context,
-      title: InventoryManagementLocale.inventoryDeleteConfirm.getString(
-        context,
-      ),
+      title: VoucherScreenLocale.deleteVoucher.getString(context),
       isDark: isDark,
       submit: () async {
         await ref
-            .read(productProvider.notifier)
-            .deleteInventoryManagement(inventory.id!)
+            .read(voucherProvider.notifier)
+            .deleteVoucher(voucher.id)
             .then((data) {
               if (data) {
                 ShowToast(
                   context,
                   description: Text(
-                    InventoryManagementLocale.inventoryDeleteSuccess.getString(
-                      context,
-                    ),
+                    VoucherScreenLocale.deletedSuccess.getString(context),
                   ),
                 );
                 context.pop();
@@ -109,9 +106,7 @@ class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
               ShowToast(
                 context,
                 description: Text(
-                  InventoryManagementLocale.inventoryDeleteFail.getString(
-                    context,
-                  ),
+                  GeneralScreenLocale.somethingWentWrong.getString(context),
                 ),
                 isError: true,
               );
@@ -140,12 +135,11 @@ class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
     return PagingListener(
       controller: _pagingController,
       builder: (context, state, fetchNextPage) =>
-          PagedListView<int, InventoryManagement>(
+          PagedListView<int, VoucherDetailModel>(
             state: state,
             fetchNextPage: fetchNextPage,
-            builderDelegate: PagedChildBuilderDelegate<InventoryManagement>(
-              itemBuilder: (context, expireItem, index) {
-                // print("Expire item 🥸 ${expireItem.totalAmount}");
+            builderDelegate: PagedChildBuilderDelegate<VoucherDetailModel>(
+              itemBuilder: (context, voucher, index) {
                 final isEven = index % 2 == 0;
                 BoxDecoration containerDecoration = isEven
                     ? getContainerBoxDecorationByEven(dividerColor)
@@ -154,18 +148,18 @@ class _ExpireDamageListsState extends ConsumerState<RequestItemLists> {
                   splashColor: kPrimary.withOpacity(0.08),
                   highlightColor: rowHoverColor,
                   child: Container(
-                    //padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     decoration: containerDecoration,
-                    child: ExpireDamageCard(
+                    child: DebtAndRepayVoucherListComponent(
                       textColor: textColor,
                       subColor: subColor,
-                      inventory: expireItem,
+                      voucher: voucher,
+                      pagingController: _pagingController,
                       onDelete:
                           (user != null &&
                               (isAdmin(user.role) || isManager(user.role)))
-                          ? () => _delete(expireItem, isDark)
+                          ? () => _delete(voucher, isDark)
                           : null,
-                      //pagingController: _pagingController,
                     ),
                   ),
                 );

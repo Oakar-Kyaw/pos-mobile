@@ -155,8 +155,8 @@ class _GeneralExpenseCardState extends ConsumerState<GeneralExpenseCard> {
                 ),
             ],
           ),
-          if (user != null && (isAdmin(user.role) || isManager(user.role)))
-            DeleteIcon(onDelete: () => _delete(expense.id), top: -10, right: 0),
+          // if (user != null && (isAdmin(user.role) || isManager(user.role)))
+          //   DeleteIcon(onDelete: () => _delete(expense.id), top: -10, right: 0),
         ],
       ),
     );

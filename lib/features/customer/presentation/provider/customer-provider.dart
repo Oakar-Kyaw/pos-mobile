@@ -138,22 +138,21 @@ class CustomerAsyncNotifier extends AsyncNotifier<List<Customer>> {
   // SEARCH CUSTOMERS
   // ==========================================
 
-  Future<void> searchCustomers({required String search}) async {
-    state = const AsyncLoading();
-
+  Future<List<Customer>> searchCustomers({required String search}) async {
     try {
-      final customers = await getCustomerLists(
-        page: 1,
-        limit: 20,
-        search: search,
-      );
+      final response = await _dio.get("v1/customers/filter?search=$search");
 
-      state = AsyncData(customers);
-    } catch (e, st) {
-      state = AsyncError(e, st);
+      final data = response.data;
+
+      if (data["success"] == true) {
+        final customers = Customer.listFromJson(data["data"]);
+        return customers;
+      }
+      return [];
+    } catch (e) {
+      return [];
     }
   }
-
   // ==========================================
   // REFRESH CUSTOMERS
   // ==========================================

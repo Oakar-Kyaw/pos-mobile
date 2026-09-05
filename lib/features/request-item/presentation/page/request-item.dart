@@ -5,15 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/core/utils/date-range-select.dart';
 import 'package:pos/core/utils/user-select.dart';
+import 'package:pos/features/request-item/presentation/page/request-item-list.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/inventory-management-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
-import 'package:pos/ui/request-item-list.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/check-role.dart';
-import 'package:pos/utils/description-widget.dart';
 import 'package:pos/utils/inventory-configuration.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -41,7 +40,6 @@ class _RequestItemPageState extends ConsumerState<RequestItemPage> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
     final textColor = isDark ? kTextDark : kTextLight;
-    final subColor = isDark ? kTextSubDark : kTextSubLight;
     final user = ref.watch(userStateProvider);
     final selectedData = ref.watch(selectedDataStateProvider);
     final config = InventoryActionConfig('Request', context);
@@ -70,8 +68,10 @@ class _RequestItemPageState extends ConsumerState<RequestItemPage> {
 
             // const SizedBox(height: 20),
             GradientSubmitButton(
-              onPressed: () =>
-                  context.pushNamed(AppRoute.inventoryItem, extra: 'Request'),
+              onPressed: () => context.pushNamed(
+                AppRoute.inventoryItem,
+                extra: {'type': 'Request'},
+              ),
               text: DrawerScreenLocale.drawerCreate.getString(context),
               width: 120,
             ),
@@ -109,30 +109,7 @@ class RequestLabel extends ConsumerWidget {
     final user = ref.watch(userStateProvider);
     return Row(
       children: [
-        Container(
-          width: 4,
-          height: 18,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [kPrimary, kSecondary],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          InventoryManagementLocale.inventoryCard.getString(context),
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: textColor,
-            letterSpacing: -0.2,
-          ),
-        ),
         if (user != null && (isAdmin(user.role) || isManager(user.role))) ...[
-          const Spacer(),
           const UserSelect(),
         ],
       ],

@@ -134,6 +134,19 @@ class PurchaseAsyncNotifier extends AsyncNotifier<List<Purchase>> {
     }
   }
 
+  Future<bool> updateSucess(int id) async {
+    final response = await _dio.patch("v1/purchases/confirm/$id");
+
+    final data = response.data;
+
+    if (data["success"] == true) {
+      ref.invalidateSelf();
+      return true;
+    }
+
+    throw Exception(data["message"] ?? "Failed to update purchase");
+  }
+
   Future<void> refresh() async {
     state = const AsyncLoading();
 
