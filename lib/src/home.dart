@@ -3,16 +3,19 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/core/widgets/custom-button.dart';
+import 'package:pos/core/network/socket/socket-provider.dart';
+import 'package:pos/core/widgets/app-local-notification.dart';
 import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/models/product.dart';
+import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/riverpod/voucher-detail.dart';
 import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/riverpod/company.riverpod.dart';
@@ -33,12 +36,26 @@ class MyHomePage extends ConsumerStatefulWidget {
 }
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
+  late final PagingController<int, Product> _pagingController;
+  String limit = "40";
   @override
   void initState() {
     super.initState();
+    _pagingController = PagingController<int, Product>(
+      getNextPageKey: (state) =>
+          state.lastPageIsEmpty ? null : state.nextIntPageKey,
+      fetchPage: (pageKey) => ref
+          .read(productProvider.notifier)
+          .getProductLists(
+            pageKey.toString(),
+            limit,
+            search: _searchQuery.isEmpty ? null : _searchQuery,
+          ),
+    );
+    _connect();
+    _listenProductProgress();
   }
 
-  final String limit = "40";
   final secureStorage = SecureStorage();
 
   // ── Search state ─────────────────────────────
@@ -46,19 +63,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   String _searchQuery = '';
-
-  late final PagingController<int, Product> _pagingController =
-      PagingController<int, Product>(
-        getNextPageKey: (state) =>
-            state.lastPageIsEmpty ? null : state.nextIntPageKey,
-        fetchPage: (pageKey) => ref
-            .read(productProvider.notifier)
-            .getProductLists(
-              pageKey.toString(),
-              limit,
-              search: _searchQuery.isEmpty ? null : _searchQuery,
-            ),
-      );
+  StreamSubscription<Map<String, dynamic>>? _productProgressSubscription;
 
   void _onSearchChanged(String value) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
@@ -100,8 +105,65 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     ref.read(voucherDetailProvider.notifier).removeItem(id);
   }
 
+  //connect socket
+  void _connect() {
+    final user = ref.read(userStateProvider);
+    if (user == null) {
+      return;
+    }
+    final socketClient = ref.read(socketClientProvider);
+    socketClient.connect(
+      baseUrl: "${dotenv.env["BACKEND_URL"]}/socket",
+      userId: user.id,
+    );
+  }
+
+  void _listenProductProgress() {
+    final socketClient = ref.read(socketClientProvider);
+
+    _productProgressSubscription = socketClient.productProgressStream.listen((
+      data,
+    ) async {
+      try {
+        final percent = (data['percent'] as num?)?.toInt() ?? 0;
+        final processed = (data['processed'] as num?)?.toInt() ?? 0;
+        final total = (data['total'] as num?)?.toInt() ?? 0;
+
+        print('📦 Product progress: $percent%');
+        print('📦 Processed: $processed / $total');
+
+        if (total <= 0) {
+          return;
+        }
+
+        // // Import completed
+        if (percent >= 100 || processed >= total) {
+          await AppLocalNotification().showProductCompletedNotification(
+            notiId: 1001,
+            title: 'Product Import Completed',
+            body: '$processed of $total products imported successfully',
+          );
+
+          return;
+        }
+
+        // Import is still processing
+        await AppLocalNotification().showProductUploadProgress(
+          notiId: 1001,
+          title: 'Product Import',
+          body: 'Processing $processed of $total products',
+          progress: processed,
+          maxProgress: total,
+        );
+      } catch (e) {
+        print('❌ Product progress notification error: $e');
+      }
+    });
+  }
+
   @override
   void dispose() {
+    _productProgressSubscription?.cancel();
     _pagingController.dispose();
     _searchController.dispose();
     _debounce?.cancel();

@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/component/theme-divider.dart';
+import 'package:pos/features/income/data/model/dashboard-stats.dart';
 import 'package:pos/features/sale-report/data/model/sale-report.dart';
 import 'package:pos/features/sale-report/presentation/widget/report-row.dart';
 import 'package:pos/localization/sale-report-local.dart';
-import 'package:pos/models/dashboard-stats.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 

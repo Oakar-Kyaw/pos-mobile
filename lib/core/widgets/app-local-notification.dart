@@ -65,6 +65,74 @@ class AppLocalNotification {
     );
   }
 
+  Future<void> showProductUploadProgress({
+    required int notiId,
+    required String title,
+    required String body,
+    required int progress,
+    required int maxProgress,
+  }) async {
+    await notificationPlugin.show(
+      id: notiId,
+      title: title,
+      body: body,
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          'channelId',
+          'channelName',
+          channelDescription: 'notification',
+          importance: Importance.low,
+          priority: Priority.low,
+          // 👇 This creates the linear progress bar
+          showProgress: true,
+          maxProgress: maxProgress,
+          progress: progress,
+
+          // Don't remove notification while processing
+          ongoing: true,
+
+          // Optional
+          onlyAlertOnce: true,
+        ),
+      ),
+    );
+  }
+
+  Future<void> showProductCompletedNotification({
+    required int notiId,
+    required String title,
+    required String body,
+  }) async {
+    await notificationPlugin.show(
+      id: notiId,
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'channelId',
+          'channelName',
+          channelDescription: 'notification',
+          importance: Importance.high,
+          priority: Priority.high,
+
+          // Progress notification
+          showProgress: false,
+
+          ongoing: false,
+
+          autoCancel: true,
+
+          playSound: true,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+    );
+  }
+
   static Future<void> requestNotification() async {
     await notificationPlugin
         .resolvePlatformSpecificImplementation<

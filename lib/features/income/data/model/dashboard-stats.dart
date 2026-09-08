@@ -1,6 +1,5 @@
-// ──────────────────────────────
-// Root Dashboard Response
-// ──────────────────────────────
+import 'package:flutter/cupertino.dart';
+
 class DashboardStats {
   final SaleSummary yearlySale;
   final SaleSummary monthlySale;
@@ -48,21 +47,55 @@ class SaleSummary {
   final String total;
   final String deliveryFee;
   final String tax;
+  final String packagingFee;
+  final String discountAmount;
+  final String discountPercent;
   final String subTotal;
+  final String refundAmount;
+  final String debtAmount;
+  final String expenseAmount;
+  final String purchaseAmount;
+  final String netIncome;
+  final String totalPaymentAmount;
+  // final String openingAmount;
+  // final String transferAmount;
 
   SaleSummary({
     required this.total,
+    required this.packagingFee,
+    required this.discountAmount,
+    required this.discountPercent,
     required this.deliveryFee,
     required this.tax,
     required this.subTotal,
+    required this.refundAmount,
+    required this.debtAmount,
+    required this.expenseAmount,
+    required this.purchaseAmount,
+    required this.netIncome,
+    required this.totalPaymentAmount,
+    // required this.openingAmount,
+    // required this.transferAmount,
   });
 
   factory SaleSummary.fromJson(Map<String, dynamic> json) {
+    // debugPrint("sale summary $json");
     return SaleSummary(
       total: json['total'],
       deliveryFee: json['deliveryFee'],
+      packagingFee: json['packagingFee'],
+      discountAmount: json['discountAmount'],
+      discountPercent: json['discountPercent'],
       tax: json['tax'],
       subTotal: json['subTotal'],
+      refundAmount: json['refundAmount'],
+      debtAmount: json['debtAmount'],
+      expenseAmount: json['expenseAmount'],
+      purchaseAmount: json['purchaseAmount'],
+      netIncome: json['netIncome'],
+      totalPaymentAmount: json['totalPaymentAmount'],
+      // openingAmount: json['openingAmount'],
+      // transferAmount: json["transferAmount"],
     );
   }
 }
@@ -99,6 +132,14 @@ class MonthlySale {
   final String deliveryFee;
   final String tax;
   final String subTotal;
+  final String refundAmount;
+  final String debtAmount;
+  final String expenseAmount;
+  final String purchaseAmount;
+  final String netIncome;
+  final String totalPaymentAmount;
+  // final String openingAmount;
+  // final String transferAmount;
 
   MonthlySale({
     required this.month,
@@ -106,15 +147,32 @@ class MonthlySale {
     required this.deliveryFee,
     required this.tax,
     required this.subTotal,
+    required this.refundAmount,
+    required this.debtAmount,
+    required this.expenseAmount,
+    required this.purchaseAmount,
+    required this.netIncome,
+    required this.totalPaymentAmount,
+    // required this.openingAmount,
+    // required this.transferAmount,
   });
 
   factory MonthlySale.fromJson(Map<String, dynamic> json) {
+    debugPrint("MOnth sale $json");
     return MonthlySale(
-      month: json['month'],
-      total: json['total'],
-      deliveryFee: json['deliveryFee'],
-      tax: json['tax'],
-      subTotal: json['subTotal'],
+      month: json['month'].toString(),
+      total: json['total'].toString(),
+      deliveryFee: json['deliveryFee'].toString(),
+      tax: json['tax'].toString(),
+      subTotal: json['subTotal'].toString(),
+      refundAmount: json['refundAmount'],
+      debtAmount: json['debtAmount'],
+      expenseAmount: json['expenseAmount'],
+      purchaseAmount: json['purchaseAmount'],
+      netIncome: json['netIncome'],
+      totalPaymentAmount: json['paymentIn'],
+      // openingAmount: json['openingAmount'],
+      // transferAmount: json["transferAmount"],
     );
   }
 }
@@ -126,6 +184,7 @@ class MonthlyTopSaleUser {
   final String? saleFirstName;
   final String? saleLastName;
   final String saleEmail;
+  final String? phone;
   final int saleUserId;
   final String total;
   final String deliveryFee;
@@ -135,6 +194,7 @@ class MonthlyTopSaleUser {
   MonthlyTopSaleUser({
     this.saleFirstName,
     this.saleLastName,
+    this.phone,
     required this.saleEmail,
     required this.saleUserId,
     required this.total,
@@ -147,6 +207,7 @@ class MonthlyTopSaleUser {
     return MonthlyTopSaleUser(
       saleFirstName: json['salefirstname'],
       saleLastName: json['salelastname'],
+      phone: json["phone"] ?? "",
       saleEmail: json['saleemail'],
       saleUserId: json['saleuserid'],
       total: json['total'],

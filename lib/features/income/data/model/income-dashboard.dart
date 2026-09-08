@@ -1,4 +1,4 @@
-import 'package:pos/models/income-summary.dart';
+import 'package:pos/features/income/data/model/income-summary.dart';
 import 'package:pos/models/sale-item.dart';
 
 class IncomeDashboard {

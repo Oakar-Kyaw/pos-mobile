@@ -5,11 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/income-dashboard.api.dart';
 import 'package:pos/component/app-bar.dart';
+import 'package:pos/features/income/data/model/dashboard-stats.dart';
 import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/income-local.dart';
-import 'package:pos/models/dashboard-stats.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/date-ui.dart';
+import 'package:pos/utils/formatAmount.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class IncomePage extends ConsumerStatefulWidget {
@@ -21,13 +22,6 @@ class IncomePage extends ConsumerStatefulWidget {
 
 class _IncomePageState extends ConsumerState<IncomePage> {
   DateTime selectedDate = DateTime.now();
-
-  String _formatNumber(String value) {
-    final num = double.tryParse(value) ?? 0;
-    if (num >= 1000000) return '${(num / 1000000).toStringAsFixed(1)}M';
-    if (num >= 1000) return '${(num / 1000).toStringAsFixed(1)}K';
-    return num.toStringAsFixed(0);
-  }
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
@@ -93,6 +87,14 @@ class _IncomePageState extends ConsumerState<IncomePage> {
             onTap: _pickDate,
             isDark: isDark,
           ),
+          const SizedBox(height: 24),
+          _SectionHeader(
+            title: IncomeScreenLocale.incomeMonthlyRevenue.getString(context),
+            textColor: textColor,
+          ),
+          const SizedBox(height: 14),
+          _MonthlyBarChart(monthlyData: data.getMonthByMonth, isDark: isDark),
+
           SizedBox(height: 20),
           Text(
             IncomeScreenLocale.incomeOverview.getString(context),
@@ -105,43 +107,72 @@ class _IncomePageState extends ConsumerState<IncomePage> {
           ),
           const SizedBox(height: 12),
 
-          Row(
-            children: [
-              Expanded(
-                child: _StatCard(
-                  label: IncomeScreenLocale.incomeThisYear.getString(context),
-                  value: _formatNumber(data.yearlySale.total),
-                  sub:
-                      '${IncomeScreenLocale.incomeTax.getString(context)} ${_formatNumber(data.yearlySale.tax)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${_formatNumber(data.yearlySale.deliveryFee)}',
-                  dark: true,
-                  icon: Icons.trending_up_rounded,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _StatCard(
-                  label: IncomeScreenLocale.incomeThisMonth.getString(context),
-                  value: _formatNumber(data.monthlySale.total),
-                  sub:
-                      '${IncomeScreenLocale.incomeTax.getString(context)} ${_formatNumber(data.monthlySale.tax)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${_formatNumber(data.monthlySale.deliveryFee)}',
-                  dark: false,
-                  isDark: isDark,
-                  icon: Icons.calendar_today_rounded,
-                ),
-              ),
-            ],
+          // ── Today ──────────────────────────────────────
+          _StatCard(
+            label: IncomeScreenLocale.incomeToday.getString(context),
+            netIncome: data.getTodaySale.netIncome,
+            taxValue: data.getTodaySale.tax,
+            deliveryFeeValue: data.getTodaySale.deliveryFee,
+            packagingFeeValue: data.getTodaySale.packagingFee,
+            discountAmount: data.getTodaySale.discountAmount,
+            discountPercent: data.getTodaySale.discountPercent,
+            refundAmount: data.getTodaySale.refundAmount,
+            debtAmount: data.getTodaySale.debtAmount,
+            expenseAmount: data.getTodaySale.expenseAmount,
+            purchaseAmount: data.getTodaySale.purchaseAmount,
+            totalPaymentAmount: data.getTodaySale.totalPaymentAmount,
+            total: data.getTodaySale.total,
+            sub:
+                '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.getTodaySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.getTodaySale.deliveryFee) ?? 0)}',
+            dark: true,
+            icon: Icons.trending_up_rounded,
+            fullWidth: true,
+          ),
+          const SizedBox(height: 12),
+
+          // ── This Month ─────────────────────────────────
+          _StatCard(
+            label: IncomeScreenLocale.incomeThisMonth.getString(context),
+            netIncome: data.monthlySale.netIncome,
+            taxValue: data.monthlySale.tax,
+            deliveryFeeValue: data.monthlySale.deliveryFee,
+            packagingFeeValue: data.monthlySale.packagingFee,
+            discountAmount: data.monthlySale.discountAmount,
+            discountPercent: data.monthlySale.discountPercent,
+            refundAmount: data.monthlySale.refundAmount,
+            debtAmount: data.monthlySale.debtAmount,
+            expenseAmount: data.monthlySale.expenseAmount,
+            purchaseAmount: data.monthlySale.purchaseAmount,
+            totalPaymentAmount: data.monthlySale.totalPaymentAmount,
+            total: data.monthlySale.total,
+            sub:
+                '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.monthlySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.monthlySale.deliveryFee) ?? 0)}',
+            dark: false,
+            isDark: isDark,
+            icon: Icons.calendar_today_rounded,
           ),
 
           const SizedBox(height: 20),
 
+          // ── This Year ──────────────────────────────────
           _StatCard(
-            label: IncomeScreenLocale.incomeToday.getString(context),
-            value: _formatNumber(data.getTodaySale.total),
+            label: IncomeScreenLocale.incomeThisYear.getString(context),
+            netIncome: data.yearlySale.netIncome,
+            taxValue: data.yearlySale.tax,
+            deliveryFeeValue: data.yearlySale.deliveryFee,
+            packagingFeeValue: data.yearlySale.packagingFee,
+            discountAmount: data.yearlySale.discountAmount,
+            discountPercent: data.yearlySale.discountPercent,
+            refundAmount: data.yearlySale.refundAmount,
+            debtAmount: data.yearlySale.debtAmount,
+            expenseAmount: data.yearlySale.expenseAmount,
+            purchaseAmount: data.yearlySale.purchaseAmount,
+            totalPaymentAmount: data.yearlySale.totalPaymentAmount,
+            total: data.yearlySale.total,
             sub:
-                '${IncomeScreenLocale.incomeTax.getString(context)} ${_formatNumber(data.getTodaySale.tax)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${_formatNumber(data.getTodaySale.deliveryFee)}',
+                '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.deliveryFee) ?? 0)}',
             dark: true,
             icon: Icons.trending_up_rounded,
-            fullWidth: true,
           ),
 
           const SizedBox(height: 20),
@@ -172,24 +203,12 @@ class _IncomePageState extends ConsumerState<IncomePage> {
 
           const SizedBox(height: 24),
           _SectionHeader(
-            title: IncomeScreenLocale.incomeMonthlyRevenue.getString(context),
-            textColor: textColor,
-          ),
-          const SizedBox(height: 14),
-          _MonthlyBarChart(monthlyData: data.getMonthByMonth, isDark: isDark),
-
-          const SizedBox(height: 24),
-          _SectionHeader(
             title: IncomeScreenLocale.incomeTopSalesStaff.getString(context),
             textColor: textColor,
           ),
           const SizedBox(height: 12),
           ...data.getMonthlyTopSaleUser.map(
-            (u) => _TopUserCard(
-              user: u,
-              formatNumber: _formatNumber,
-              isDark: isDark,
-            ),
+            (u) => _TopUserCard(user: u, isDark: isDark),
           ),
 
           const SizedBox(height: 20),
@@ -201,10 +220,25 @@ class _IncomePageState extends ConsumerState<IncomePage> {
 
 // ─────────────────────────────────────────
 // Stat Card
+// All amount-related fields here are RAW (unformatted) strings straight
+// from the API. formatAmount() is only ever called at display time,
+// right before a Text widget — never on a value that gets re-parsed
+// or used in arithmetic afterwards.
 // ─────────────────────────────────────────
 class _StatCard extends StatelessWidget {
   final String label;
-  final String value;
+  final String netIncome;
+  final String taxValue;
+  final String deliveryFeeValue;
+  final String packagingFeeValue;
+  final String discountAmount;
+  final String discountPercent;
+  final String refundAmount;
+  final String debtAmount;
+  final String expenseAmount;
+  final String purchaseAmount;
+  final String totalPaymentAmount;
+  final String total;
   final String sub;
   final bool dark;
   final bool isDark;
@@ -213,42 +247,51 @@ class _StatCard extends StatelessWidget {
 
   const _StatCard({
     required this.label,
-    required this.value,
+    required this.netIncome,
+    required this.taxValue,
+    required this.deliveryFeeValue,
+    required this.packagingFeeValue,
+    required this.discountAmount,
+    required this.discountPercent,
     required this.sub,
     required this.dark,
     required this.icon,
+    required this.refundAmount,
+    required this.debtAmount,
+    required this.expenseAmount,
+    required this.purchaseAmount,
+    required this.totalPaymentAmount,
+    required this.total,
     this.isDark = false,
     this.fullWidth = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final otherExpenseTotal =
+        (double.tryParse(refundAmount) ?? 0) +
+        (double.tryParse(expenseAmount) ?? 0) +
+        (double.tryParse(purchaseAmount) ?? 0);
+    final netIncomeValue = double.tryParse(netIncome) ?? 0;
+    final isNegative = netIncomeValue < 0;
+
     return Container(
       width: fullWidth ? double.infinity : null,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: dark
             ? const LinearGradient(
-                colors: [kPrimary, kSecondary],
+                colors: [
+                  Color.fromARGB(255, 46, 54, 75),
+                  Color.fromARGB(255, 30, 36, 52),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )
             : null,
         color: dark ? null : (isDark ? kSurfaceDark : Colors.white),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: dark
-                ? kPrimary.withOpacity(0.35)
-                : (isDark
-                      ? kPrimary.withOpacity(0.1)
-                      : Colors.black.withOpacity(0.06)),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(5),
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -260,37 +303,159 @@ class _StatCard extends StatelessWidget {
                 style: TextStyle(
                   color: dark ? Colors.white70 : kTextSubLight,
                   fontSize: 11,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
                 ),
               ),
               Icon(
-                icon,
-                color: dark ? Colors.white60 : kPrimary.withOpacity(0.5),
+                isNegative ? Icons.trending_down_rounded : icon,
+                color: isNegative
+                    ? kRed
+                    : (dark ? Colors.white60 : kPrimary.withOpacity(0.5)),
                 size: 15,
               ),
             ],
           ),
           const SizedBox(height: 10),
           Text(
-            value,
+            formatAmount(double.tryParse(netIncome) ?? 0),
             style: TextStyle(
-              color: dark ? Colors.white : (isDark ? kTextDark : kTextLight),
+              color: isNegative
+                  ? kRed
+                  : (dark ? Colors.white : (isDark ? kTextDark : kTextLight)),
               fontSize: 16,
               fontWeight: FontWeight.w800,
               letterSpacing: -1,
             ),
           ),
           const SizedBox(height: 6),
+
+          // tax / deliveryFee / packagingFee / discountAmount / discountPercent
+          // intentionally left off the card — order-composition detail,
+          // not income-health detail. Move to a "Sale detail" screen if needed.
+          StatCardRow(
+            label:
+                "${IncomeScreenLocale.incomeDebtAmount.getString(context)} :",
+            value: formatAmount(double.tryParse(debtAmount) ?? 0),
+            dark: dark,
+            isDark: isDark,
+          ),
+          const SizedBox(height: 6),
+          StatCardRow(
+            label:
+                "${IncomeScreenLocale.incomeTotalPaymentAmount.getString(context)} :",
+            value: formatAmount(double.tryParse(totalPaymentAmount) ?? 0),
+            dark: dark,
+            isDark: isDark,
+          ),
+          const SizedBox(height: 6),
+          const Divider(),
+          StatCardRow(
+            label:
+                "${IncomeScreenLocale.incomeTotalSales.getString(context)} :",
+            labelColor: kGreen,
+            valueColor: kGreenSecondary,
+            value: formatAmount(double.tryParse(total) ?? 0),
+            dark: dark,
+            isDark: isDark,
+          ),
+          const SizedBox(height: 10),
           Text(
-            sub,
+            IncomeScreenLocale.incomeOtherExpense.getString(context),
             style: TextStyle(
-              color: dark ? Colors.white54 : kTextSubLight,
-              fontSize: 10,
+              color: (dark ? Colors.white : (isDark ? kTextDark : kTextLight)),
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -1,
             ),
+          ),
+          const Divider(),
+          StatCardRow(
+            label:
+                "${IncomeScreenLocale.incomeRefundAmount.getString(context)} :",
+            value: formatAmount(double.tryParse(refundAmount) ?? 0),
+            dark: dark,
+            isDark: isDark,
+          ),
+          const SizedBox(height: 6),
+          StatCardRow(
+            label:
+                "${IncomeScreenLocale.incomeExpenseAmount.getString(context)} :",
+            value: formatAmount(double.tryParse(expenseAmount) ?? 0),
+            dark: dark,
+            isDark: isDark,
+          ),
+          const SizedBox(height: 6),
+          StatCardRow(
+            label:
+                "${IncomeScreenLocale.incomePurchaseAmount.getString(context)} :",
+            value: formatAmount(double.tryParse(purchaseAmount) ?? 0),
+            dark: dark,
+            isDark: isDark,
+          ),
+          const SizedBox(height: 6),
+          const Divider(),
+          const SizedBox(height: 6),
+          StatCardRow(
+            label:
+                "${IncomeScreenLocale.incomeTotalOtherExpense.getString(context)} :",
+            labelColor: kRed,
+            valueColor: kRed,
+            value: formatAmount(otherExpenseTotal),
+            dark: dark,
+            isDark: isDark,
           ),
         ],
       ),
+    );
+  }
+}
+
+class StatCardRow extends StatelessWidget {
+  final String label;
+  final Color? labelColor;
+  final String value;
+  final Color? valueColor;
+  final bool dark;
+  final bool isDark;
+  const StatCardRow({
+    super.key,
+    required this.label,
+    this.labelColor,
+    this.valueColor,
+    required this.value,
+    required this.dark,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color:
+                labelColor ??
+                (dark ? Colors.white : (isDark ? kTextDark : kTextLight)),
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -1,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          value,
+          style: TextStyle(
+            color:
+                valueColor ??
+                (dark ? Colors.white : (isDark ? kTextDark : kTextLight)),
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -1,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -465,7 +630,7 @@ class _MonthlyBarChart extends StatelessWidget {
       final v = double.tryParse(item.total) ?? 0;
       if (v > max) max = v;
     }
-    return max * 1.2;
+    return max == 0 ? 100 : max * 1.2;
   }
 
   @override
@@ -483,6 +648,21 @@ class _MonthlyBarChart extends StatelessWidget {
       "10": "OCT",
       "11": "NOV",
       "12": "DEC",
+    };
+
+    final monthColors = {
+      "1": Colors.blue,
+      "2": Colors.pink,
+      "3": Colors.green,
+      "4": Colors.orange,
+      "5": Colors.purple,
+      "6": Colors.teal,
+      "7": Colors.red,
+      "8": Colors.indigo,
+      "9": Colors.amber,
+      "10": Colors.cyan,
+      "11": Colors.deepPurple,
+      "12": Colors.brown,
     };
 
     final cardColor = isDark ? kSurfaceDark : Colors.white;
@@ -540,8 +720,9 @@ class _MonthlyBarChart extends StatelessWidget {
                 showTitles: true,
                 getTitlesWidget: (value, _) {
                   final index = value.toInt();
-                  if (index < 0 || index >= monthlyData.length)
+                  if (index < 0 || index >= monthlyData.length) {
                     return const SizedBox();
+                  }
                   final monthName = months[monthlyData[index].month] ?? '';
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
@@ -591,19 +772,19 @@ class _MonthlyBarChart extends StatelessWidget {
             ),
           ),
           barGroups: List.generate(monthlyData.length, (index) {
-            final total = double.tryParse(monthlyData[index].total) ?? 0;
+            final item = monthlyData[index];
+            final total = double.tryParse(item.total) ?? 0;
+
+            final color = monthColors[item.month] ?? kPrimary;
+
             return BarChartGroupData(
               x: index,
               barRods: [
                 BarChartRodData(
                   toY: total,
                   width: 28,
+                  color: color,
                   borderRadius: BorderRadius.circular(8),
-                  gradient: const LinearGradient(
-                    colors: [kPrimary, kSecondary],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                  ),
                 ),
               ],
             );
@@ -619,14 +800,9 @@ class _MonthlyBarChart extends StatelessWidget {
 // ─────────────────────────────────────────
 class _TopUserCard extends StatelessWidget {
   final MonthlyTopSaleUser user;
-  final String Function(String) formatNumber;
   final bool isDark;
 
-  const _TopUserCard({
-    required this.user,
-    required this.formatNumber,
-    required this.isDark,
-  });
+  const _TopUserCard({required this.user, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -693,6 +869,17 @@ class _TopUserCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
+                if (user.phone != null)
+                  Text(
+                    user.phone!,
+                    style: TextStyle(
+                      color: isDark ? kTextDark : kTextLight,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                const SizedBox(height: 2),
                 Text(
                   user.saleEmail,
                   style: TextStyle(
@@ -708,7 +895,7 @@ class _TopUserCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                formatNumber(user.total),
+                formatAmount(double.tryParse(user.total) ?? 0),
                 style: const TextStyle(
                   color: kPrimary,
                   fontWeight: FontWeight.w800,
@@ -716,7 +903,7 @@ class _TopUserCard extends StatelessWidget {
                 ),
               ),
               Text(
-                'total sales',
+                IncomeScreenLocale.incomeTotalSales.getString(context),
                 style: TextStyle(
                   color: isDark ? kTextSubDark : kTextSubLight,
                   fontSize: 10,
