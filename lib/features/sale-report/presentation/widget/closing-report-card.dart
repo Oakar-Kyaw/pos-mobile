@@ -3,9 +3,7 @@
 // ─────────────────────────────────────────────
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/component/theme-divider.dart';
-import 'package:pos/features/income/data/model/dashboard-stats.dart';
 import 'package:pos/features/sale-report/data/model/sale-report.dart';
 import 'package:pos/features/sale-report/presentation/widget/report-row.dart';
 import 'package:pos/localization/sale-report-local.dart';
@@ -14,30 +12,29 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 
 class ClosingReportCard extends StatelessWidget {
   final SaleReport report;
-  final AsyncValue<DashboardStats> asyncIncome;
   final bool isDark;
 
   const ClosingReportCard({
+    super.key,
     required this.report,
-    required this.asyncIncome,
     required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
-    final openingAmount = report.openingAmount ?? 0;
-    final closingAmount = report.closingAmount ?? 0;
-    final totalGeneralExpense = report.totalGeneralExpense ?? 0;
-    final totalPurchase = report.totalPurchase ?? 0;
-    final todaySaleAmount = asyncIncome.maybeWhen(
-      data: (income) => income.getTodaySale.total,
-      orElse: () => 0,
-    );
-
-    final total =
-        openingAmount +
-        closingAmount +
-        double.parse(todaySaleAmount.toString());
+    final openingAmount = report.openingAmount;
+    final closingAmount = report.closingAmount;
+    final totalGeneralExpense = report.totalGeneralExpense;
+    final totalPurchase = report.totalPurchase;
+    final totalSaleAmount = report.totalSaleAmount;
+    final totalPaidAmount = report.totalPaidAmount;
+    final totalDebtAmount = report.totalDebtAmount;
+    final totalRefundAmount = report.totalRefundAmount;
+    final totalRepayAmount = report.totalRepayAmount;
+    final totalTransferAmount = report.totalTransferAmount;
+    final totalExternalTransferAmount = report.totalExternalTransferAmount;
+    final totalInternalTransferAmount = report.totalInternalTransferAmount;
+    final isClosed = report.isClosed;
 
     final bodyColor = isDark ? kSurfaceDark : kSurfaceLight;
     final dividerColor = isDark
@@ -85,31 +82,69 @@ class ClosingReportCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        SaleReportLocale.saleReportClosingReport.getString(
-                          context,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          SaleReportLocale.saleReportClosingReport.getString(
+                            context,
+                          ),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
+                          ),
                         ),
-                        style: const TextStyle(
+                        const SizedBox(height: 2),
+                        Text(
+                          SaleReportLocale.saleReportDailySummary.getString(
+                            context,
+                          ),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // ── isClosed badge ────────────
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isClosed ? LucideIcons.lock : LucideIcons.lockOpen,
                           color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.3,
+                          size: 12,
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        SaleReportLocale.saleReportDailySummary.getString(
-                          context,
+                        const SizedBox(width: 4),
+                        Text(
+                          isClosed
+                              ? SaleReportLocale.saleReportClosed.getString(
+                                  context,
+                                )
+                              : SaleReportLocale.saleReportOpen.getString(
+                                  context,
+                                ),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -130,17 +165,64 @@ class ClosingReportCard extends StatelessWidget {
                     isPositive: true,
                     isDark: isDark,
                   ),
+
                   ThemeDivider(color: dividerColor),
                   ReportRow(
-                    icon: LucideIcons.lockKeyhole,
-                    iconColor: kAmber,
-                    label: SaleReportLocale.saleReportClosingAmount.getString(
+                    icon: LucideIcons.trendingUp,
+                    iconColor: kPrimary,
+                    label: SaleReportLocale.saleReportTodaySales.getString(
                       context,
                     ),
-                    amount: total.toString(),
+                    amount: totalSaleAmount.toString(),
+                    isPositive: true,
+                    highlight: true,
+                    isDark: isDark,
+                  ),
+                  ThemeDivider(color: dividerColor),
+                  ReportRow(
+                    icon: LucideIcons.banknote,
+                    iconColor: kGreen,
+                    label: SaleReportLocale.saleReportTotalPaid.getString(
+                      context,
+                    ),
+                    amount: totalPaidAmount.toString(),
+                    isPositive: true,
+                    isDark: isDark,
+                  ),
+                  ThemeDivider(color: dividerColor),
+                  ReportRow(
+                    icon: LucideIcons.badgeDollarSign,
+                    iconColor: kRed,
+                    label: SaleReportLocale.saleReportTotalDebt.getString(
+                      context,
+                    ),
+                    amount: totalDebtAmount.toString(),
                     isPositive: false,
                     isDark: isDark,
                   ),
+                  ThemeDivider(color: dividerColor),
+                  ReportRow(
+                    icon: LucideIcons.undo2,
+                    iconColor: kRed,
+                    label: SaleReportLocale.saleReportTotalRefund.getString(
+                      context,
+                    ),
+                    amount: totalRefundAmount.toString(),
+                    isPositive: false,
+                    isDark: isDark,
+                  ),
+                  ThemeDivider(color: dividerColor),
+                  ReportRow(
+                    icon: LucideIcons.handCoins,
+                    iconColor: kGreen,
+                    label: SaleReportLocale.saleReportTotalRepay.getString(
+                      context,
+                    ),
+                    amount: totalRepayAmount.toString(),
+                    isPositive: true,
+                    isDark: isDark,
+                  ),
+
                   ThemeDivider(color: dividerColor),
                   ReportRow(
                     icon: LucideIcons.receipt,
@@ -163,36 +245,49 @@ class ClosingReportCard extends StatelessWidget {
                     isPositive: false,
                     isDark: isDark,
                   ),
+
+                  // Transfer — internal (doesn't affect closing amount)
                   ThemeDivider(color: dividerColor),
-                  asyncIncome.when(
-                    data: (income) => ReportRow(
-                      icon: LucideIcons.trendingUp,
-                      iconColor: kPrimary,
-                      label: SaleReportLocale.saleReportTodaySales.getString(
-                        context,
-                      ),
-                      amount: income.getTodaySale.total.toString(),
-                      isPositive: true,
-                      highlight: true,
-                      isDark: isDark,
+                  ReportRow(
+                    icon: LucideIcons.repeat,
+                    iconColor: isDark ? kTextSubDark : kTextSubLight,
+                    label: "Internal Transfer Amount",
+                    amount: totalInternalTransferAmount.toString(),
+                    isPositive: true,
+                    isDark: isDark,
+                  ),
+                  // Transfer — external (reduces closing amount)
+                  ThemeDivider(color: dividerColor),
+                  ReportRow(
+                    icon: LucideIcons.externalLink,
+                    iconColor: kRed,
+                    label: "External Transfer Amount",
+                    amount: totalExternalTransferAmount.toString(),
+                    isPositive: false,
+                    isDark: isDark,
+                  ),
+                  //Transfer (all)
+                  ThemeDivider(color: dividerColor),
+                  ReportRow(
+                    icon: LucideIcons.arrowLeftRight,
+                    iconColor: kAmber,
+                    label: SaleReportLocale.saleReportTotalTransfer.getString(
+                      context,
                     ),
-                    loading: () => const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Center(
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: kPrimary,
-                          ),
-                        ),
-                      ),
+                    amount: totalTransferAmount.toString(),
+                    isPositive: false,
+                    isDark: isDark,
+                  ),
+                  ThemeDivider(color: dividerColor),
+                  ReportRow(
+                    icon: LucideIcons.lockKeyhole,
+                    iconColor: kAmber,
+                    label: SaleReportLocale.saleReportClosingAmount.getString(
+                      context,
                     ),
-                    error: (err, _) => const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 6),
-                      child: Text('Error', style: TextStyle(color: Colors.red)),
-                    ),
+                    amount: closingAmount.toString(),
+                    isPositive: false,
+                    isDark: isDark,
                   ),
                 ],
               ),

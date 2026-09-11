@@ -1,5 +1,4 @@
 mixin ProductScreenLocale {
-  // ===== Keys =====
   static const productTitle = 'product_title';
   static const productDescription = 'product_description';
 
@@ -49,6 +48,10 @@ mixin ProductScreenLocale {
 
   static const isActive = 'product_is_active';
 
+  static const lowStockEmpty = 'low_stock_empty';
+  static const lowStockStock = 'low_stock_stock';
+  static const lowStockMin = 'low_stock_min';
+
   static const save = 'product_save';
   static const saveEdit = 'product_save_edit';
   static const saving = 'product_saving';
@@ -62,7 +65,6 @@ mixin ProductScreenLocale {
 
   static const productNotFound = 'product_not_found';
 
-  // ===== English =====
   static const EN = {
     productTitle: 'Products',
     productDescription: 'Manage your products here',
@@ -113,6 +115,10 @@ mixin ProductScreenLocale {
 
     isActive: 'Active',
 
+    lowStockEmpty: 'No low stock items',
+    lowStockStock: 'Stock',
+    lowStockMin: 'Min',
+
     save: 'Save',
     saveEdit: 'Save Changes',
     saving: 'Saving...',
@@ -127,7 +133,6 @@ mixin ProductScreenLocale {
     productNotFound: 'Product not found',
   };
 
-  // ===== Burmese (Myanmar) =====
   static const MM = {
     productTitle: 'ကုန်ပစ္စည်း',
     productDescription: 'ကုန်ပစ္စည်းများကို ဒီနေရာတွင် စီမံခန့်ခွဲနိုင်ပါသည်',
@@ -177,6 +182,10 @@ mixin ProductScreenLocale {
     minStockPlaceholder: 'အနည်းဆုံး အရေအတွက် ထည့်ပါ',
 
     isActive: 'အသုံးပြုနေသည်',
+
+    lowStockEmpty: 'စတော့လျော့နေသော ကုန်ပစ္စည်း မရှိပါ',
+    lowStockStock: 'လက်ကျန်',
+    lowStockMin: 'အနည်းဆုံး',
 
     save: 'သိမ်းမည်',
     saveEdit: 'ပြောင်းလဲမှုများကို သိမ်းမည်',

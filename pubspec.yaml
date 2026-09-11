@@ -119,8 +119,8 @@ flutter:
       fonts:
         # - asset: assets/fonts/mm3_05-Jan-2011.ttf
         # - asset: assets/fonts/mm3-multi-os.ttf
-        - asset: assets/fonts/mm3h.ttf
-          # - asset: assets/fonts/MyanmarAngoun.ttf
+        # - asset: assets/fonts/mm3h.ttf
+        - asset: assets/fonts/MyanmarAngoun.ttf
           # - asset: assets/fonts/MyanmarBlack.ttf
           # - asset: assets/fonts/NotoSerifMyanmar-Bold.ttf
           # - asset: assets/fonts/NotoSerifMyanmar-Regular.ttf

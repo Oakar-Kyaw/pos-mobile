@@ -79,7 +79,7 @@ class SaleSummary {
   });
 
   factory SaleSummary.fromJson(Map<String, dynamic> json) {
-    // debugPrint("sale summary $json");
+    // debugPrint("🤩sale summary $json");
     return SaleSummary(
       total: json['total'],
       deliveryFee: json['deliveryFee'],
@@ -115,8 +115,10 @@ class SaleItem {
   });
 
   factory SaleItem.fromJson(Map<String, dynamic> json) {
+    // debugPrint("🤖Sale item for $json");
     return SaleItem(
-      itemId: json['itemId'] ?? json['itemid'], // handle case-insensitive keys
+      itemId:
+          json['productId'] ?? json['itemid'], // handle case-insensitive keys
       name: json['name'],
       totalQuantity: json['totalQuantity'],
     );
@@ -158,7 +160,7 @@ class MonthlySale {
   });
 
   factory MonthlySale.fromJson(Map<String, dynamic> json) {
-    debugPrint("MOnth sale $json");
+    // debugPrint("MOnth sale $json");
     return MonthlySale(
       month: json['month'].toString(),
       total: json['total'].toString(),

@@ -44,7 +44,7 @@ class CustomerDrawer {
       await _storage.saveLanguageSetting(langCode);
     }
 
-    List<MenuItem> getMenuList(String role) {
+    List<MenuSection> getMenuList(String role) {
       print(" User role is: $role");
       if (role == "ADMIN") return menuListByAdmin(context);
       if (role == 'MANAGER') return menuListByManager(context);
@@ -135,13 +135,15 @@ class CustomerDrawer {
                         horizontal: 12,
                       ),
                       children: [
-                        // Nav items
-                        ...getMenuList(user!.role).map(
-                          (item) => _drawerItem(
+                        // Nav items, grouped by section with an
+                        // optional header above each group.
+                        ...getMenuList(user!.role).expand(
+                          (section) => _drawerSection(
                             context,
-                            item: item,
+                            section: section,
                             isDark: isDark,
                             textColor: textColor,
+                            subColor: subColor,
                             dividerColor: dividerColor,
                           ),
                         ),
@@ -365,6 +367,43 @@ class CustomerDrawer {
         );
       },
     );
+  }
+
+  // Renders one MenuSection: an optional header row, followed by its
+  // items. Returns a flat list of widgets so it can be spread directly
+  // into the parent ListView's children via .expand().
+  List<Widget> _drawerSection(
+    BuildContext context, {
+    required MenuSection section,
+    required bool isDark,
+    required Color textColor,
+    required Color subColor,
+    required Color dividerColor,
+  }) {
+    return [
+      if (section.title != null)
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
+          child: Text(
+            section.title!.toUpperCase(),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+              color: subColor,
+            ),
+          ),
+        ),
+      ...section.items.map(
+        (item) => _drawerItem(
+          context,
+          item: item,
+          isDark: isDark,
+          textColor: textColor,
+          dividerColor: dividerColor,
+        ),
+      ),
+    ];
   }
 
   Widget _drawerItem(

@@ -36,25 +36,30 @@ class _PaymentDataPageState extends ConsumerState<PaymentDataPage> {
     return Scaffold(
       backgroundColor: isDark ? kBgDark : kBgLight,
       appBar: _buildAppBar(context),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          children: [
-            _buildSectionLabel(context, isDark),
-            const SizedBox(height: 12),
-            AccountForm(
-              existedData: data,
-              onSaved: () =>
-                  ref.read(paymentDataProvider.notifier).refreshAccounts(),
-            ),
-            const SizedBox(height: 25),
-            _buildContainer(context, isDark, (v) {
-              //print("V ${v.accountName}");
-              setState(() {
-                data = v;
-              });
-            }),
-          ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(paymentDataProvider.notifier).refreshAccounts();
+        },
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            children: [
+              _buildSectionLabel(context, isDark),
+              const SizedBox(height: 12),
+              AccountForm(
+                existedData: data,
+                onSaved: () =>
+                    ref.read(paymentDataProvider.notifier).refreshAccounts(),
+              ),
+              const SizedBox(height: 25),
+              _buildContainer(context, isDark, (v) {
+                //print("V ${v.accountName}");
+                setState(() {
+                  data = v;
+                });
+              }),
+            ],
+          ),
         ),
       ),
     );

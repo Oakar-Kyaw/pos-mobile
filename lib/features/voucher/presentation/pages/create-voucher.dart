@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
+import 'package:pos/core/widgets/delete-icon.dart';
 import 'package:pos/features/voucher/presentation/pages/calculation.dart';
 import 'package:pos/features/voucher/presentation/widgets/calculation-add-product.dart';
 import 'package:pos/features/voucher/presentation/widgets/calculation-qty-button.dart';
@@ -47,6 +48,11 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
           .read(productProvider.notifier)
           .getProductLists("10", "10", search: value);
     });
+  }
+
+  void _removeItem(VoucherDetailNotifier notifier, int id) {
+    notifier.removeItem(id);
+    notifier.calculate();
   }
 
   // Future<void> _takePhoto() async {
@@ -112,119 +118,158 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
                 return Column(
                   children: [
                     // ── Item Card ──────────────────────
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      decoration: BoxDecoration(
-                        color: surfaceColor,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: isDark
-                                ? kPrimary.withOpacity(0.08)
-                                : Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(16),
-                        clipBehavior: Clip.antiAlias,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
-                          ),
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: SizedBox(
-                              width: 50,
-                              height: 50,
-                              child: item.photoUrl != null
-                                  ? CachedNetworkImage(
-                                      imageUrl: item.photoUrl!,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Image.asset(
-                                      "assets/default.jpg",
-                                      fit: BoxFit.cover,
-                                    ),
-                            ),
-                          ),
-                          title: Text(
-                            item.name,
-                            style: TextStyle(
-                              fontSize: FontSizeConfig.body(context),
-                              color: textColor,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          subtitle: Text(
-                            "${VoucherScreenLocale.price.getString(context)}: ${item.price} x ${item.quantity}",
-                            style: TextStyle(
-                              fontSize: FontSizeConfig.body(context),
-                              color: subColor,
-                            ),
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              QtyButton(
-                                icon: Icons.remove,
-                                onTap: () {
-                                  if (item.quantity > 1) {
-                                    notifier.updateVoucher(
-                                      items: voucher.items
-                                          .map(
-                                            (e) => e.id == item.id
-                                                ? e.copyWith(
-                                                    quantity: e.quantity - 1,
-                                                  )
-                                                : e,
-                                          )
-                                          .toList(),
-                                    );
-                                    notifier.calculate();
-                                  } else {
-                                    notifier.removeItem(item.id);
-                                  }
-                                },
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                ),
-                                child: Text(
-                                  item.quantity.toString(),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: textColor,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                              QtyButton(
-                                icon: Icons.add,
-                                onTap: () {
-                                  notifier.updateVoucher(
-                                    items: voucher.items
-                                        .map(
-                                          (e) => e.id == item.id
-                                              ? e.copyWith(
-                                                  quantity: e.quantity + 1,
-                                                )
-                                              : e,
-                                        )
-                                        .toList(),
-                                  );
-                                  notifier.calculate();
-                                },
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          decoration: BoxDecoration(
+                            color: surfaceColor,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: isDark
+                                    ? kPrimary.withOpacity(0.08)
+                                    : Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
+                          child: Material(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(16),
+                            clipBehavior: Clip.antiAlias,
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
+                              ),
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: item.photoUrl != null
+                                      ? CachedNetworkImage(
+                                          imageUrl: item.photoUrl!,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.asset(
+                                          "assets/default.jpg",
+                                          fit: BoxFit.cover,
+                                        ),
+                                ),
+                              ),
+                              title: Text(
+                                item.name,
+                                style: TextStyle(
+                                  fontSize: FontSizeConfig.body(context),
+                                  color: textColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              subtitle: Text(
+                                "${VoucherScreenLocale.price.getString(context)}: ${item.price} x ${item.quantity}",
+                                style: TextStyle(
+                                  fontSize: FontSizeConfig.body(context),
+                                  color: subColor,
+                                ),
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  QtyButton(
+                                    icon: Icons.remove,
+                                    onTap: () {
+                                      if (item.quantity > 1) {
+                                        notifier.updateVoucher(
+                                          items: voucher.items
+                                              .map(
+                                                (e) => e.id == item.id
+                                                    ? e.copyWith(
+                                                        quantity:
+                                                            e.quantity - 1,
+                                                      )
+                                                    : e,
+                                              )
+                                              .toList(),
+                                        );
+                                        notifier.calculate();
+                                      } else {
+                                        notifier.removeItem(item.id);
+                                      }
+                                    },
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
+                                    child: Text(
+                                      item.quantity.toString(),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: textColor,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ),
+                                  QtyButton(
+                                    icon: Icons.add,
+                                    onTap: () {
+                                      notifier.updateVoucher(
+                                        items: voucher.items
+                                            .map(
+                                              (e) => e.id == item.id
+                                                  ? e.copyWith(
+                                                      quantity: e.quantity + 1,
+                                                    )
+                                                  : e,
+                                            )
+                                            .toList(),
+                                      );
+                                      notifier.calculate();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        // ── Remove Icon ─────────
+                        Positioned(
+                          top: -8,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () => _removeItem(notifier, item.id),
+                            child: Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: isDark ? kSurfaceDark : Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.redAccent.withOpacity(0.4),
+                                  width: 1,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(
+                                      isDark ? 0.3 : 0.1,
+                                    ),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                LucideIcons.x,
+                                size: 14,
+                                color: Colors.redAccent,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
 
                     // ── Add Item Button (last item) ────

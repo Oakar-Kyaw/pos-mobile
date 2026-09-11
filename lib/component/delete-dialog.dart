@@ -1,18 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/component/voucher-body.dart';
 import 'package:pos/localization/general-local.dart';
-import 'package:pos/localization/payment-data-local.dart';
-import 'package:pos/localization/payment-local.dart';
-import 'package:pos/localization/voucher-local.dart';
-import 'package:pos/models/payment-data.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/formatAmount.dart';
-import 'package:pos/utils/payment-icon.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
 
 void showDeleteDialog(
   BuildContext context, {
@@ -21,9 +10,6 @@ void showDeleteDialog(
   required submit,
   int? paymentDataId,
 }) {
-  final subColor = isDark ? kTextSubDark : kTextSubLight;
-  final progressIndicatorColor = isDark ? kPrimary : kPrimary.withOpacity(0.8);
-
   showDialog(
     context: context,
     builder: (_) => Dialog(

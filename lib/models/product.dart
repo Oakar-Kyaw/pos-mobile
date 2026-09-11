@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Product {
   final int id;
   final String name;
@@ -48,6 +50,7 @@ class Product {
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
+    debugPrint("Product json 😇 $json");
     return Product(
       id: int.parse(json['id'].toString()),
       name: json['name'],

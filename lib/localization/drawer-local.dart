@@ -32,12 +32,24 @@ mixin DrawerScreenLocale {
   static const drawerRequestItems = 'drawer_request_items';
   static const drawerPurchaseItems = 'drawer_purchase_items';
   static const drawerEmployeeSalary = 'drawer_employee_salary';
+  static const drawerLowStock = 'drawer_low_stock';
 
   static const drawerUpgrade = 'drawer_upgrade';
   static const drawerUpgradeSuggestion = 'drawer_upgrade_suggestion';
   static const drawerBankAccount = 'drawer_account';
   static const drawerCreate = 'drawer_create';
   static const drawerLogout = 'drawer_logout';
+  static const drawerNotification = 'drawer_notification';
+
+  // ✅ Section headers (used to group items in the drawer menu)
+  static const drawerSectionProduct = 'drawer_section_product';
+  static const drawerSectionSaleManagement = 'drawer_section_sale_management';
+  static const drawerSectionFinance = 'drawer_section_finance';
+  static const drawerSectionProfit = 'drawer_section_profit';
+  static const drawerSectionEmployeeManagement =
+      'drawer_section_employee_management';
+  static const drawerSectionInventoryControl =
+      'drawer_section_inventory_control';
 
   // 🇺🇸 English
   static const EN = {
@@ -75,11 +87,21 @@ mixin DrawerScreenLocale {
     drawerRequestItems: 'Request Items',
     drawerPurchaseItems: 'Purchase Items',
     drawerEmployeeSalary: 'Employee Salary',
+    drawerLowStock: 'Low Stock',
 
     drawerBankAccount: 'Payment Account',
     drawerRepay: 'Repayment',
     drawerCreate: 'Create',
     drawerLogout: 'Logout',
+    drawerNotification: 'Notification',
+
+    // Section headers
+    drawerSectionProduct: 'Product',
+    drawerSectionSaleManagement: 'Sale Management',
+    drawerSectionFinance: 'Finance',
+    drawerSectionProfit: 'Profit',
+    drawerSectionEmployeeManagement: 'Employee Management',
+    drawerSectionInventoryControl: 'Inventory Control',
   };
 
   // 🇲🇲 Burmese
@@ -116,6 +138,7 @@ mixin DrawerScreenLocale {
     drawerRequestItems: 'ပစ္စည်းတောင်းခံမှု',
     drawerPurchaseItems: 'ဝယ်ယူထားသောပစ္စည်းများ',
     drawerEmployeeSalary: 'ဝန်ထမ်းလစာ',
+    drawerLowStock: 'ကုန်ပစ္စည်း နည်းနေမှု',
 
     drawerUpgrade: 'ပလန် အဆင့်မြှင့်ရန်',
     drawerUpgradeSuggestion: 'စီးပွားရေး အဆင့်မြှင့် အကြံပြုချက်',
@@ -123,5 +146,14 @@ mixin DrawerScreenLocale {
     drawerRepay: 'အကြွေးပေးချေမှု',
     drawerCreate: 'ဖန်တီးမည်',
     drawerLogout: 'ထွက်ရန်',
+    drawerNotification: 'အသိပေးချက်',
+
+    // Section headers
+    drawerSectionProduct: 'ကုန်ပစ္စည်း',
+    drawerSectionSaleManagement: 'အရောင်းစီမံခန့်ခွဲမှု',
+    drawerSectionFinance: 'ငွေကြေး',
+    drawerSectionProfit: 'အမြတ်အစွန်း',
+    drawerSectionEmployeeManagement: 'ဝန်ထမ်းစီမံခန့်ခွဲမှု',
+    drawerSectionInventoryControl: 'ကုန်ပစ္စည်းစီမံခန့်ခွဲမှု',
   };
 }

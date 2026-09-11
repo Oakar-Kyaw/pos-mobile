@@ -98,6 +98,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   void selectedItems(ItemModel item) {
+    debugPrint("Select item: 📱 ${item.avgCostPrice}");
     ref.read(voucherDetailProvider.notifier).addItem(item);
   }
 
@@ -161,6 +162,41 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     });
   }
 
+  //Product On Tap
+  void _productOntap(VoucherDetailModel? voucher, Product item) {
+    if (voucher == null) return null;
+    final exists = voucher.items.any((s) => s.id == item.id);
+    if (exists) {
+      ref.read(voucherDetailProvider.notifier).updateQuantity(item.id, 1);
+    }
+  }
+
+  //on change or on select product
+  void _onChangedProduct(bool? value, Product item) {
+    setState(() {
+      if (value == true) {
+        if (ref.read(voucherDetailProvider) == null) {
+          setVoucher();
+        }
+        selectedItems(
+          ItemModel(
+            id: item.id,
+            productId: item.id,
+            product: item,
+            name: item.name,
+            quantity: 1,
+            price: item.price,
+            costPrice: item.costPrice ?? 0,
+            avgCostPrice: item.avgCostPrice,
+            photoUrl: item.photoUrl,
+          ),
+        );
+      } else {
+        clearSelectedItem(item.id);
+      }
+    });
+  }
+
   @override
   void dispose() {
     _productProgressSubscription?.cancel();
@@ -175,6 +211,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
     final company = ref.watch(companyStateProvider);
+    final voucher = ref.watch(voucherDetailProvider);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -230,127 +267,245 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           PagingListener(
             controller: _pagingController,
             builder: (context, state, fetchNextPage) {
-              return RefreshIndicator(
-                onRefresh: () async {
-                  _pagingController.refresh();
-                },
-                child: PagedGridView<int, Product>(
-                  padding: const EdgeInsets.only(
-                    bottom: 100,
-                    top: 8,
-                    left: 8,
-                    right: 8,
-                  ),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: Responsive.isTablet(context) ? 6 : 4,
-                    mainAxisExtent: Responsive.isTablet(context) ? 150 : 120,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                  ),
-                  state: state,
-                  fetchNextPage: fetchNextPage,
-                  builderDelegate: PagedChildBuilderDelegate<Product>(
-                    itemBuilder: (context, item, index) {
-                      return _ProductCard(
-                        item: item,
-                        isDark: isDark,
-                        isSelected:
-                            ref
-                                .watch(voucherDetailProvider)
-                                ?.items
-                                .any((s) => s.id == item.id) ??
-                            false,
-                        onChanged: (value) {
-                          setState(() {
-                            if (value == true) {
-                              if (ref.read(voucherDetailProvider) == null) {
-                                setVoucher();
-                              }
-                              selectedItems(
-                                ItemModel(
-                                  id: item.id,
-                                  productId: item.id,
-                                  product: item,
-                                  name: item.name,
-                                  quantity: 1,
-                                  price: item.price,
-                                  costPrice: item.costPrice ?? 0,
-                                  avgCostPrice: item.avgCostPrice,
-                                  photoUrl: item.photoUrl,
-                                ),
-                              );
-                            } else {
-                              clearSelectedItem(item.id);
-                            }
-                          });
-                        },
-                      );
-                    },
-                    firstPageProgressIndicatorBuilder: (_) => Center(
-                      child: CircularProgressIndicator(color: kPrimary),
+              return Column(
+                children: [
+                  ...(voucher?.items.isNotEmpty ?? false)
+                      ? [
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            height: 90,
+                            child: GridView.builder(
+                              scrollDirection: Axis.horizontal,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 1,
+                                    mainAxisSpacing: 8,
+                                    childAspectRatio: 0.9,
+                                  ),
+                              itemCount: voucher!.items.length,
+                              itemBuilder: (context, index) {
+                                final selectedItem = voucher.items[index];
+                                return SizedBox(
+                                  width: 70,
+                                  child: Stack(
+                                    children: [
+                                      Positioned.fill(
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                          child: selectedItem.photoUrl != null
+                                              ? CachedNetworkImage(
+                                                  imageUrl:
+                                                      selectedItem.photoUrl ??
+                                                      "",
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.asset(
+                                                  "assets/default.jpg",
+                                                  fit: BoxFit.cover,
+                                                ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 2,
+                                        left: 2,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 5,
+                                            vertical: 1,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: kPrimary,
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'x${selectedItem.quantity}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 9,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 2,
+                                        right: 2,
+                                        child: GestureDetector(
+                                          onTap: () => clearSelectedItem(
+                                            selectedItem.id,
+                                          ),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(3),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.black54,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.close,
+                                              size: 20,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      // Bottom label
+                                      Positioned(
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 5,
+                                            horizontal: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Colors.black.withOpacity(0.7),
+                                                Colors.black.withOpacity(0.4),
+                                              ],
+                                              begin: Alignment.bottomCenter,
+                                              end: Alignment.topCenter,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            selectedItem.name,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 11,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const Divider(),
+                          const SizedBox(height: 10),
+                        ]
+                      : <Widget>[],
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        _pagingController.refresh();
+                      },
+                      child: PagedGridView<int, Product>(
+                        padding: const EdgeInsets.only(
+                          bottom: 100,
+                          top: 8,
+                          left: 8,
+                          right: 8,
+                        ),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: Responsive.isTablet(context) ? 6 : 4,
+                          mainAxisExtent: Responsive.isTablet(context)
+                              ? 150
+                              : 120,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
+                        state: state,
+                        fetchNextPage: fetchNextPage,
+                        builderDelegate: PagedChildBuilderDelegate<Product>(
+                          itemBuilder: (context, item, index) {
+                            return InkWell(
+                              onTap: () => _productOntap(voucher, item),
+                              child: _ProductCard(
+                                item: item,
+                                isDark: isDark,
+                                isSelected:
+                                    voucher?.items.any(
+                                      (s) => s.id == item.id,
+                                    ) ??
+                                    false,
+                                onChanged: (value) =>
+                                    _onChangedProduct(value, item),
+                              ),
+                            );
+                          },
+                          firstPageProgressIndicatorBuilder: (_) => Center(
+                            child: CircularProgressIndicator(color: kPrimary),
+                          ),
+                          newPageProgressIndicatorBuilder: (_) => Center(
+                            child: CircularProgressIndicator(color: kPrimary),
+                          ),
+                        ),
+                      ),
                     ),
-                    newPageProgressIndicatorBuilder: (_) => Center(
-                      child: CircularProgressIndicator(color: kPrimary),
-                    ),
                   ),
-                ),
+                ],
               );
             },
           ),
 
           // ── Bottom Action Bar ─────────────────────────
-          Positioned(
-            bottom: 20,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(30),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withOpacity(0.08)
-                          : Colors.black.withOpacity(0.06),
+          voucher != null && voucher.items.isNotEmpty
+              ? Positioned(
+                  bottom: 20,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: ClipRRect(
                       borderRadius: BorderRadius.circular(30),
-                      border: Border.all(
-                        color: isDark
-                            ? Colors.white.withOpacity(0.12)
-                            : Colors.black.withOpacity(0.08),
-                        width: 1,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? Colors.white.withOpacity(0.08)
+                                : Colors.black.withOpacity(0.06),
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(
+                              color: isDark
+                                  ? Colors.white.withOpacity(0.12)
+                                  : Colors.black.withOpacity(0.08),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GradientSubmitButton(
+                                onPressed: () =>
+                                    context.pushNamed(AppRoute.createVoucher),
+                                text: HomeScreenLocale.createVoucher.getString(
+                                  context,
+                                ),
+                                width: 200,
+                                circularNo: 20,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        GradientSubmitButton(
-                          onPressed: () =>
-                              context.pushNamed(AppRoute.createVoucher),
-                          text: HomeScreenLocale.createVoucher.getString(
-                            context,
-                          ),
-                          width: 200,
-                          circularNo: 20,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-              ),
-            ),
-          ),
+                )
+              : const SizedBox(),
         ],
       ),
     );
   }
 }
 
-// _ProductCard class ကို မပြောင်းလဲထားပါ (အောက်မှာ ဆက်ထားပါ)
 // ─────────────────────────────────────────
 // Product Card
 // ─────────────────────────────────────────

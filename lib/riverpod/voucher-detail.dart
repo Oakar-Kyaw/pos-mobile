@@ -44,6 +44,20 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
     }
   }
 
+  void updateQuantity(int id, int delta) {
+    final current = state;
+    if (current == null) return;
+
+    final updatedItems = current.items.map((it) {
+      if (it.id == id) {
+        return it.copyWith(quantity: it.quantity + delta);
+      }
+      return it;
+    }).toList();
+
+    state = current.copyWith(items: updatedItems);
+  }
+
   void addItem(ItemModel item) {
     if (state != null) {
       List<ItemModel> items = [...state!.items, item];

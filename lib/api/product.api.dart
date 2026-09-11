@@ -49,6 +49,30 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
     }
   }
 
+  //Low Stock Products
+  Future<List<Product>> getLowStockProducts({
+    required int page,
+    required int limit,
+    String? search,
+  }) async {
+    final response = await _dio.get(
+      "v1/products/low-stocks/all",
+      query: {
+        "page": page,
+        "limit": limit,
+        if (search != null && search.isNotEmpty) "search": search,
+      },
+    );
+    final Map<String, dynamic> data = response.data;
+    if (data["success"] == true) {
+      final List list = data["data"];
+      return list
+          .map((e) => Product.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    throw Exception("Failed to fetch low stock products");
+  }
+
   Future<bool> postProduct(FormData json) async {
     final url = "v1/products";
     _dio.setContentType("multipart/form-data");

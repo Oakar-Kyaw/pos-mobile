@@ -40,6 +40,7 @@ class _VoucherCalculationDialogState
   bool isDiscountByPercent = true;
   int? customerId;
   Customer? newCustomer;
+  VoucherDetailNotifier? _voucherDetail;
 
   void handleChangeAmount(String voucherId, String value) {
     final vd = ref.read(voucherDetailProvider.notifier);
@@ -144,10 +145,22 @@ class _VoucherCalculationDialogState
   }
 
   @override
+  void initState() {
+    super.initState();
+    _voucherDetail = ref.read(voucherDetailProvider.notifier);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _voucherDetail!.clearVoucher();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final voucher = ref.watch(voucherDetailProvider);
-    final notifier = ref.read(voucherDetailProvider.notifier);
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+    final notifier = ref.read(voucherDetailProvider.notifier);
 
     final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
     final textColor = isDark ? kTextDark : kTextLight;

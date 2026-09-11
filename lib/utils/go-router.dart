@@ -6,6 +6,9 @@ import 'package:pos/core/utils/inventory/inventory-edit.dart';
 import 'package:pos/core/utils/inventory/inventory-items-create.dart';
 import 'package:pos/features/account-upgrade/presentation/pages/account-upgrade.dart';
 import 'package:pos/features/category/presentation/page/category.dart';
+import 'package:pos/features/low-stock/presentation/page/low-stock.dart';
+import 'package:pos/features/low-stock/presentation/widget/low-stock-list.dart';
+import 'package:pos/features/profit-loss/presentation/page/profit-loss.dart';
 import 'package:pos/features/sale-report/presentation/page/sale-report.dart';
 import 'package:pos/features/voucher/presentation/pages/create-voucher.dart';
 import 'package:pos/features/customer/presentation/page/create-customer.dart';
@@ -174,6 +177,16 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.income,
         name: AppRoute.income,
         builder: (context, state) => IncomePage(),
+      ),
+      GoRoute(
+        path: AppRoute.profitAndLoss,
+        name: AppRoute.profitAndLoss,
+        builder: (context, state) => ProfitAndLossPage(),
+      ),
+      GoRoute(
+        path: AppRoute.lowStock,
+        name: AppRoute.lowStock,
+        builder: (context, state) => LowStockPage(),
       ),
       GoRoute(
         path: AppRoute.saleReports,

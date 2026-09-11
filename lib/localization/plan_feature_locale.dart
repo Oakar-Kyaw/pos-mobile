@@ -12,7 +12,7 @@ mixin PlanFeatureLocaleScreen {
   static const refundManagement = 'refund_management';
   static const debtManagement = 'debt_management';
   static const repayManagement = 'repay_management';
-  static const profitAndLoss = 'profit_and_loss';
+  static const profitAndLoss = 'plan_feature_profit_and_loss';
   static const employeeManagement = 'employee_management';
   static const dailySale = 'daily_sale';
   static const dailySaleReport = 'daily_sale_report';

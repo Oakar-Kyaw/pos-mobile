@@ -51,4 +51,7 @@ class AppRoute {
   static const String supplierCreate = '/supplier-create';
   static const String customer = '/customer-history';
   static const String customerCreate = '/customer-create';
+  static const String profitAndLoss = '/profit-loss';
+  static const String lowStock = '/low-stocks';
+  static const String notification = '/notification';
 }
