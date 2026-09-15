@@ -109,11 +109,11 @@ mixin SupplierLocale {
     supplierManagementTitle: 'ပေးသွင်းသူ စီမံခန့်ခွဲမှု',
 
     supplierList: 'ပေးသွင်းသူ မှတ်တမ်းများ',
-    supplierCreate: 'ပေးသွင်းသူ အသစ်ဖန်တီးရန်',
-    supplierEdit: 'ပေးသွင်းသူ ပြင်ဆင်ရန်',
-    supplierUpdate: 'ပေးသွင်းသူ ပြင်ဆင်ရန်',
-    supplierDelete: 'ပေးသွင်းသူ ဖျက်ရန်',
-    supplierDetail: 'ပေးသွင်းသူ အသေးစိတ်',
+    supplierCreate: 'အသစ်ဖန်တီးရန်',
+    supplierEdit: 'ပြင်ဆင်ရန်',
+    supplierUpdate: 'ပြင်ဆင်ရန်',
+    supplierDelete: 'ဖျက်ရန်',
+    supplierDetail: 'အသေးစိတ်',
 
     supplierName: 'ပေးသွင်းသူ အမည်',
     supplierEmail: 'အီးမေးလ်',

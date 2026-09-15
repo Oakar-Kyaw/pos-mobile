@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/models/company.dart';
-import 'package:pos/models/user.dart';
-import 'package:pos/riverpod/company.riverpod.dart';
+import 'package:pos/features/company/data/model/company.dart';
+import 'package:pos/features/company/presentation/provider/company.riverpod.dart';
+import 'package:pos/features/profile/data/model/user.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/secure-storage.dart';
 

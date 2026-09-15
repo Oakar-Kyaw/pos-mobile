@@ -100,15 +100,15 @@ mixin CustomerLocale {
 
     customerList: 'ဖောက်သည်များ',
 
-    customerCreate: 'ဖောက်သည် အသစ်ထည့်ရန်',
+    customerCreate: 'အသစ်ထည့်ရန်',
 
     customerEdit: 'ပြင်ဆင်ရန်',
 
-    customerUpdate: 'ဖောက်သည် ပြင်ဆင်ရန်',
+    customerUpdate: 'ပြင်ဆင်ရန်',
 
     customerCancel: 'ပယ်ဖျက်ရန်',
 
-    customerDelete: 'ဖောက်သည် ဖျက်ရန်',
+    customerDelete: 'ဖျက်ရန်',
 
     customerDetail: 'အသေးစိတ်',
 

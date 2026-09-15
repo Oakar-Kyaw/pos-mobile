@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:pos/core/database/app-database.dart';
 import 'package:pos/core/database/printer-table-schema.dart';
 
@@ -10,6 +11,7 @@ class PrinterLocalDatabaseSource {
   Future<List<PrinterTableItem>> getAll() async {
     final db = await AppDatabase.instance.database;
     final rows = await db.query(PrinterTableSchema.printerTableName);
+    debugPrint("Printer Table Item $rows");
     return rows.map((row) => PrinterTableItem.fromJson(row)).toList();
   }
 

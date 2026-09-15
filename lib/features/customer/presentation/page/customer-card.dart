@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/core/utils/check-email.dart';
 import 'package:pos/core/utils/check-phone.dart';
 import 'package:pos/core/widgets/custom-action-button.dart';
-import 'package:pos/core/widgets/delete-icon.dart';
 import 'package:pos/features/customer/data/model/customer-model.dart';
 import 'package:pos/features/customer/presentation/page/customer.dart';
 import 'package:pos/features/customer/presentation/provider/customer-provider.dart';

@@ -12,12 +12,14 @@ import 'package:pos/features/printer/domain/entites/printer-device.dart';
 import 'package:pos/features/printer/domain/enums/printer-type.dart';
 import 'package:pos/features/printer/presentation/provider/printer-provider.dart';
 import 'package:pos/features/voucher/data/model/voucher-detail.dart';
+import 'package:pos/features/voucher/presentation/widgets/receipt-generator.dart';
+import 'package:pos/features/voucher/presentation/widgets/show-recept-dialog.dart';
 import 'package:pos/localization/company-local.dart';
 import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/localization/payment-local.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/formatAmount.dart';
-import 'package:pos/utils/receipt-generator.dart';
+import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 final voucherByIdProvider = FutureProvider.family<VoucherDetailModel, int>((
@@ -54,7 +56,7 @@ class _ReceiptPageState extends ConsumerState<ReceiptPage> {
       final printers = await datasource.getAll();
       final initialPrinter = printers.firstWhereOrNull((e) => e.setDefault);
 
-      print("printers are: ${initialPrinter} ");
+      print("printers are: ${initialPrinter} $printers ");
       setState(() {
         listOfPrinters = printers;
       });
@@ -86,6 +88,28 @@ class _ReceiptPageState extends ConsumerState<ReceiptPage> {
         .printTest(PrinterType.bluetooth, bytes);
   }
 
+  Future<void> showReceiptvoucher() async {
+    // Loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final voucher = await ref.read(voucherByIdProvider(widget.id).future);
+
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+
+      await showReceiptVoucherDialog(context, voucher);
+    } catch (e) {
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+      ShowToast(context, isError: true, description: Text("Error: $e"));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final voucherAsync = ref.watch(voucherByIdProvider(widget.id));
@@ -96,7 +120,7 @@ class _ReceiptPageState extends ConsumerState<ReceiptPage> {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (err, _) => Center(child: Text("Error: $err")),
           data: (voucher) {
-            print("receipt voucher is ${voucher.discountPercent}");
+            //print("receipt voucher is ${voucher.discountPercent}");
             return LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
@@ -309,7 +333,8 @@ class _ReceiptPageState extends ConsumerState<ReceiptPage> {
 
                             /// ================= PRINT BUTTON =================
                             ShadButton(
-                              onPressed: () => printReceipt(voucher),
+                              onPressed: () => showReceiptvoucher(),
+                              // printReceipt(voucher),
                               child: Text(
                                 VoucherScreenLocale.printReceipt.getString(
                                   context,

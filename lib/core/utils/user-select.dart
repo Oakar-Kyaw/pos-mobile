@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/user.api.dart';
+import 'package:pos/features/company/presentation/provider/company.riverpod.dart';
 import 'package:pos/localization/general-local.dart';
-import 'package:pos/riverpod/company.riverpod.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 

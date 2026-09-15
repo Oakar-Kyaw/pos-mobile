@@ -76,6 +76,8 @@ class _VoucherCalculationDialogState
             size: FontSizeConfig.iconSize(context),
           ),
         );
+
+        _voucherDetail!.clearVoucher();
         context.pushReplacement(AppRoute.receipt, extra: saveVoucherApi["id"]);
       } else {
         ShowToast(
@@ -153,7 +155,6 @@ class _VoucherCalculationDialogState
   @override
   void dispose() {
     super.dispose();
-    _voucherDetail!.clearVoucher();
   }
 
   @override
@@ -241,17 +242,6 @@ class _VoucherCalculationDialogState
                 ),
               ),
 
-              const SizedBox(height: 16),
-              CustomerVoucher(
-                onChanged: (Customer customer) {
-                  setState(() {
-                    //if customerId = 0 then this is local value then sendCustomer
-                    customer.id == 0
-                        ? newCustomer = customer
-                        : customerId = customer.id;
-                  });
-                },
-              ),
               const SizedBox(height: 10),
 
               // ── Section label ──────────────────
@@ -347,8 +337,6 @@ class _VoucherCalculationDialogState
                 ),
               ),
 
-              const SizedBox(height: 16),
-
               // // ── Photo section ──────────────────
               // sectionLabel(
               //   PaymentScreenLocale.paymentPhoto.getString(context),
@@ -358,6 +346,18 @@ class _VoucherCalculationDialogState
 
               // // --- Payment Photo (placeholder, add back when ready) ---
               // const SizedBox(height: 16),
+              const SizedBox(height: 16),
+              CustomerVoucher(
+                onChanged: (Customer customer) {
+                  setState(() {
+                    //if customerId = 0 then this is local value then sendCustomer
+                    customer.id == 0
+                        ? newCustomer = customer
+                        : customerId = customer.id;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
 
               // ── Note ──────────────────────────
               rowNote(

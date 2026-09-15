@@ -1,13 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/api/user.api.dart';
-import 'package:pos/component/loading-component.dart';
-import 'package:pos/localization/payroll-local.dart';
-import 'package:pos/models/user.dart';
-import 'package:pos/ui/attendance-list-by-userId.dart';
+import 'package:pos/features/profile/data/model/user.dart';
 import 'package:pos/utils/user-search-field.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:pos/utils/app-theme.dart';
@@ -54,6 +49,7 @@ class _PayrollFormState extends ConsumerState<PayrollForm> {
               role: user.role,
               employeeType: user.employeeType,
               gender: user.gender,
+              companyId: user.companyId,
               holidays: user.holidays,
               createdAt: user.createdAt,
             ),

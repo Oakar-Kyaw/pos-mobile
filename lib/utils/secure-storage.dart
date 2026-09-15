@@ -48,6 +48,26 @@ class SecureStorage {
     await storage.write(key: "isDarkTheme", value: jsonString);
   }
 
+  ///save firebase token
+  Future<void> saveFirebaseToken(String token) async {
+    // Convert map to JSON string
+    String jsonString = jsonEncode(token);
+    //print("save login data: $jsonString");
+    await storage.write(key: "firebaseToken", value: jsonString);
+  }
+
+  //get firebase token
+  Future<String?> getFirebaseToken() async {
+    // Convert map to JSON string
+    String? jsonString = await storage.read(key: "firebaseToken");
+    // print("getLogin data is: $jsonString");
+    if (jsonString != null) {
+      final data = jsonDecode(jsonString);
+      return data;
+    }
+    return null;
+  }
+
   Future<bool> getTheme() async {
     // Convert map to JSON string
     String? jsonString = await storage.read(key: "isDarkTheme");

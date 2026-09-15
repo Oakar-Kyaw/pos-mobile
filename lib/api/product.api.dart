@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,7 +31,7 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
         query: {"page": page, "limit": limit, "search": search},
       );
       final Map<String, dynamic> data = response.data;
-      print("data 👨‍🏭 $data");
+      // print("data 👨‍🏭 $data");
       if (data["success"] == true) {
         final items = data["data"] as List;
         List<Product> products = items
@@ -130,7 +132,7 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
 
       final response = await _dio.get(url);
       final Map<String, dynamic> data = response.data;
-      print("product by barcode is 📱 $data");
+      // print("product by barcode is 📱 $data");
       if (data["success"] == true) {
         return Product.fromJson(Map<String, dynamic>.from(data["data"]));
       }
@@ -246,6 +248,39 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
     }
 
     throw Exception(data["message"] ?? "Failed to delete inventory item");
+  }
+
+  Future<Map<String, dynamic>> uploadProductExcel(
+    File file, {
+    void Function(int sent, int total)? onSendProgress,
+  }) async {
+    final formData = FormData.fromMap({
+      "file": await MultipartFile.fromFile(
+        file.path,
+        filename: file.path.split('/').last,
+      ),
+    });
+
+    final url = "v1/products/excel";
+    _dio.setContentType("multipart/form-data");
+
+    final response = await _dio.post(
+      url,
+      data: formData,
+      onSendProgress: onSendProgress,
+    );
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      ref.invalidateSelf(); // product list refresh
+      return {
+        "success": true,
+        "message": data["message"] ?? "Excel uploaded successfully",
+        "importedCount": data["data"]?["importedCount"],
+      };
+    }
+
+    throw Exception(data["message"] ?? "Failed to upload Excel");
   }
 }
 

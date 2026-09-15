@@ -1,3 +1,4 @@
+// features/product/presentation/page/product-lists.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -70,64 +71,6 @@ class _ProductListPageState extends ConsumerState<ProductLists> {
     );
   }
 
-  // void _delete(VoucherDetailModel voucher, bool isDark) {
-  //   showDeleteDialog(
-  //     context,
-  //     title: VoucherScreenLocale.deleteVoucher.getString(context),
-  //     isDark: isDark,
-  //     submit: () async {
-  //       //print("delete");
-  //       await ref
-  //           .read(voucherProvider.notifier)
-  //           .deleteVoucher(voucher.id)
-  //           .then((data) {
-  //             if (data) {
-  //               ShowToast(
-  //                 context,
-  //                 description: Text(
-  //                   VoucherScreenLocale.deletedSuccess.getString(context),
-  //                 ),
-  //               );
-  //               context.pop();
-  //               _pagingController.refresh();
-  //             }
-  //           })
-  //           .catchError((err) {
-  //             ShowToast(
-  //               context,
-  //               description: Text(
-  //                 GeneralScreenLocale.somethingWentWrong.getString(context),
-  //               ),
-  //               isError: true,
-  //             );
-  //           });
-  //     },
-  //   );
-  // }
-
-  // Widget getVoucherComponentByRole(
-  //   String role,
-  //   Color textColor,
-  //   Color subColor,
-  //   bool isDark,
-  //   VoucherDetailModel voucher,
-  // ) {
-  //   return (isAdmin(role) || isManager(role))
-  //       ? VoucherComponent(
-  //           textColor: textColor,
-  //           subColor: subColor,
-  //           voucher: voucher,
-  //           pagingController: _pagingController,
-  //           onDelete: () => _delete(voucher, isDark),
-  //         )
-  //       : VoucherComponent(
-  //           textColor: textColor,
-  //           subColor: subColor,
-  //           voucher: voucher,
-  //           pagingController: _pagingController,
-  //         );
-  // }
-
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
@@ -140,12 +83,6 @@ class _ProductListPageState extends ConsumerState<ProductLists> {
         : kPrimary.withOpacity(0.04);
 
     final user = ref.watch(userStateProvider);
-    print("user is: ${user!.role}");
-
-    // Listen to selected user changes and refresh paging controller
-    // ref.listen<SelectedData?>(selectedDataStateProvider, (prev, next) {
-    //   _pagingController.refresh();
-    // });
 
     return PagingListener(
       controller: _pagingController,
@@ -163,15 +100,12 @@ class _ProductListPageState extends ConsumerState<ProductLists> {
               child: InkWell(
                 splashColor: kPrimary.withOpacity(0.08),
                 highlightColor: rowHoverColor,
-                child: (user.role == "ADMIN")
-                    ?
-                      //only see this by admin and manager role
-                      ProductListByAdminAndManager(
+                child: (user!.role == "ADMIN")
+                    ? ProductListByAdminAndManager(
                         key: ValueKey(product.id),
                         product: product,
                         containerDecoration: containerDecoration,
                       )
-                    //only other role see this
                     : ProductListByPosAndSale(
                         product: product,
                         containerDecoration: containerDecoration,
@@ -179,7 +113,6 @@ class _ProductListPageState extends ConsumerState<ProductLists> {
               ),
             );
           },
-
           firstPageProgressIndicatorBuilder: (_) => LoadingWidget(),
           newPageProgressIndicatorBuilder: (_) => LoadingWidget(),
           noItemsFoundIndicatorBuilder: (_) =>

@@ -151,7 +151,7 @@ class _GeneralExpenseCardState extends ConsumerState<GeneralExpenseCard> {
                 GradientSubmitButton(
                   onPressed: () => _edit(expense),
                   text: GeneralExpenseLocale.editExpense.getString(context),
-                  width: 120,
+                  width: 150,
                 ),
             ],
           ),

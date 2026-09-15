@@ -9,6 +9,7 @@ import 'package:pos/core/widgets/delete-icon.dart';
 import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/localization/customer-local.dart';
 import 'package:pos/localization/payment-local.dart';
+import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/badge.dart';
 import 'package:pos/utils/route-constant.dart';
@@ -110,7 +111,9 @@ class VoucherComponent extends StatelessWidget {
                         if (voucher.customer != null) ...[
                           Divider(),
                           Text(CustomerLocale.customerName.getString(context)),
+                          const SizedBox(height: 8.0),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
                                 voucher.customer!.name,
@@ -118,6 +121,26 @@ class VoucherComponent extends StatelessWidget {
                               ),
                               Text(
                                 " (${voucher.customer!.phone})",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ],
+                        if (voucher.user != null) ...[
+                          Divider(),
+                          Text(
+                            VoucherScreenLocale.createdBy.getString(context),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                voucher.user!.email!,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                " (${voucher.user!.phone})",
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ],

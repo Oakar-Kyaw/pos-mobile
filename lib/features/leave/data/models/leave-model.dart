@@ -1,5 +1,5 @@
 import 'package:pos/features/leave/domain/entites/leave.dart';
-import 'package:pos/models/user.dart';
+import 'package:pos/features/profile/data/model/user.dart';
 
 class LeaveModel extends Leave {
   LeaveModel({

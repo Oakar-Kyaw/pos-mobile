@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/income-dashboard.api.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/component/delete-dialog.dart';
 import 'package:pos/core/utils/confirm-dialog.dart';
 import 'package:pos/features/sale-report/data/model/sale-report.dart';
 import 'package:pos/features/sale-report/presentation/provider/sale-report.api.dart';
@@ -33,12 +32,22 @@ class SaleReportPage extends ConsumerStatefulWidget {
 class _SaleReportPageState extends ConsumerState<SaleReportPage> {
   DateTime selectedDate = DateTime.now();
 
+  // 👇 opening balance အတွက် controller အသစ်
+  final TextEditingController _openingBalanceController =
+      TextEditingController();
+
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
       ref.read(saleReportProvider.notifier).getOpenClosing(date: selectedDate);
     });
+  }
+
+  @override
+  void dispose() {
+    _openingBalanceController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickDate() async {
@@ -57,8 +66,6 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
 
   Future<void> _transferSaleAmount(SaleReport saleReport) async {
     final amount = saleReport.closingAmount;
-
-    // final postMessage = await
 
     if (amount == 0) {
       ShowToast(
@@ -125,6 +132,66 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
     }
   }
 
+  Future<void> _submitOpeningBalance() async {
+    final text = _openingBalanceController.text.trim();
+
+    if (text.isEmpty) {
+      ShowToast(
+        context,
+        description: const Text(
+          'Please enter opening balance',
+          style: TextStyle(color: kRed),
+        ),
+        isError: true,
+        borderColor: kRed,
+      );
+      return;
+    }
+
+    final amount = double.tryParse(text);
+    if (amount == null) {
+      ShowToast(
+        context,
+        description: const Text(
+          'Invalid amount',
+          style: TextStyle(color: kRed),
+        ),
+        isError: true,
+        borderColor: kRed,
+      );
+      return;
+    }
+
+    final success = await ref
+        .read(saleReportProvider.notifier)
+        .setFirstOpeningAmountCompany(
+          date: selectedDate.toIso8601String().split("T")[0],
+          amount: amount,
+        );
+
+    if (!mounted) return;
+
+    if (success) {
+      ShowToast(context, description: const Text('Opening balance saved'));
+      _openingBalanceController.clear();
+      ref.read(saleReportProvider.notifier).getOpenClosing(date: selectedDate);
+      ref.read(saleReportProvider.notifier).refreshAccount(date: selectedDate);
+      ref.invalidate(
+        saleReportListProvider(selectedDate.toIso8601String().split("T")[0]),
+      );
+      ref
+          .read(saleReportProvider.notifier)
+          .refreshTransfer(selectedDate.toIso8601String().split("T")[0]);
+    } else {
+      ShowToast(
+        context,
+        isError: true,
+        description: const Text('Failed to save opening balance'),
+        borderColor: kRed,
+      );
+    }
+  }
+
   void _deleteTransfer(Transfer transfer, bool isDark) async {
     final confirmed = await showConfirmDialog(
       context,
@@ -178,6 +245,9 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
       ref.invalidate(
         saleReportListProvider(selectedDate.toIso8601String().split("T")[0]),
       );
+      ref
+          .read(saleReportProvider.notifier)
+          .refreshTransfer(selectedDate.toIso8601String().split("T")[0]);
     } else {
       ShowToast(
         context,
@@ -202,7 +272,6 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
     final subColor = isDark ? kTextSubDark : kTextSubLight;
     final user = ref.watch(userStateProvider);
 
-    // debugPrint("the select date 📆 $selectedDate");
     return Scaffold(
       backgroundColor: isDark ? kBgDark : kBgLight,
       appBar: CustomAppBar(
@@ -244,156 +313,22 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
                     isDark: isDark,
                   ),
                   const SizedBox(height: 20),
-                  ClosingReportCard(report: report, isDark: isDark),
-                  const SizedBox(height: 20),
-                  //Button for save and transfer
-                  Row(
-                    children: [
-                      Expanded(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [kPrimary, kSecondary],
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: ShadButton(
-                            backgroundColor: Colors.transparent,
-                            onPressed: () => _submit(
-                              selectedDate.toIso8601String().split("T")[0],
-                              report.closingAmount,
-                            ),
-                            child: Text(
-                              SaleReportLocale.saleReportSave.getString(
-                                context,
-                              ),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [kGreen, kGreenSecondary],
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: ShadButton(
-                            backgroundColor: Colors.transparent,
-                            onPressed: () => _transferSaleAmount(report),
-                            child: Text(
-                              SaleReportLocale.saleReportTransfer.getString(
-                                context,
-                              ),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
 
-                  const SizedBox(height: 20),
-
-                  ///Sale Report History
-                  const Text(
-                    "Sale Report History",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  saleReportEntriesAsync.when(
-                    data: (entries) {
-                      if (entries.isEmpty) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          child: Text(
-                            "No records for this day",
-                            style: TextStyle(color: subColor, fontSize: 12),
-                          ),
-                        );
-                      }
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: entries.length,
-                        itemBuilder: (context, index) {
-                          final e = entries[index];
-                          return SaleReportEntryCard(
-                            entry: e,
-                            isDark: isDark,
-                            canDelete: isAdmin(user!.role),
-                            onDelete: () => _deleteSaleReportEntry(e, isDark),
-                          );
-                        },
-                      );
-                    },
-                    loading: () => const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
+                  // ============================================
+                  // 👇 CONDITIONAL — existAnyOpeningAndClosing အလိုက်
+                  // ============================================
+                  if (!report.existAnyOpeningAndClosing) ...[
+                    _buildOpeningBalanceCard(isDark, subColor),
+                  ] else ...[
+                    _buildSaleReportContent(
+                      report,
+                      isDark,
+                      subColor,
+                      transfersAsync,
+                      saleReportEntriesAsync,
+                      user,
                     ),
-                    error: (err, _) => Text(
-                      "Error loading sale report entries: $err",
-                      style: TextStyle(color: subColor, fontSize: 12),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  ///Transfer Data
-                  const Text(
-                    "Transfer Datas",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  transfersAsync.when(
-                    data: (transfers) {
-                      if (transfers.isEmpty) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          child: Text(
-                            "No transfers for this day",
-                            style: TextStyle(color: subColor, fontSize: 12),
-                          ),
-                        );
-                      }
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: transfers.length,
-                        itemBuilder: (context, index) {
-                          final t = transfers[index];
-                          return TransferCard(
-                            transfer: t,
-                            isDark: isDark,
-                            canDelete: isAdmin(user!.role),
-                            onDelete: () => _deleteTransfer(t, isDark),
-                          );
-                        },
-                      );
-                    },
-                    loading: () => const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                    error: (err, _) => Text(
-                      "Error loading transfers: $err",
-                      style: TextStyle(color: subColor, fontSize: 12),
-                    ),
-                  ),
+                  ],
 
                   const SizedBox(height: 30),
                 ],
@@ -402,6 +337,243 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
           );
         },
       ),
+    );
+  }
+
+  // ======================================================
+  // OPENING BALANCE CARD (existAnyOpeningAndClosing == false)
+  // ======================================================
+
+  Widget _buildOpeningBalanceCard(bool isDark, Color subColor) {
+    final textColor = isDark ? kTextDark : kTextLight;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? kSurfaceDark : kSurfaceLight,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? kPrimary.withOpacity(0.12)
+                : Colors.black.withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "No opening balance set for company",
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: FontSizeConfig.title(context),
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            "Enter today's opening balance to start recording sales",
+            style: TextStyle(color: subColor, fontSize: 12),
+          ),
+          const SizedBox(height: 16),
+
+          ShadInputFormField(
+            controller: _openingBalanceController,
+            label: const Text("Opening Balance"),
+            placeholder: const Text("0.00"),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          ),
+
+          const SizedBox(height: 16),
+
+          SizedBox(
+            width: double.infinity,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: [kPrimary, kSecondary]),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ShadButton(
+                backgroundColor: Colors.transparent,
+                onPressed: _submitOpeningBalance,
+                child: const Text(
+                  "Save Opening Balance",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ======================================================
+  // FULL SALE REPORT (existAnyOpeningAndClosing == true)
+  // ======================================================
+
+  Widget _buildSaleReportContent(
+    SaleReport report,
+    bool isDark,
+    Color subColor,
+    AsyncValue<List<Transfer>> transfersAsync,
+    AsyncValue<List<SaleReportEntry>> saleReportEntriesAsync,
+    dynamic user,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClosingReportCard(report: report, isDark: isDark),
+        const SizedBox(height: 20),
+
+        Row(
+          children: [
+            Expanded(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [kPrimary, kSecondary],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ShadButton(
+                  backgroundColor: Colors.transparent,
+                  onPressed: () => _submit(
+                    selectedDate.toIso8601String().split("T")[0],
+                    report.closingAmount,
+                  ),
+                  child: Text(
+                    SaleReportLocale.saleReportSave.getString(context),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [kGreen, kGreenSecondary],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ShadButton(
+                  backgroundColor: Colors.transparent,
+                  onPressed: () => _transferSaleAmount(report),
+                  child: Text(
+                    SaleReportLocale.saleReportTransfer.getString(context),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        const Text(
+          "Sale Report History",
+          textAlign: TextAlign.start,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        saleReportEntriesAsync.when(
+          data: (entries) {
+            if (entries.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Text(
+                  "No records for this day",
+                  style: TextStyle(color: subColor, fontSize: 12),
+                ),
+              );
+            }
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: entries.length,
+              itemBuilder: (context, index) {
+                final e = entries[index];
+                return SaleReportEntryCard(
+                  entry: e,
+                  isDark: isDark,
+                  canDelete: isAdmin(user!.role),
+                  onDelete: () => _deleteSaleReportEntry(e, isDark),
+                );
+              },
+            );
+          },
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(12),
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+          error: (err, _) => Text(
+            "Error loading sale report entries: $err",
+            style: TextStyle(color: subColor, fontSize: 12),
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        const Text(
+          "Transfer Datas",
+          textAlign: TextAlign.start,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        transfersAsync.when(
+          data: (transfers) {
+            if (transfers.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Text(
+                  "No transfers for this day",
+                  style: TextStyle(color: subColor, fontSize: 12),
+                ),
+              );
+            }
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: transfers.length,
+              itemBuilder: (context, index) {
+                final t = transfers[index];
+                return TransferCard(
+                  transfer: t,
+                  isDark: isDark,
+                  canDelete: isAdmin(user!.role),
+                  onDelete: () => _deleteTransfer(t, isDark),
+                );
+              },
+            );
+          },
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(12),
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+          error: (err, _) => Text(
+            "Error loading transfers: $err",
+            style: TextStyle(color: subColor, fontSize: 12),
+          ),
+        ),
+      ],
     );
   }
 }

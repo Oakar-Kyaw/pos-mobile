@@ -36,6 +36,18 @@ mixin VoucherScreenLocale {
   static const deleteVoucher = 'delete_voucher';
   static const scanWithBarCode = 'scan_with_barcode';
   static const voucherCalculate = 'calculate';
+  static const createdBy = 'voucher_created_by';
+  static const receiptNo = 'voucher_receipt_no';
+  static const receiptDate = 'voucher_receipt_date';
+
+  // Customer Keys
+  static const customerOptional = 'voucher_customer_optional';
+  static const searchCustomerPlaceholder =
+      'voucher_search_customer_placeholder';
+  static const noCustomerFound = 'voucher_no_customer_found';
+  static const customerName = 'voucher_customer_name';
+  static const phoneOptional = 'voucher_phone_optional';
+  static const createAndSelect = 'voucher_create_and_select';
 
   static const EN = {
     title: 'Create Voucher',
@@ -76,6 +88,17 @@ mixin VoucherScreenLocale {
     scanWithBarCode: 'Scan with Barcode',
     voucherCalculate: 'Calculate',
     thankYouMessage: 'Thank you for shopping with us',
+    createdBy: 'Created by',
+    receiptNo: 'Receipt No.',
+    receiptDate: 'Receipt Date',
+
+    // Customer EN
+    customerOptional: 'Customer (optional)',
+    searchCustomerPlaceholder: 'Search by name or phone...',
+    noCustomerFound: 'No customer found. Create new:',
+    customerName: 'Customer name',
+    phoneOptional: 'Phone (optional)',
+    createAndSelect: 'Create & Select',
   };
 
   static const MM = {
@@ -117,5 +140,16 @@ mixin VoucherScreenLocale {
     scanWithBarCode: 'ဘားကုဒ်ဖြင့် စကန်ဖတ်မည်',
     voucherCalculate: 'တွက်ချက်မည်',
     thankYouMessage: 'ဝယ်ယူအားပေးမှုအတွက် အထူးကျေးဇူးတင်ရှိပါသည်',
+    createdBy: 'ရေးသွင်းသူ',
+    receiptNo: 'ပြေစာ အမှတ်',
+    receiptDate: 'ပြေစာ ရက်စွဲ',
+
+    // Customer MM
+    customerOptional: 'ဖောက်သည် (စိတ်ကြိုက်)',
+    searchCustomerPlaceholder: 'အမည် သို့မဟုတ် ဖုန်းနံပါတ်ဖြင့် ရှာပါ...',
+    noCustomerFound: 'ဖောက်သည် မတွေ့ပါ။ အသစ်ဖန်တီးပါ:',
+    customerName: 'ဖောက်သည် အမည်',
+    phoneOptional: 'ဖုန်းနံပါတ် (စိတ်ကြိုက်)',
+    createAndSelect: 'ဖန်တီးပြီး ရွေးချယ်မည်',
   };
 }

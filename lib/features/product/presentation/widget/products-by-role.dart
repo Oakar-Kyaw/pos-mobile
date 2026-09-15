@@ -1,3 +1,4 @@
+// features/product/presentation/widget/products-by-role.dart
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -8,7 +9,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/bar-code.dart';
-import 'package:pos/features/product/presentation/provider/edit-item.dart';
+import 'package:pos/features/product/presentation/provider/edit-product.provider.dart';
 import 'package:pos/features/product/presentation/widget/product-image-with-remove.dart';
 import 'package:pos/features/product/presentation/widget/product-row.dart';
 import 'package:pos/localization/product-local.dart';
@@ -16,6 +17,10 @@ import 'package:pos/models/product.dart';
 import 'package:pos/utils/extension.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+
+// ==========================================================
+// POS / SALE ROLE — read-only card
+// ==========================================================
 
 class ProductListByPosAndSale extends StatelessWidget {
   const ProductListByPosAndSale({
@@ -47,18 +52,15 @@ class ProductListByPosAndSale extends StatelessWidget {
                   maxLines: 1,
                   style: context.titleStyle,
                 ),
-
                 ProductRow(
                   title: "${ProductScreenLocale.barcode.getString(context)}:",
                   text: product.barcode ?? "-",
                 ),
-
                 ProductRow(
                   title:
                       "${ProductScreenLocale.productPrice.getString(context)}:",
                   text: product.price.toString(),
                 ),
-
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -81,9 +83,7 @@ class ProductListByPosAndSale extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(width: 12),
-
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: CachedNetworkImage(
@@ -106,6 +106,10 @@ class ProductListByPosAndSale extends StatelessWidget {
     );
   }
 }
+
+// ==========================================================
+// ADMIN / MANAGER ROLE — editable card
+// ==========================================================
 
 class ProductListByAdminAndManager extends ConsumerStatefulWidget {
   const ProductListByAdminAndManager({
@@ -137,6 +141,10 @@ class _ProductListByAdminAndManagerState
   final _resetVersion = 0;
   File? imageFile;
 
+  // ======================================================
+  // INIT
+  // ======================================================
+
   @override
   void initState() {
     super.initState();
@@ -165,7 +173,6 @@ class _ProductListByAdminAndManagerState
   @override
   void didUpdateWidget(covariant ProductListByAdminAndManager oldWidget) {
     super.didUpdateWidget(oldWidget);
-
     if (oldWidget.product != widget.product) {
       _resetDraft();
     }
@@ -219,13 +226,16 @@ class _ProductListByAdminAndManagerState
       _stockController.text != widget.product.stock.toString() ||
       _minStockController.text != widget.product.minStock.toString() ||
       active != widget.product.isActive ||
-      imageUrl != widget.product.photoUrl;
+      imageUrl != widget.product.photoUrl ||
+      imageUrl != widget.product.photoUrl ||
+      imageFile != null;
 
-  void _onAnyFieldChanged(int id) {
-    final editingId = ref.read(editingProductIdProvider);
-    if (editingId == null) {
-      ref.read(editingProductIdProvider.notifier).startEdit(id);
-    }
+  // ======================================================
+  // START EDIT (Edit icon နှိပ်မှသာ ခေါ်မယ်)
+  // ======================================================
+
+  void _startEditing() {
+    ref.read(editingProductIdProvider.notifier).startEdit(widget.product.id);
   }
 
   Future<void> scanBarCode(int id) async {
@@ -235,10 +245,15 @@ class _ProductListByAdminAndManagerState
     );
 
     if (result != null) {
-      _barcodeController.text = result;
-      _onAnyFieldChanged(id);
+      setState(() {
+        _barcodeController.text = result;
+      });
     }
   }
+
+  // ======================================================
+  // SAVE
+  // ======================================================
 
   void _save() async {
     final productPayload = {
@@ -249,12 +264,14 @@ class _ProductListByAdminAndManagerState
       "costPrice": double.parse(_costPriceController.text),
       "stock": int.parse(_stockController.text),
       "minStock": int.parse(_minStockController.text),
+      "memberSellingPrice": 0,
+      "vipSellingPrice": 0,
+      "vvipSellingPrice": 0,
       "isActive": active,
     };
 
     FormData formData = FormData.fromMap(productPayload);
 
-    debugPrint("🟢 Product Payload => $productPayload");
     if (imageFile != null) {
       formData.files.add(
         MapEntry(
@@ -266,11 +283,13 @@ class _ProductListByAdminAndManagerState
         ),
       );
     }
-    debugPrint("🟢 Product Payload => $formData");
+
     final success = await ref
         .read(productProvider.notifier)
         .editProductById(widget.product.id, formData);
+
     if (success) {
+      if (!mounted) return;
       ShowToast(
         context,
         description: Text(
@@ -279,14 +298,20 @@ class _ProductListByAdminAndManagerState
       );
       ref.read(editingProductIdProvider.notifier).clearEdit();
     }
-    return;
   }
+
+  // ======================================================
+  // CANCEL
+  // ======================================================
 
   void _cancel() {
     _resetDraft();
-
     ref.read(editingProductIdProvider.notifier).clearEdit();
   }
+
+  // ======================================================
+  // BUILD
+  // ======================================================
 
   @override
   Widget build(BuildContext context) {
@@ -294,7 +319,10 @@ class _ProductListByAdminAndManagerState
     final editingId = ref.watch(editingProductIdProvider);
     final isLockedByOther = editingId != null && editingId != product.id;
     final isThisEditing = editingId == product.id;
-    // print("imageUrl is 📈 $imageUrl");
+
+    // 👇 Edit icon မနှိပ်ရင် field တွေ ရေးလို့မရအောင်
+    final fieldsReadOnly = !isThisEditing;
+
     return Container(
       decoration: widget.containerDecoration,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -312,7 +340,7 @@ class _ProductListByAdminAndManagerState
                     Expanded(
                       child: ShadInputFormField(
                         controller: _nameController,
-                        readOnly: isLockedByOther,
+                        readOnly: fieldsReadOnly,
                         padding: const EdgeInsets.symmetric(
                           vertical: 5,
                           horizontal: 5,
@@ -320,11 +348,21 @@ class _ProductListByAdminAndManagerState
                         decoration: const ShadDecoration(
                           shape: BoxShape.rectangle,
                         ),
-                        onChanged: (val) {
-                          _onAnyFieldChanged(product.id);
-                        },
+                        onChanged: (val) => setState(() {}),
                       ),
                     ),
+
+                    const SizedBox(width: 8),
+
+                    // ==========================================
+                    // EDIT ICON — Customer management page ရဲ့ pattern
+                    // ==========================================
+                    if (!isThisEditing)
+                      IconButton(
+                        onPressed: isLockedByOther ? null : _startEditing,
+                        icon: const Icon(Icons.edit_outlined, size: 20),
+                        tooltip: "Edit",
+                      ),
                   ],
                 ),
 
@@ -333,35 +371,28 @@ class _ProductListByAdminAndManagerState
                   key: ValueKey('code-$_resetVersion'),
                   controller: _codeController,
                   title: ProductScreenLocale.productCode.getString(context),
-                  //text: product.code,
-                  readOnly: isLockedByOther,
-                  onChanged: (val) {
-                    _onAnyFieldChanged(product.id);
-                  },
+                  readOnly: fieldsReadOnly,
+                  onChanged: (val) => setState(() {}),
                 ),
                 const SizedBox(height: 10),
                 ProductRowByTextField(
                   key: ValueKey('barcode-$_resetVersion'),
                   controller: _barcodeController,
                   title: ProductScreenLocale.barcode.getString(context),
-                  // text: product.barcode ?? "-",
-                  readOnly: isLockedByOther,
+                  readOnly: fieldsReadOnly,
                   isBarcode: true,
-                  onChanged: (val) {
-                    _onAnyFieldChanged(product.id);
-                  },
-                  onPressed: () => scanBarCode(product.id),
+                  onChanged: (val) => setState(() {}),
+                  onPressed: fieldsReadOnly
+                      ? null
+                      : () => scanBarCode(product.id),
                 ),
                 const SizedBox(height: 10),
                 ProductRowByTextField(
                   key: ValueKey('price-$_resetVersion'),
                   controller: _priceController,
                   title: ProductScreenLocale.productPrice.getString(context),
-                  //text: product.price.toString(),
-                  readOnly: isLockedByOther,
-                  onChanged: (val) {
-                    _onAnyFieldChanged(product.id);
-                  },
+                  readOnly: fieldsReadOnly,
+                  onChanged: (val) => setState(() {}),
                 ),
                 const SizedBox(height: 10),
                 ProductRowByTextField(
@@ -370,57 +401,32 @@ class _ProductListByAdminAndManagerState
                   title: ProductScreenLocale.productCostPrice.getString(
                     context,
                   ),
-                  // text: product.costPrice.toString(),
-                  readOnly: isLockedByOther,
-                  onChanged: (val) {
-                    _onAnyFieldChanged(product.id);
-                  },
+                  readOnly: fieldsReadOnly,
+                  onChanged: (val) => setState(() {}),
                 ),
                 const SizedBox(height: 10),
                 ProductRowByTextField(
                   key: ValueKey('stock-$_resetVersion'),
                   controller: _stockController,
                   title: ProductScreenLocale.productStock.getString(context),
-                  // text: product.stock.toString(),
-                  readOnly: isLockedByOther,
-                  onChanged: (val) {
-                    _onAnyFieldChanged(product.id);
-                  },
+                  readOnly: fieldsReadOnly,
+                  onChanged: (val) => setState(() {}),
                 ),
                 const SizedBox(height: 10),
                 ProductRowByTextField(
                   key: ValueKey('minStock-$_resetVersion'),
                   controller: _minStockController,
                   title: ProductScreenLocale.minStock.getString(context),
-                  // text: product.minStock.toString(),
-                  readOnly: isLockedByOther,
-                  onChanged: (val) {
-                    _onAnyFieldChanged(product.id);
-                  },
+                  readOnly: fieldsReadOnly,
+                  onChanged: (val) => setState(() {}),
                 ),
                 const SizedBox(height: 15),
 
-                /// Active Switch
-                // ShadSwitchFormField(
-                //   label: Text(
-                //     ProductScreenLocale.isActive.getString(context),
-                //     style: context.bodyStyle,
-                //   ),
-                //   key: ValueKey(active),
-                //   initialValue: active,
-                //   onChanged: (value) {
-                //     setState(() {
-                //       active = value;
-                //     });
-
-                //     _onAnyFieldChanged(product.id);
-                //   },
-                // ),
-                if (isThisEditing && _isDirty) ...[
+                if (isThisEditing) ...[
                   Row(
                     children: [
                       IconButton.filled(
-                        onPressed: _save,
+                        onPressed: _isDirty ? _save : null,
                         icon: const Icon(Icons.check),
                         style: IconButton.styleFrom(
                           backgroundColor: Colors.green,
@@ -451,14 +457,15 @@ class _ProductListByAdminAndManagerState
           ProductImageWithRemove(
             photoUrl: imageUrl,
             imageFile: imageFile,
-            onUpload: uploadPhoto,
-            onRemove: () {
-              setState(() {
-                imageUrl = null;
-                imageFile = null;
-              });
-              _onAnyFieldChanged(product.id);
-            },
+            onUpload: fieldsReadOnly ? () {} : uploadPhoto,
+            onRemove: fieldsReadOnly
+                ? () {}
+                : () {
+                    setState(() {
+                      imageUrl = null;
+                      imageFile = null;
+                    });
+                  },
           ),
         ],
       ),

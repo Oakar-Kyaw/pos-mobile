@@ -13,10 +13,12 @@
 #include <flutter_secure_storage_windows/flutter_secure_storage_windows_plugin.h>
 #include <flutter_thermal_printer/flutter_thermal_printer_plugin_c_api.h>
 #include <flutter_timezone/flutter_timezone_plugin_c_api.h>
+#include <open_folder/open_folder_plugin_c_api.h>
 #include <permission_handler_windows/permission_handler_windows_plugin.h>
 #include <print_bluetooth_thermal/print_bluetooth_thermal_plugin_c_api.h>
 #include <printing/printing_plugin.h>
 #include <universal_ble/universal_ble_plugin_c_api.h>
+#include <url_launcher_windows/url_launcher_windows.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   AudioplayersWindowsPluginRegisterWithRegistrar(
@@ -33,6 +35,8 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("FlutterThermalPrinterPluginCApi"));
   FlutterTimezonePluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FlutterTimezonePluginCApi"));
+  OpenFolderPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("OpenFolderPluginCApi"));
   PermissionHandlerWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("PermissionHandlerWindowsPlugin"));
   PrintBluetoothThermalPluginCApiRegisterWithRegistrar(
@@ -41,4 +45,6 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("PrintingPlugin"));
   UniversalBlePluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("UniversalBlePluginCApi"));
+  UrlLauncherWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("UrlLauncherWindows"));
 }

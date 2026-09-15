@@ -6,8 +6,13 @@ import 'package:pos/core/utils/inventory/inventory-edit.dart';
 import 'package:pos/core/utils/inventory/inventory-items-create.dart';
 import 'package:pos/features/account-upgrade/presentation/pages/account-upgrade.dart';
 import 'package:pos/features/category/presentation/page/category.dart';
+import 'package:pos/features/company/presentation/page/company-profile.dart';
+import 'package:pos/features/employee/presentation/page/employee.dart';
+import 'package:pos/features/employee/presentation/widget/employee-create.dart';
 import 'package:pos/features/low-stock/presentation/page/low-stock.dart';
-import 'package:pos/features/low-stock/presentation/widget/low-stock-list.dart';
+import 'package:pos/features/notification/presentation/page/notification.dart';
+import 'package:pos/features/product/presentation/page/product.dart';
+import 'package:pos/features/profile/presentation/page/profile.dart';
 import 'package:pos/features/profit-loss/presentation/page/profit-loss.dart';
 import 'package:pos/features/sale-report/presentation/page/sale-report.dart';
 import 'package:pos/features/voucher/presentation/pages/create-voucher.dart';
@@ -41,22 +46,17 @@ import 'package:pos/features/supplier/presentation/page/supplier.dart';
 import 'package:pos/features/voucher/presentation/pages/receipt.dart';
 import 'package:pos/features/voucher/presentation/pages/voucher.dart';
 import 'package:pos/models/inventory-management.dart';
+import 'package:pos/repay/presentation/page/repay.dart';
 import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/splash-screen.dart';
 import 'package:pos/src/attendance.dart';
 import 'package:pos/src/attendance-create.dart';
-import 'package:pos/src/company-profile.dart';
-import 'package:pos/src/employee.dart';
 import 'package:pos/src/home.dart';
 import 'package:pos/src/hr-rule.dart';
 import 'package:pos/src/login.dart';
 import 'package:pos/src/payroll-create.dart';
 import 'package:pos/src/payroll-payslip.dart';
-import 'package:pos/src/product.dart';
-import 'package:pos/src/repay.dart';
 import 'package:pos/src/payroll-salary.dart';
-import 'package:pos/src/setting.dart';
-import 'package:pos/ui/employee-create.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -89,11 +89,17 @@ final routeProvider = Provider<GoRouter>((ref) {
       final isLogined = ref.read(checkLoginProvider);
       final isLoggingIn = state.matchedLocation == AppRoute.login;
       final isSplash = state.matchedLocation == AppRoute.splash;
+      final isCompanyProfile = state.matchedLocation == AppRoute.companyProfile;
       // 1. If NOT logged in and NOT trying to go to login page, force them to login.
       //leave splash screen
       if (isSplash) {
         return null;
       }
+
+      if (isCompanyProfile) {
+        return AppRoute.companyProfile;
+      }
+
       if (!isLogined) {
         return isLoggingIn ? null : AppRoute.login;
       }
@@ -115,15 +121,15 @@ final routeProvider = Provider<GoRouter>((ref) {
         name: AppRoute.splash,
         builder: (context, state) => SplashScreen(),
       ),
-      GoRoute(
-        path: AppRoute.settings,
-        name: AppRoute.settings,
-        builder: (context, state) => Setting(),
-      ),
+      // GoRoute(
+      //   path: AppRoute.settings,
+      //   name: AppRoute.settings,
+      //   builder: (context, state) => Setting(),
+      // ),
       GoRoute(
         path: AppRoute.profile,
         name: AppRoute.profile,
-        builder: (context, state) => Setting(),
+        builder: (context, state) => ProfilePage(),
       ),
       GoRoute(
         path: AppRoute.category,
@@ -177,6 +183,11 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.income,
         name: AppRoute.income,
         builder: (context, state) => IncomePage(),
+      ),
+      GoRoute(
+        path: AppRoute.notification,
+        name: AppRoute.notification,
+        builder: (context, state) => NotificationPage(),
       ),
       GoRoute(
         path: AppRoute.profitAndLoss,

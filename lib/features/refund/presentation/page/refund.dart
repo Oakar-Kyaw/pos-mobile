@@ -53,7 +53,7 @@ class _RefundPageState extends ConsumerState<RefundPage> {
                 GradientSubmitButton(
                   onPressed: () => context.pushNamed(AppRoute.refundCreate),
                   text: RefundLocale.refundButton.getString(context),
-                  width: 150,
+                  width: 200,
                 ),
                 SizedBox(height: 20),
                 UserSelect(),

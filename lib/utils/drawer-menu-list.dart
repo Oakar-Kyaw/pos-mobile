@@ -264,16 +264,16 @@ List<MenuSection> menuListBySale(BuildContext context) => [
       context,
     ),
     items: [
-      MenuItem(
-        icon: LucideIcons.calendarCheck,
-        label: DrawerScreenLocale.drawerAttendance.getString(context),
-        route: AppRoute.attendance,
-      ),
-      MenuItem(
-        icon: LucideIcons.banknote,
-        label: DrawerScreenLocale.drawerEmployeeSalary.getString(context),
-        route: AppRoute.payroll,
-      ),
+      // MenuItem(
+      //   icon: LucideIcons.calendarCheck,
+      //   label: DrawerScreenLocale.drawerAttendance.getString(context),
+      //   route: AppRoute.attendance,
+      // ),
+      // MenuItem(
+      //   icon: LucideIcons.banknote,
+      //   label: DrawerScreenLocale.drawerEmployeeSalary.getString(context),
+      //   route: AppRoute.payroll,
+      // ),
     ],
   ),
 ];
@@ -365,16 +365,16 @@ List<MenuSection> menuListByManager(BuildContext context) => [
         label: DrawerScreenLocale.drawerEmployee.getString(context),
         route: AppRoute.employee,
       ),
-      MenuItem(
-        icon: LucideIcons.calendarCheck,
-        label: DrawerScreenLocale.drawerAttendance.getString(context),
-        route: AppRoute.attendance,
-      ),
-      MenuItem(
-        icon: LucideIcons.banknote,
-        label: DrawerScreenLocale.drawerEmployeeSalary.getString(context),
-        route: AppRoute.payroll,
-      ),
+      // MenuItem(
+      //   icon: LucideIcons.calendarCheck,
+      //   label: DrawerScreenLocale.drawerAttendance.getString(context),
+      //   route: AppRoute.attendance,
+      // ),
+      // MenuItem(
+      //   icon: LucideIcons.banknote,
+      //   label: DrawerScreenLocale.drawerEmployeeSalary.getString(context),
+      //   route: AppRoute.payroll,
+      // ),
       MenuItem(
         icon: LucideIcons.clipboardCheck,
         label: DrawerScreenLocale.drawerHrRule.getString(context),

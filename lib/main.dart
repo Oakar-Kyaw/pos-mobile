@@ -7,11 +7,9 @@ import 'package:pos/api/user.api.dart';
 import 'package:pos/core/service/firebase-service.dart';
 import 'package:pos/core/widgets/app-local-notification.dart';
 import 'package:pos/localization/localization.dart';
-import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/go-router.dart';
-import 'package:pos/utils/local-user.dart';
 import 'package:pos/utils/secure-storage.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:shorebird_code_push/shorebird_code_push.dart';
@@ -25,7 +23,6 @@ void main() async {
     dotenv.load(fileName: ".env"),
   ]);
   initLocalization();
-
   //Pre-load font so it's ready before any theme build
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
@@ -45,12 +42,11 @@ class MyApp extends ConsumerStatefulWidget {
   ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-final _fontFamily = "NotoSerif";
 // final _fontFamily = GoogleFonts.merriweather().fontFamily;
 //final _fontFamily = GoogleFonts.notoSansMyanmar().fontFamily;
 
 class _MyAppState extends ConsumerState<MyApp> {
-  // final _secureStorage = SecureStorage();
+  final _secureStorage = SecureStorage();
 
   @override
   void initState() {
@@ -129,6 +125,13 @@ class _MyAppState extends ConsumerState<MyApp> {
     FirebaseMessaging instance = FirebaseMessaging.instance;
     print("setup firbase notification is: 😘 $instance");
     await instance.requestPermission(alert: true, badge: true, sound: true);
+    //for foreground
+    await instance.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
     // Get & Print Token
     String? token = await instance.getToken() ?? "";
     debugPrint("🔑 FCM Tokens: $token");
@@ -136,13 +139,11 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     //if token exist
     if (token.isNotEmpty) {
-      ref
-          .read(userProvider.notifier)
-          .createorUpdateNotificationDeviceToken(deviceToken: token);
+      await _secureStorage.saveFirebaseToken(token);
     }
 
     FirebaseService.instance.noitificationListen().listen((notif) {
-      // print("notif 👨‍🏭 ${notif.description}");
+      print("notif 👨‍🏭 ${notif.description}");
       AppLocalNotification().showNotification(
         notiId: DateTime.now().millisecondsSinceEpoch.remainder(100000),
         title: notif.title,
@@ -158,6 +159,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
     final router = ref.watch(routeProvider);
+    final fontFamily = "NotoSerif";
 
     return ShadApp.custom(
       themeMode: themeMode,
@@ -174,13 +176,11 @@ class _MyAppState extends ConsumerState<MyApp> {
             scaffoldBackgroundColor: kBgLight,
             textTheme: Theme.of(
               context,
-            ).textTheme.apply(fontFamily: _fontFamily),
+            ).textTheme.apply(fontFamily: fontFamily),
           ),
           darkTheme: ThemeData.dark().copyWith(
             scaffoldBackgroundColor: kBgDark, // 👈 add this
-            textTheme: ThemeData.dark().textTheme.apply(
-              fontFamily: _fontFamily,
-            ),
+            textTheme: ThemeData.dark().textTheme.apply(fontFamily: fontFamily),
           ),
           themeMode: themeMode,
           themeAnimationDuration: Duration.zero,

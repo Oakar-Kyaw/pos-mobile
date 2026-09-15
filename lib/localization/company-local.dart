@@ -1,7 +1,4 @@
 mixin CompanyRegisterScreenLocal {
-  // =======================
-  // Keys
-  // =======================
   static const companyTitle = 'company_title';
   static const companyDescription = 'company_description';
 
@@ -29,20 +26,22 @@ mixin CompanyRegisterScreenLocal {
   static const companyButton = 'company_button';
   static const companyAction = 'company_action';
 
-  // Validation Errors
+  static const country = 'company_country';
+  static const subscriptionEndDate = 'company_subscription_end_date';
+  static const editCompany = 'company_edit';
+  static const trial = 'company_trial';
+  static const notAvailable = 'company_not_available';
+  static const error = 'company_error';
+
   static const requiredError = 'required_error';
   static const emailInvalidError = 'email_invalid_error';
   static const phoneInvalidError = 'phone_invalid_error';
   static const passwordRequiredError = 'password_required_error';
 
-  // Status messages
   static const createdSuccess = 'created_success';
   static const createFailed = 'create_failed';
   static const serverError = 'server_error';
 
-  // =======================
-  // English
-  // =======================
   static const EN = {
     companyTitle: 'Company',
     companyDescription: 'Please create your company profile',
@@ -68,21 +67,23 @@ mixin CompanyRegisterScreenLocal {
     companyButton: 'Add',
     companyAction: 'Actions',
 
-    // Errors
+    country: 'Country',
+    subscriptionEndDate: 'Subscription End Date',
+    editCompany: 'Edit Company',
+    trial: 'TRIAL',
+    notAvailable: 'N/A',
+    error: 'Error',
+
     requiredError: 'This field is required',
     emailInvalidError: 'Please enter a valid email address',
     phoneInvalidError: 'Please enter a valid phone number',
     passwordRequiredError: 'Password is required',
 
-    // Status messages
     createdSuccess: 'Company created successfully',
     createFailed: 'Failed to create company',
     serverError: 'Server error occurred, please try again',
   };
 
-  // =======================
-  // Burmese (Myanmar)
-  // =======================
   static const MM = {
     companyTitle: 'ကုမ္ပဏီ',
     companyDescription: 'ကျေးဇူးပြု၍ သင့်ကုမ္ပဏီကို ဖန်တီးပါ',
@@ -108,13 +109,18 @@ mixin CompanyRegisterScreenLocal {
     companyButton: 'ထည့်ရန်',
     companyAction: 'လုပ်ဆောင်ချက်များ',
 
-    // Errors
+    country: 'နိုင်ငံ',
+    subscriptionEndDate: 'စာရင်းသွင်းမှု ကုန်ဆုံးမည့်ရက်',
+    editCompany: 'ကုမ္ပဏီ ပြင်ဆင်မည်',
+    trial: 'အစမ်းသုံး',
+    notAvailable: 'မရှိပါ',
+    error: 'အမှား',
+
     requiredError: 'ဤအချက်အလက်ကို မဖြစ်မနေ ထည့်သွင်းရပါမည်',
     emailInvalidError: 'မှန်ကန်သော အီးမေးလ်လိပ်စာကို ထည့်ပါ',
     phoneInvalidError: 'မှန်ကန်သော ဖုန်းနံပါတ်ကို ထည့်ပါ',
     passwordRequiredError: 'စကားဝှက်ကို မဖြစ်မနေ ထည့်ရပါမည်',
 
-    // Status messages
     createdSuccess: 'ကုမ္ပဏီကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
     createFailed: 'ကုမ္ပဏီ ဖန်တီးမှု မအောင်မြင်ပါ',
     serverError: 'ဆာဗာမှ အမှား ဖြစ်ပွားနေသည်၊ နောက်မှ ပြန်ကြိုးစားပါ',

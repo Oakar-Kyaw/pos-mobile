@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pos/localization/customer-local.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'package:pos/features/customer/presentation/provider/customer-provider.dart';
@@ -42,9 +44,9 @@ class _CreateCustomerPageState extends ConsumerState<CreateCustomerPage> {
     if (nameController.text.trim().isEmpty) {
       ShowToast(
         context,
-        description: const Text(
-          'Customer name is required',
-          style: TextStyle(color: Colors.red),
+        description: Text(
+          CustomerLocale.customerNameRequired.getString(context),
+          style: const TextStyle(color: Colors.red),
         ),
         borderColor: Colors.red,
         isError: true,
@@ -76,9 +78,9 @@ class _CreateCustomerPageState extends ConsumerState<CreateCustomerPage> {
       if (success) {
         ShowToast(
           context,
-          description: const Text(
-            'Customer created successfully',
-            style: TextStyle(color: Colors.green),
+          description: Text(
+            CustomerLocale.customerCreateSuccess.getString(context),
+            style: const TextStyle(color: Colors.green),
           ),
           borderColor: Colors.green,
         );
@@ -124,7 +126,10 @@ class _CreateCustomerPageState extends ConsumerState<CreateCustomerPage> {
       appBar: AppBar(
         backgroundColor: bgColor,
         foregroundColor: textColor,
-        title: Text('Create Customer', style: TextStyle(color: textColor)),
+        title: Text(
+          CustomerLocale.customerCreate.getString(context),
+          style: TextStyle(color: textColor),
+        ),
       ),
 
       // ============================================================
@@ -152,8 +157,13 @@ class _CreateCustomerPageState extends ConsumerState<CreateCustomerPage> {
                     ShadInputFormField(
                       id: 'name',
                       controller: nameController,
-                      label: Text('Name', style: TextStyle(color: subColor)),
-                      placeholder: const Text('Enter customer name'),
+                      label: Text(
+                        CustomerLocale.customerName.getString(context),
+                        style: TextStyle(color: subColor),
+                      ),
+                      placeholder: Text(
+                        CustomerLocale.customerName.getString(context),
+                      ),
                     ),
 
                     const SizedBox(height: 16),
@@ -165,8 +175,13 @@ class _CreateCustomerPageState extends ConsumerState<CreateCustomerPage> {
                       id: 'email',
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
-                      label: Text('Email', style: TextStyle(color: subColor)),
-                      placeholder: const Text('Enter email'),
+                      label: Text(
+                        CustomerLocale.customerEmail.getString(context),
+                        style: TextStyle(color: subColor),
+                      ),
+                      placeholder: Text(
+                        CustomerLocale.customerEmail.getString(context),
+                      ),
                     ),
 
                     const SizedBox(height: 16),
@@ -178,8 +193,13 @@ class _CreateCustomerPageState extends ConsumerState<CreateCustomerPage> {
                       id: 'phone',
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
-                      label: Text('Phone', style: TextStyle(color: subColor)),
-                      placeholder: const Text('Enter phone number'),
+                      label: Text(
+                        CustomerLocale.customerPhone.getString(context),
+                        style: TextStyle(color: subColor),
+                      ),
+                      placeholder: Text(
+                        CustomerLocale.customerPhone.getString(context),
+                      ),
                     ),
 
                     const SizedBox(height: 16),
@@ -191,8 +211,13 @@ class _CreateCustomerPageState extends ConsumerState<CreateCustomerPage> {
                       id: 'address',
                       controller: addressController,
                       maxLines: 3,
-                      label: Text('Address', style: TextStyle(color: subColor)),
-                      placeholder: const Text('Enter address'),
+                      label: Text(
+                        CustomerLocale.customerAddress.getString(context),
+                        style: TextStyle(color: subColor),
+                      ),
+                      placeholder: Text(
+                        CustomerLocale.customerAddress.getString(context),
+                      ),
                     ),
                   ],
                 ),
@@ -205,7 +230,7 @@ class _CreateCustomerPageState extends ConsumerState<CreateCustomerPage> {
               // ======================================================
               GradientSubmitButton(
                 onPressed: createCustomer,
-                text: 'Create Customer',
+                text: CustomerLocale.customerCreate.getString(context),
                 width: double.infinity,
               ),
             ],

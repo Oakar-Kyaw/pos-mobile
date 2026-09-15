@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pos/localization/supplier-local.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'package:pos/features/supplier/presentation/provider/supplier-provider.dart';
@@ -37,9 +39,9 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
     if (nameController.text.trim().isEmpty) {
       ShowToast(
         context,
-        description: const Text(
-          'Supplier name is required',
-          style: TextStyle(color: Colors.red),
+        description: Text(
+          SupplierLocale.supplierNameRequired.getString(context),
+          style: const TextStyle(color: Colors.red),
         ),
         borderColor: Colors.red,
         isError: true,
@@ -70,9 +72,9 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
       if (success) {
         ShowToast(
           context,
-          description: const Text(
-            'Supplier created successfully',
-            style: TextStyle(color: Colors.green),
+          description: Text(
+            SupplierLocale.supplierCreateSuccess.getString(context),
+            style: const TextStyle(color: Colors.green),
           ),
           borderColor: Colors.green,
         );
@@ -110,7 +112,10 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
       appBar: AppBar(
         backgroundColor: bgColor,
         foregroundColor: textColor,
-        title: Text('Create Supplier', style: TextStyle(color: textColor)),
+        title: Text(
+          SupplierLocale.supplierCreate.getString(context),
+          style: TextStyle(color: textColor),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -125,8 +130,13 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
                     ShadInputFormField(
                       id: 'name',
                       controller: nameController,
-                      label: Text('Name', style: TextStyle(color: subColor)),
-                      placeholder: const Text('Enter supplier name'),
+                      label: Text(
+                        SupplierLocale.supplierName.getString(context),
+                        style: TextStyle(color: subColor),
+                      ),
+                      placeholder: Text(
+                        SupplierLocale.supplierName.getString(context),
+                      ),
                     ),
 
                     const SizedBox(height: 16),
@@ -135,8 +145,13 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
                       id: 'email',
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
-                      label: Text('Email', style: TextStyle(color: subColor)),
-                      placeholder: const Text('Enter email'),
+                      label: Text(
+                        SupplierLocale.supplierEmail.getString(context),
+                        style: TextStyle(color: subColor),
+                      ),
+                      placeholder: Text(
+                        SupplierLocale.supplierEmail.getString(context),
+                      ),
                     ),
 
                     const SizedBox(height: 16),
@@ -145,8 +160,13 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
                       id: 'phone',
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
-                      label: Text('Phone', style: TextStyle(color: subColor)),
-                      placeholder: const Text('Enter phone number'),
+                      label: Text(
+                        SupplierLocale.supplierPhone.getString(context),
+                        style: TextStyle(color: subColor),
+                      ),
+                      placeholder: Text(
+                        SupplierLocale.supplierPhone.getString(context),
+                      ),
                     ),
 
                     const SizedBox(height: 16),
@@ -155,8 +175,13 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
                       id: 'address',
                       controller: addressController,
                       maxLines: 3,
-                      label: Text('Address', style: TextStyle(color: subColor)),
-                      placeholder: const Text('Enter address'),
+                      label: Text(
+                        SupplierLocale.supplierAddress.getString(context),
+                        style: TextStyle(color: subColor),
+                      ),
+                      placeholder: Text(
+                        SupplierLocale.supplierAddress.getString(context),
+                      ),
                     ),
                   ],
                 ),
@@ -166,7 +191,7 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
 
               GradientSubmitButton(
                 onPressed: createSupplier,
-                text: 'Create Supplier',
+                text: SupplierLocale.supplierCreate.getString(context),
                 width: double.infinity,
               ),
             ],

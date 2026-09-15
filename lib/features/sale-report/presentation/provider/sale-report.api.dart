@@ -51,6 +51,28 @@ class SaleReportAsyncNotifier extends AsyncNotifier<SaleReport> {
     throw Exception("Failed to post sale report");
   }
 
+  //set for first open
+  Future<bool> setFirstOpeningAmountCompany({
+    required String date,
+    required double amount,
+  }) async {
+    try {
+      final response = await _dio.post(
+        "v1/sale-reports/first-opening-amount",
+        data: {"date": date, "amount": amount},
+      );
+      final Map<String, dynamic> data = response.data;
+
+      if (data["success"] == true) {
+        ref.invalidateSelf();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<void> getOpenClosing({DateTime? date}) async {
     state = const AsyncLoading();
 

@@ -79,7 +79,7 @@ class _SupplierPageState extends ConsumerState<SupplierPage> {
 
               text: SupplierLocale.supplierCreate.getString(context),
 
-              width: 100,
+              width: 200,
             ),
 
             const SizedBox(height: 20),

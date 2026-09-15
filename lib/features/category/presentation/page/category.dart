@@ -19,6 +19,17 @@ class CategoryPage extends ConsumerStatefulWidget {
 
 class _CategoryPageState extends ConsumerState<CategoryPage> {
   Category? categoryData;
+
+  Future<void> _onRefresh() async {
+    if (!mounted) return;
+
+    setState(() {
+      categoryData = null;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 300));
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
@@ -26,9 +37,8 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
 
     final bgColor = isDark ? kBgDark : kBgLight;
     final textColor = isDark ? kTextDark : kTextLight;
-    final subColor = isDark ? kTextSubDark : kTextSubLight;
 
-    BoxDecoration categoryFormBoxDecoration = BoxDecoration(
+    final categoryFormBoxDecoration = BoxDecoration(
       color: isDark ? kSurfaceDark : kSurfaceLight,
       borderRadius: BorderRadius.circular(16),
       boxShadow: [
@@ -51,50 +61,47 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
         ),
         title: CategoryScreenLocale.categoryTitle.getString(context),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          children: [
-            CategoryFormTitle(textColor: textColor),
-
-            const SizedBox(height: 12),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: categoryFormBoxDecoration,
-              child: CategoryForm(
-                category: categoryData,
-                onClear: () => setState(() {
-                  categoryData = null;
-                }),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            CategoriesNameTitle(textColor: textColor),
-
-            const SizedBox(height: 12),
-
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: CategoryCard(
-                  onEdit: (Category value) {
-                    print("value is ${value.title}");
-                    setState(() {
-                      categoryData = value;
-                    });
-                  },
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            children: [
+              CategoryFormTitle(textColor: textColor),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: categoryFormBoxDecoration,
+                child: CategoryForm(
+                  category: categoryData,
+                  onClear: () => setState(() {
+                    categoryData = null;
+                  }),
                 ),
               ),
-            ),
-
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 20),
+              CategoriesNameTitle(textColor: textColor),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.55,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: CategoryCard(
+                    onEdit: (Category value) {
+                      setState(() {
+                        categoryData = value;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );

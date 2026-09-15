@@ -51,7 +51,7 @@ class _ProductBarcodeScanPageState
 
   void _setVoucher() {
     final existing = ref.read(voucherDetailProvider);
-    if (existing != null) return; // ရှိပြီးသားဆို မထိတော့ဘူး
+    if (existing != null) return;
 
     final voucherDetailModel = VoucherDetailModel(
       id: 0,
@@ -113,14 +113,12 @@ class _ProductBarcodeScanPageState
 
   @override
   Widget build(BuildContext context) {
-    // Example:
     final voucher = ref.watch(voucherDetailProvider);
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final textColor = isDark ? kTextDark : kTextLight;
     final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
     final notifier = ref.read(voucherDetailProvider.notifier);
-    // final productState = ref.watch(productProvider);
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -163,12 +161,14 @@ class _ProductBarcodeScanPageState
           ),
 
           const Divider(height: 1),
-          voucher == null
+          voucher == null || voucher.items.isEmpty
               ? Expanded(
                   flex: 6,
                   child: Center(
                     child: Text(
-                      "No voucher",
+                      voucher == null
+                          ? "No voucher"
+                          : VoucherScreenLocale.noItems.getString(context),
                       style: TextStyle(color: textColor),
                     ),
                   ),
@@ -246,6 +246,7 @@ class _ProductBarcodeScanPageState
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
+                                    // Decrement Button
                                     QtyButton(
                                       icon: Icons.remove,
                                       onTap: () {
@@ -281,6 +282,7 @@ class _ProductBarcodeScanPageState
                                         ),
                                       ),
                                     ),
+                                    // Increment Button
                                     QtyButton(
                                       icon: Icons.add,
                                       onTap: () {
@@ -299,56 +301,35 @@ class _ProductBarcodeScanPageState
                                         notifier.calculate();
                                       },
                                     ),
+                                    const SizedBox(width: 8),
+                                    // ── Remove Item Button ──────
+                                    InkWell(
+                                      borderRadius: BorderRadius.circular(8),
+                                      onTap: () {
+                                        notifier.removeItem(item.id);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.delete_outline,
+                                          color: Colors.red,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                             ),
                           ),
 
-                          // ── Add Item Button (last item) ────
-                          // if (index == voucher.items.length - 1)
-                          //   Padding(
-                          //     padding: const EdgeInsets.only(top: 4, bottom: 8),
-                          //     child: showAdd
-                          //         ? buildSearchField(
-                          //             ref,
-                          //             searchController,
-                          //             isDark,
-                          //             textColor,
-                          //             subColor,
-                          //             setState,
-                          //             showAddField,
-                          //             onSearchChanged: onSearchChanged,
-                          //           )
-                          //         : SizedBox(
-                          //             width: double.infinity,
-                          //             child: DecoratedBox(
-                          //               decoration: BoxDecoration(
-                          //                 gradient: const LinearGradient(
-                          //                   colors: [kPrimary, kSecondary],
-                          //                   begin: Alignment.centerLeft,
-                          //                   end: Alignment.centerRight,
-                          //                 ),
-                          //                 borderRadius: BorderRadius.circular(
-                          //                   8,
-                          //                 ),
-                          //               ),
-                          //               child: ShadButton(
-                          //                 backgroundColor: Colors.transparent,
-                          //                 onPressed: () => setState(
-                          //                   () => showAddField = true,
-                          //                 ),
-                          //                 child: Text(
-                          //                   VoucherScreenLocale.addItem
-                          //                       .getString(context),
-                          //                   style: const TextStyle(
-                          //                     color: Colors.white,
-                          //                   ),
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //           ),
-                          //   ),
+                          // ── Add Item / Calculate Button (last item) ────
                           if (index == voucher.items.length - 1)
                             SizedBox(
                               width: double.infinity,
@@ -366,7 +347,9 @@ class _ProductBarcodeScanPageState
                                   onPressed: () => showDialog(
                                     context: context,
                                     builder: (context) =>
-                                        VoucherCalculationDialog(photos: []),
+                                        const VoucherCalculationDialog(
+                                          photos: [],
+                                        ),
                                   ),
                                   child: Text(
                                     VoucherScreenLocale.voucherCalculate

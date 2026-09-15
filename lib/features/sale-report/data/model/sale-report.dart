@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:pos/features/profile/data/model/user.dart';
 import 'package:pos/models/payment-data.dart';
-import 'package:pos/models/user.dart';
 
 enum TransferType {
   internal,
@@ -31,6 +31,7 @@ class SaleReport {
   final double totalExternalTransferAmount;
   final double totalInternalTransferAmount;
   final bool isClosed;
+  final bool existAnyOpeningAndClosing;
 
   SaleReport({
     required this.openingAmount,
@@ -46,6 +47,7 @@ class SaleReport {
     required this.totalExternalTransferAmount,
     required this.totalInternalTransferAmount,
     required this.isClosed,
+    required this.existAnyOpeningAndClosing,
   });
 
   factory SaleReport.fromJson(Map<String, dynamic> json) {
@@ -67,6 +69,7 @@ class SaleReport {
         json['totalInternalTransferAmount'],
       ),
       isClosed: json['isClosed'] ?? false,
+      existAnyOpeningAndClosing: json['existAnyOpeningAndClosing'] ?? false,
     );
   }
 

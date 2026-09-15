@@ -111,7 +111,10 @@ class _ExpireItemsPageState extends ConsumerState<ExpireItemsPage> {
             if (user != null && (isAdmin(user.role) || isManager(user.role)))
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
-                child: DateRangeSelect(),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: DateRangeSelect(),
+                ),
               ),
 
             Expanded(

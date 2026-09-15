@@ -72,6 +72,11 @@ dependencies:
   flutter_local_notifications: ^22.2.0
   firebase_core: ^4.12.1
   socket_io_client: ^3.1.6
+  flutter_native_splash: ^2.4.8
+  flutter_file_downloader: ^2.1.1
+  open_folder: ^0.0.4
+  device_info_plus: ^12.4.0
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
@@ -117,14 +122,25 @@ flutter:
   fonts:
     - family: NotoSerif
       fonts:
+        - asset: assets/fonts/mm3_05-Jan-2011.ttf
+          weight: 800
+        - asset: assets/fonts/mm3_05-Jan-2011.ttf
+          weight: 900
         # - asset: assets/fonts/mm3_05-Jan-2011.ttf
         # - asset: assets/fonts/mm3-multi-os.ttf
         # - asset: assets/fonts/mm3h.ttf
-        - asset: assets/fonts/MyanmarAngoun.ttf
-          # - asset: assets/fonts/MyanmarBlack.ttf
-          # - asset: assets/fonts/NotoSerifMyanmar-Bold.ttf
-          # - asset: assets/fonts/NotoSerifMyanmar-Regular.ttf
-          weight: 700
+        # - asset: assets/fonts/MyanmarAngoun.ttf
+        #   weight: 800
+        # - asset: assets/fonts/MyanmarAngoun.ttf
+        #   weight: 900
+        # - asset: assets/fonts/MyanmarBlack.ttf
+        #   weight: 800
+        # - asset: assets/fonts/MyanmarBlack.ttf
+        #   weight: 900
+        # - asset: assets/fonts/MyanmarBlack.ttf
+        # - asset: assets/fonts/NotoSerifMyanmar-Bold.ttf
+        # - asset: assets/fonts/NotoSerifMyanmar-Regular.ttf
+
     - family: Pyidaungsu
       fonts:
         - asset: assets/fonts/Pyidaungsu-2.5.3_Bold.ttf
@@ -146,8 +162,13 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-
-  image_path: 'assets/icon/pos master logo.png'
+  macos:
+    generate: true
+  windows:
+    generate: true
+    image_path: 'assets/icon/pos-master-logo.png'
+    icon_size: 256
+  image_path: 'assets/icon/pos-master-logo.png'
 
   min_sdk_android: 21
   remove_alpha_ios: true
@@ -159,3 +180,6 @@ flutter_launcher_icons:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_native_splash:
+  color: '#ffffff'
+  image: 'assets/icon/pos-master-logo.png'

@@ -1,4 +1,4 @@
-import 'package:pos/models/user.dart';
+import 'package:pos/features/profile/data/model/user.dart';
 
 class SalaryDeductionItem {
   final DateTime? date;
@@ -267,4 +267,3 @@ class PayrollRecord {
         .toList();
   }
 }
-

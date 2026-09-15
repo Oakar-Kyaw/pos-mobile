@@ -1,4 +1,4 @@
-import 'package:pos/models/user.dart';
+import 'package:pos/features/profile/data/model/user.dart';
 
 class Attendance {
   final int id;

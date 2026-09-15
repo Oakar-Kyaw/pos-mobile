@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/component/accent-bar.dart';
+import 'package:pos/features/profile/data/model/user.dart';
 import 'package:pos/localization/employee-local.dart';
-import 'package:pos/models/user.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/badge.dart';
 import 'package:pos/utils/font-size.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
 
 class EmployeeCard extends StatelessWidget {
   EmployeeCard({

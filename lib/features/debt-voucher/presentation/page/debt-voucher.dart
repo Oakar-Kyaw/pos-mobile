@@ -55,7 +55,7 @@ class _DebtVoucherPageState extends ConsumerState<DebtVoucherPage> {
           // if (user != null && (isAdmin(user.role) || isManager(user.role)))
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: DateRangeSelect(),
+            child: SizedBox(width: double.infinity, child: DateRangeSelect()),
           ),
           Expanded(
             child: DebtListTile(
@@ -83,30 +83,7 @@ class DebtLabel extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          Container(
-            width: 4,
-            height: 18,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [kPrimary, kSecondary],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            DebtLocaleScreenLocale.debtTitle.getString(context),
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: textColor,
-              letterSpacing: -0.2,
-            ),
-          ),
           if (user != null && (isAdmin(user.role) || isManager(user.role))) ...[
-            const Spacer(),
             const UserSelect(),
           ],
         ],

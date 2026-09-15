@@ -58,12 +58,43 @@ mixin ProductScreenLocale {
   static const unsavedChanges = 'product_unsaved_changes';
   static const cancel = 'product_cancel';
 
+  static const success = 'product_success';
+  static const error = 'product_error';
+
   static const productCreated = 'product_created';
   static const productUpdated = 'product_updated';
   static const productDeleted = 'product_deleted';
   static const productEditSaved = 'product_edit_saved';
 
   static const productNotFound = 'product_not_found';
+
+  static const getExcel = 'product_get_excel';
+  static const uploadExcel = 'product_upload_excel';
+
+  static const downloading = 'product_downloading';
+  static const uploading = 'product_uploading';
+
+  static const downloadComplete = 'product_download_complete';
+  static const uploadComplete = 'product_upload_complete';
+
+  static const downloadFailed = 'product_download_failed';
+  static const uploadFailed = 'product_upload_failed';
+
+  static const productExcelDownloaded = 'product_excel_downloaded';
+  static const productExcelUploaded = 'product_excel_uploaded';
+
+  static const storagePermissionRequired =
+      'product_storage_permission_required';
+
+  static const downloadUrlUnavailable = 'product_download_url_unavailable';
+
+  static const savedTo = 'product_saved_to';
+  static const openFilesApp = 'product_open_files_app';
+  static const fileSavedSuccessfully = 'product_file_saved_successfully';
+
+  static const couldNotOpenFolder = 'product_could_not_open_folder';
+  static const viewLocation = 'product_view_location';
+  static const openFolder = 'product_open_folder';
 
   static const EN = {
     productTitle: 'Products',
@@ -125,12 +156,45 @@ mixin ProductScreenLocale {
     unsavedChanges: 'You have unsaved changes',
     cancel: 'Cancel',
 
+    success: 'Success',
+    error: 'Error',
+
     productCreated: 'Product created successfully',
     productUpdated: 'Product updated successfully',
     productDeleted: 'Product deleted successfully',
     productEditSaved: 'Product changes saved successfully',
 
     productNotFound: 'Product not found',
+
+    getExcel: 'Get Excel',
+    uploadExcel: 'Upload Excel',
+
+    downloading: 'Downloading...',
+    uploading: 'Uploading...',
+
+    downloadComplete: 'Download Complete',
+    uploadComplete: 'Upload Complete',
+
+    downloadFailed: 'Download Failed',
+    uploadFailed: 'Upload Failed',
+
+    productExcelDownloaded:
+        'Product Excel file has been downloaded successfully.',
+
+    productExcelUploaded:
+        'Product Excel file has been uploaded and processed successfully.',
+
+    storagePermissionRequired: 'Storage permission is required to download.',
+
+    downloadUrlUnavailable: 'Download URL is not available.',
+
+    savedTo: 'Saved to',
+    openFilesApp: 'Open via Files app',
+    fileSavedSuccessfully: 'File saved successfully',
+
+    couldNotOpenFolder: 'Could not open folder',
+    viewLocation: 'View Location',
+    openFolder: 'Open Folder',
   };
 
   static const MM = {
@@ -193,6 +257,9 @@ mixin ProductScreenLocale {
     unsavedChanges: 'မသိမ်းရသေးသော ပြောင်းလဲမှုများ ရှိပါသည်',
     cancel: 'မလုပ်တော့ပါ',
 
+    success: 'အောင်မြင်ပါသည်',
+    error: 'မအောင်မြင်ပါ',
+
     productCreated: 'ကုန်ပစ္စည်း အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ',
     productUpdated: 'ကုန်ပစ္စည်း အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ',
     productDeleted: 'ကုန်ပစ္စည်း ဖျက်ပြီးပါပြီ',
@@ -200,5 +267,36 @@ mixin ProductScreenLocale {
         'ကုန်ပစ္စည်း ပြောင်းလဲမှုများကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ',
 
     productNotFound: 'ကုန်ပစ္စည်း မတွေ့ပါ',
+
+    getExcel: 'Excel ရယူမည်',
+    uploadExcel: 'Excel တင်မည်',
+
+    downloading: 'ဒေါင်းလုဒ်လုပ်နေသည်...',
+    uploading: 'တင်နေသည်...',
+
+    downloadComplete: 'ဒေါင်းလုဒ် အောင်မြင်ပါသည်',
+    uploadComplete: 'တင်ခြင်း အောင်မြင်ပါသည်',
+
+    downloadFailed: 'ဒေါင်းလုဒ် မအောင်မြင်ပါ',
+    uploadFailed: 'တင်ခြင်း မအောင်မြင်ပါ',
+
+    productExcelDownloaded:
+        'ကုန်ပစ္စည်း Excel ဖိုင်ကို အောင်မြင်စွာ ဒေါင်းလုဒ်လုပ်ပြီးပါပြီ။',
+
+    productExcelUploaded:
+        'ကုန်ပစ္စည်း Excel ဖိုင်ကို အောင်မြင်စွာ တင်ပြီး လုပ်ဆောင်ပြီးပါပြီ။',
+
+    storagePermissionRequired:
+        'ဒေါင်းလုဒ်လုပ်ရန် Storage ခွင့်ပြုချက် လိုအပ်ပါသည်။',
+
+    downloadUrlUnavailable: 'ဒေါင်းလုဒ် URL မရရှိနိုင်ပါ။',
+
+    savedTo: 'သိမ်းထားသောနေရာ',
+    openFilesApp: 'Files App မှတစ်ဆင့် ဖွင့်နိုင်ပါသည်',
+    fileSavedSuccessfully: 'ဖိုင်ကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ',
+
+    couldNotOpenFolder: 'Folder ကို ဖွင့်၍မရပါ',
+    viewLocation: 'သိမ်းထားသောနေရာ ကြည့်မည်',
+    openFolder: 'Folder ဖွင့်မည်',
   };
 }

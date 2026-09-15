@@ -1,7 +1,43 @@
+import 'package:pos/features/company/data/model/company.dart';
 import 'package:pos/features/customer/data/model/customer-model.dart';
-import 'package:pos/models/company.dart';
 import 'package:pos/models/payment-data.dart';
 import 'package:pos/models/product.dart';
+
+class VoucherUser {
+  final int id;
+  final String? firstName;
+  final String? lastName;
+  final String? phone;
+  final String? email;
+
+  VoucherUser({
+    required this.id,
+    this.firstName,
+    this.lastName,
+    this.phone,
+    this.email,
+  });
+
+  factory VoucherUser.fromJson(Map<String, dynamic> json) {
+    return VoucherUser(
+      id: (json['id'] as num).toInt(),
+      firstName: json['firstName'] as String?,
+      lastName: json['lastName'] as String?,
+      phone: json['phone'] as String?,
+      email: json['email'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'firstName': firstName,
+      'lastName': lastName,
+      'phone': phone,
+      'email': email,
+    };
+  }
+}
 
 class VoucherPayment {
   String? id;
@@ -18,19 +54,17 @@ class VoucherPayment {
     required this.type,
   });
 
-  // Optional: factory from JSON
   factory VoucherPayment.fromJson(Map<String, dynamic> json) {
     return VoucherPayment(
-      paymentDataId: json['paymentDataId'] as int,
-      amount: double.parse(json['amount'].toString()),
-      type: (json["type"]),
+      paymentDataId: json['paymentDataId'] as int?,
+      amount: double.tryParse(json['amount'].toString()) ?? 0.0,
+      type: json["type"].toString(),
       paymentData: json["paymentData"] != null
           ? PaymentData.fromJson(json["paymentData"])
           : null,
     );
   }
 
-  // Optional: convert to JSON
   Map<String, dynamic> toJson() {
     return {'paymentDataId': paymentDataId, 'amount': amount, 'type': type};
   }
@@ -55,7 +89,7 @@ class VoucherPayment {
 class ItemModel {
   final int id;
   final int productId;
-  final Product? product; // ← nullable ပြောင်းပါ
+  final Product? product;
   final String name;
   final String? photoUrl;
   int quantity;
@@ -105,7 +139,7 @@ class ItemModel {
       productId: (json['productId'] as num).toInt(),
       product: json['product'] != null
           ? Product.fromJson(json['product'] as Map<String, dynamic>)
-          : null, // ← key မပါရင် null ထားလိုက်
+          : null,
       name: json['name'] as String,
       photoUrl: json['photoUrl'] as String?,
       quantity: (json['quantity'] as num?)?.toInt() ?? 0,
@@ -139,6 +173,7 @@ class VoucherDetailModel {
   List<VoucherPayment> payments;
   Customer? customer;
   Company? company;
+  VoucherUser? user;
 
   double subTotal;
   double totalPaymentAmount;
@@ -162,6 +197,7 @@ class VoucherDetailModel {
     required this.payments,
     this.customer,
     this.company,
+    this.user, // ← Added to constructor
     this.totalPaymentAmount = 0,
     this.deliveryFee = 0,
     this.packagingFee = 0,
@@ -183,6 +219,8 @@ class VoucherDetailModel {
     List<ItemModel>? items,
     List<VoucherPayment>? payments,
     Customer? customer,
+    Company? company,
+    VoucherUser? user, // ← Added to copyWith
     double? total,
     double? totalPaymentAmount,
     double? deliveryFee,
@@ -202,6 +240,8 @@ class VoucherDetailModel {
       items: items ?? this.items,
       payments: payments ?? this.payments,
       customer: customer ?? this.customer,
+      company: company ?? this.company,
+      user: user ?? this.user,
       subTotal: subTotal ?? this.subTotal,
       total: total ?? this.total,
       totalPaymentAmount: totalPaymentAmount ?? this.totalPaymentAmount,
@@ -216,34 +256,36 @@ class VoucherDetailModel {
       type: type ?? this.type,
       existDebt: existDebt ?? this.existDebt,
       isRefund: isRefund ?? this.isRefund,
-      company: company,
     );
   }
 
   // From JSON
   factory VoucherDetailModel.fromJson(Map<String, dynamic> json) {
-    // print("voucher detail model ${json['Customer']}, ${json['customer']}");
     return VoucherDetailModel(
       id: json['id'],
       voucherCode: json['voucherCode'] ?? "",
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : null,
-
       items: (json['items'] as List<dynamic>)
           .map((item) => ItemModel.fromJson(item))
           .toList(),
       customer: json['Customer'] != null
           ? Customer.fromJson(json['Customer'])
-          : null,
+          : (json['customer'] != null
+                ? Customer.fromJson(json['customer'])
+                : null),
+      user: json['user'] != null
+          ? VoucherUser.fromJson(json['user'])
+          : null, // ← Added json parsing
       subTotal: double.parse(json['subTotal'].toString()),
       total: double.parse(json['total'].toString()),
       tax: double.parse(json['tax'].toString()),
-
       totalPaymentAmount: double.parse(json['totalPaymentAmount'].toString()),
       deliveryFee: double.parse(json['deliveryFee'].toString()),
       discountAmount: double.parse(json["discountAmount"].toString()),
       discountPercent: double.parse(json["discountPercent"].toString()),
+      packagingFee: double.parse(json["packagingFee"].toString()),
       remainingPaymentAmount: double.parse(
         json['remainingPaymentAmount'].toString(),
       ),
@@ -251,11 +293,9 @@ class VoucherDetailModel {
       type: json['type'],
       existDebt: json["existDebt"],
       isRefund: json["isRefund"],
-
       payments: (json['payments'] as List<dynamic>)
           .map((item) => VoucherPayment.fromJson(item))
           .toList(),
-
       company: json['company'] != null
           ? Company.fromJson(json['company'])
           : null,

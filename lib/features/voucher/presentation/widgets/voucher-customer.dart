@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/features/customer/data/model/customer-model.dart';
 import 'package:pos/features/customer/presentation/provider/customer-provider.dart';
+import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -78,10 +80,6 @@ class _CustomerVoucherState extends ConsumerState<CustomerVoucher> {
       _searchCtrl.text = customer.name;
       widget.onChanged.call(customer);
     });
-
-    // ⚠️ Attach customerId to the voucher state — add a `customerId` param
-    // to VoucherDetailNotifier.updateVoucher() if it doesn't exist yet.
-    // ref.read(voucherDetailProvider.notifier).updateVoucher(customerId: customer.id);
   }
 
   void _clearCustomer() {
@@ -91,7 +89,6 @@ class _CustomerVoucherState extends ConsumerState<CustomerVoucher> {
       _results = [];
       _showCreateForm = false;
     });
-    // ref.read(voucherDetailProvider.notifier).updateVoucher(customerId: null);
   }
 
   Future<void> _createNewCustomer() async {
@@ -101,15 +98,7 @@ class _CustomerVoucherState extends ConsumerState<CustomerVoucher> {
     if (phone.isEmpty) return;
 
     try {
-      // ⚠️ Replace with your actual create-customer call, e.g.:
-      // final newCustomer = await ref
-      //     .read(customerProvider.notifier)
-      //     .createCustomer(name: name, phone: _newPhoneCtrl.text.trim());
-      Customer newCustomer = Customer(
-        id: 0,
-        name: name,
-        phone: phone,
-      ); // placeholder
+      Customer newCustomer = Customer(id: 0, name: name, phone: phone);
 
       if (!mounted) return;
       _selectCustomer(newCustomer);
@@ -191,14 +180,18 @@ class _CustomerVoucherState extends ConsumerState<CustomerVoucher> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Customer (optional)',
+                  VoucherScreenLocale.customerOptional.getString(context),
                   style: TextStyle(color: subColor, fontSize: 12),
                 ),
                 const SizedBox(height: 8),
 
                 ShadInputFormField(
                   controller: _searchCtrl,
-                  placeholder: const Text('Search by name or phone...'),
+                  placeholder: Text(
+                    VoucherScreenLocale.searchCustomerPlaceholder.getString(
+                      context,
+                    ),
+                  ),
                   onChanged: _onSearchChanged,
                   trailing: _isSearching
                       ? const SizedBox(
@@ -209,7 +202,7 @@ class _CustomerVoucherState extends ConsumerState<CustomerVoucher> {
                       : null,
                 ),
 
-                // Search results — bounded height so ListView doesn't blow up
+                // Search results
                 if (_results.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   ConstrainedBox(
@@ -225,7 +218,7 @@ class _CustomerVoucherState extends ConsumerState<CustomerVoucher> {
                           contentPadding: EdgeInsets.zero,
                           leading: const Icon(LucideIcons.user, size: 18),
                           title: Text(
-                            c.name, // ⚠️ adjust field name
+                            c.name,
                             style: TextStyle(color: textColor),
                           ),
                           subtitle: c.phone != null
@@ -241,22 +234,26 @@ class _CustomerVoucherState extends ConsumerState<CustomerVoucher> {
                   ),
                 ],
 
-                // No results → quick create-new form
+                // Quick create-new form
                 if (_showCreateForm) ...[
                   const SizedBox(height: 12),
                   Text(
-                    'No customer found. Create new:',
+                    VoucherScreenLocale.noCustomerFound.getString(context),
                     style: TextStyle(color: subColor, fontSize: 12),
                   ),
                   const SizedBox(height: 8),
                   ShadInputFormField(
                     controller: _newNameCtrl,
-                    placeholder: const Text('Customer name'),
+                    placeholder: Text(
+                      VoucherScreenLocale.customerName.getString(context),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   ShadInputFormField(
                     controller: _newPhoneCtrl,
-                    placeholder: const Text('Phone (optional)'),
+                    placeholder: Text(
+                      VoucherScreenLocale.phoneOptional.getString(context),
+                    ),
                     keyboardType: TextInputType.phone,
                   ),
                   const SizedBox(height: 8),
@@ -264,7 +261,9 @@ class _CustomerVoucherState extends ConsumerState<CustomerVoucher> {
                     width: double.infinity,
                     child: ShadButton.outline(
                       onPressed: _createNewCustomer,
-                      child: const Text('Create & Select'),
+                      child: Text(
+                        VoucherScreenLocale.createAndSelect.getString(context),
+                      ),
                     ),
                   ),
                 ],

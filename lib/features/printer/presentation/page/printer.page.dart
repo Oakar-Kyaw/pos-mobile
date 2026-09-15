@@ -300,8 +300,8 @@ class _PrinterPageState extends ConsumerState<PrinterPage> {
                         options:
                             [
                                   {"key": "Bluetooth", "value": "bluetooth"},
-                                  {"key": "USB", "value": "usb"},
-                                  {"key": "Ethernet", "value": "ethernet"},
+                                  // {"key": "USB", "value": "usb"},
+                                  // {"key": "Ethernet", "value": "ethernet"},
                                 ]
                                 .map(
                                   (item) => ShadOption(

@@ -119,19 +119,44 @@ class DioService {
           final statusCode = e.response?.statusCode;
 
           print(
-            "Dio Error: "
+            "Dio Error: 💁"
             "$statusCode "
             "${e.requestOptions.path} "
             "${e.response}",
           );
+          // =====================================================
+          // 403 - SUBSCRIPTION / TRIAL EXPIRED
+          // =====================================================
+          final data = e.response?.data;
 
+          final message = data is Map ? data['message']?.toString() : null;
+
+          if (_isSubscriptionExpired(message)) {
+            print("Trial/subscription expired 🚫");
+
+            await _handleSubscriptionExpired();
+
+            return handler.reject(e);
+          }
+          print("Access token expired 🔐");
+          // if (statusCode == 403) {
+          //   final data = e.response?.data;
+
+          //   final message = data is Map ? data['message']?.toString() : null;
+
+          //   if (_isSubscriptionExpired(message)) {
+          //     print("Trial/subscription expired 🚫");
+
+          //     await _handleSubscriptionExpired();
+
+          //     return handler.reject(e);
+          //   }
+          // }
           // =====================================================
           // 401 UNAUTHORIZED
           // =====================================================
 
           if (statusCode == 401) {
-            print("Access token expired 🔐");
-
             // ---------------------------------------------------
             // IMPORTANT:
             //
@@ -193,7 +218,7 @@ class DioService {
 
           final errorMessage = _handleError(e);
 
-          print("API error: ${e.response} ");
+          // print("API error: ${e.response} ");
 
           return handler.reject(
             DioException(
@@ -552,13 +577,17 @@ class DioService {
   // =============================================================
 
   Future<Response> post(
-    String path, {
+    String url, {
     dynamic data,
     Map<String, dynamic>? query,
+    void Function(int sent, int total)? onSendProgress,
   }) async {
-    print("POST path: $path");
-
-    return await _dio.post(path, data: data, queryParameters: query);
+    return _dio.post(
+      url,
+      data: data,
+      queryParameters: query,
+      onSendProgress: onSendProgress,
+    );
   }
 
   // =============================================================
@@ -579,5 +608,30 @@ class DioService {
 
   Future<Response> delete(String path, {dynamic data}) async {
     return await _dio.delete(path, data: data);
+  }
+
+  bool _subscriptionExpiredHandled = false;
+
+  bool _isSubscriptionExpired(String? message) {
+    if (message == null) return false;
+    debugPrint("is subscription expired $message");
+    return message.toLowerCase().contains('trial') ||
+        message.toLowerCase().contains('subscription');
+  }
+
+  Future<void> _handleSubscriptionExpired() async {
+    if (_subscriptionExpiredHandled) return;
+
+    _subscriptionExpiredHandled = true;
+    try {
+      debugPrint("show subsctioptoion");
+      await session.subscriptionExpired();
+    } catch (error) {
+      print("subscriptionExpired handler error: $error");
+    }
+
+    Future.delayed(const Duration(seconds: 5), () {
+      _subscriptionExpiredHandled = false;
+    });
   }
 }

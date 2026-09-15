@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/user.api.dart';
-import 'package:pos/models/user.dart';
 import 'package:pos/component/loading-component.dart';
+import 'package:pos/features/profile/data/model/user.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';

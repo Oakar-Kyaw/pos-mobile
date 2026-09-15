@@ -95,7 +95,7 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
                   _pagingController.refresh();
                 },
                 text: GeneralExpenseLocale.expenseButton.getString(context),
-                width: 160,
+                width: 150,
               ),
               const SizedBox(height: 20),
               if (isAdmin(user!.role) || isManager(user.role)) ...[

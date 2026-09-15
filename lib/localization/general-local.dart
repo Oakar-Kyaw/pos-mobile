@@ -22,6 +22,14 @@ mixin GeneralScreenLocale {
   static const invalidEmail = 'general_invalid_email';
   static const invalidPhone = 'general_invalid_phone';
 
+  // Subscription
+
+  static const subscriptionExpired = 'general_subscription_expired';
+  static const subscriptionExpiredDescription =
+      'general_subscription_expired_description';
+  static const subscribe = 'general_subscribe';
+  static const later = 'general_later';
+
   // 🇺🇸 English
 
   static const EN = {
@@ -45,6 +53,12 @@ mixin GeneralScreenLocale {
 
     invalidEmail: 'Invalid email address',
     invalidPhone: 'Invalid phone number',
+
+    subscriptionExpired: 'Subscription Expired',
+    subscriptionExpiredDescription:
+        'Please subscribe to continue using the app.',
+    subscribe: 'Subscribe',
+    later: 'Later',
   };
 
   // 🇲🇲 Burmese
@@ -70,5 +84,10 @@ mixin GeneralScreenLocale {
 
     invalidEmail: 'အီးမေးလ် လိပ်စာ မှားယွင်းနေပါသည်',
     invalidPhone: 'ဖုန်းနံပါတ် မှားယွင်းနေပါသည်',
+
+    subscriptionExpired: 'သက်တမ်း ကုန်ဆုံးသွားပါပြီ',
+    subscriptionExpiredDescription: 'ဆက်လက်အသုံးပြုရန် subscribe လုပ်ပေးပါ။',
+    subscribe: 'Subscribe လုပ်ရန်',
+    later: 'နောက်မှ',
   };
 }

@@ -66,14 +66,14 @@ mixin GeneralExpenseLocale {
   static const MM = {
     expenseDescription: 'အရောင်း ဆော့ဖ်ဝဲ',
     expenseNo: 'စဉ်',
-    addExpense: 'သင်အသုံးစရိတ်ကို ထည့်ပါ',
+    addExpense: 'ထည့်ပါ',
     expenseTitle: 'ခေါင်းစဉ်',
     expenseAmount: 'ငွေပမာဏ',
     expenseCategory: 'အမျိုးအစား',
     expenseDate: 'ရက်စွဲ',
     expensePaymentMethod: 'ငွေပေးချေမှုနည်းလမ်း',
     expensePaymentAccount: 'ငွေပေးချေမှု အကောင့်',
-    expenseButton: 'အသုံးစရိတ်ထည့်မည်',
+    expenseButton: 'ထည့်မည်',
     expenseSaveSuccess: 'အထွေထွေ အသုံးစရိတ်ကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ',
     expenseSaveFailed: 'အထွေထွေ အသုံးစရိတ် သိမ်းဆည်းမှု မအောင်မြင်ပါ',
     expenseForm: 'အထွေထွေ အသုံးစရိတ် ဖောင်',
@@ -85,7 +85,7 @@ mixin GeneralExpenseLocale {
     pleaseSelectPaymentAccount:
         'ကျေးဇူးပြု၍ ငွေပေးချေမှု အကောင့်ကို ရွေးချယ်ပါ',
 
-    editExpense: 'အသုံးစရိတ် ပြင်ဆင်မည်',
+    editExpense: 'ပြင်ဆင်မည်',
     editExpenseButton: 'ပြင်ဆင်မည်',
     editSuccess: 'အသုံးစရိတ်ကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ',
     editFail: 'အသုံးစရိတ် ပြင်ဆင်မှု မအောင်မြင်ပါ',

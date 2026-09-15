@@ -20,6 +20,7 @@ mixin ReceiptScreenLocale {
   static const receiptDiscountPercent = 'receipt_discount_percent';
   static const receiptTax = 'receipt_tax';
   static const receiptDeliveryFee = 'receipt_delivery_fee';
+  static const packagingFee = 'receipt_packaging_fee';
   static const receiptTotal = 'receipt_total';
 
   static const receiptPaidAmount = 'receipt_paid_amount';
@@ -49,6 +50,7 @@ mixin ReceiptScreenLocale {
     receiptDiscountPercent: 'Discount (%)',
     receiptTax: 'Tax',
     receiptDeliveryFee: 'Delivery Fee',
+    packagingFee: 'Packaging Fee',
     receiptTotal: 'TOTAL',
 
     receiptPaidAmount: 'Paid Amount',
@@ -79,6 +81,7 @@ mixin ReceiptScreenLocale {
     receiptDiscountPercent: 'လျှော့နှုန်း (%)',
     receiptTax: 'အခွန်',
     receiptDeliveryFee: 'ပို့ဆောင်ခ',
+    packagingFee: 'ထုပ်ပိုးခ',
     receiptTotal: 'စုစုပေါင်းကျသင့်ငွေ',
 
     receiptPaidAmount: 'ပေးချေပြီးငွေ',

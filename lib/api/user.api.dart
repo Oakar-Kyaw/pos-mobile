@@ -1,7 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
 import 'package:pos/core/provider.dart';
-import 'package:pos/models/user.dart';
+import 'package:pos/features/profile/data/model/user.dart';
 
 class UserAsyncNotifier extends AsyncNotifier<User> {
   late DioService _dio;
@@ -74,6 +75,28 @@ class UserAsyncNotifier extends AsyncNotifier<User> {
     }
 
     throw Exception("Failed to fetch users by company");
+  }
+
+  Future<bool> updateUser(int userId, FormData formData) async {
+    final url = "v1/users/$userId";
+
+    _dio.setContentType("multipart/form-data");
+
+    final response = await _dio.patch(url, data: formData);
+
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      final items = data["data"];
+
+      final updated = User.fromJson(Map<String, dynamic>.from(items));
+
+      state = AsyncData(updated);
+
+      return true;
+    }
+
+    throw Exception("Failed to update user");
   }
 
   /// Search users

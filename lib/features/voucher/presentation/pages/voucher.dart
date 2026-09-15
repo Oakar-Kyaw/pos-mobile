@@ -68,7 +68,10 @@ class _VoucherCardPageState extends ConsumerState<VoucherCardPage> {
             if (isAdmin(user!.role) || isManager(user.role))
               Padding(
                 padding: const EdgeInsets.all(20),
-                child: DateRangeSelect(),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: DateRangeSelect(),
+                ),
               ),
 
             const SizedBox(height: 12),

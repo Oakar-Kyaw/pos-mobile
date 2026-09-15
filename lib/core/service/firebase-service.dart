@@ -70,9 +70,9 @@ class FirebaseService {
       String imageUrl = "";
       bool isAndroidImage = false;
       bool isIOSImage = false;
-      // print(
-      //   "📩 Notification: ${message.notification?.title} - ${message.notification?.body}",
-      // );
+      print(
+        "📩 Notification: ${message.notification?.title} - ${message.notification?.body}",
+      );
       // print("📦 Data: ${message.data}");
       // print("🆔 Message ID: ${message.messageId}");
 

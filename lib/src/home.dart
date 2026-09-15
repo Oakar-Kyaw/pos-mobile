@@ -12,13 +12,13 @@ import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/core/network/socket/socket-provider.dart';
 import 'package:pos/core/widgets/app-local-notification.dart';
+import 'package:pos/features/company/presentation/provider/company.riverpod.dart';
 import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/models/product.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/riverpod/voucher-detail.dart';
 import 'package:pos/riverpod/login-check.dart';
-import 'package:pos/riverpod/company.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/drawer.dart';
@@ -442,6 +442,11 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                           ),
                           newPageProgressIndicatorBuilder: (_) => Center(
                             child: CircularProgressIndicator(color: kPrimary),
+                          ),
+                          noItemsFoundIndicatorBuilder: (_) => Center(
+                            child: Text(
+                              HomeScreenLocale.noItemFound.getString(context),
+                            ),
                           ),
                         ),
                       ),

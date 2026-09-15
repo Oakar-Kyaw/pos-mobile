@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
-import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/login.dart';
+import 'package:pos/api/user.api.dart';
+import 'package:pos/core/utils/register-button-widget.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/register-button-widget.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/route-constant.dart';
+import 'package:pos/utils/secure-storage.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:pos/localization/login-local.dart';
-import 'dart:async';
 
 class LoginScreen extends ConsumerStatefulWidget {
   final bool? showToast;
@@ -54,30 +53,54 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void submit() async {
-    final loginApi = await ref
-        .read(loginProvider.notifier)
-        .login(email: emailController.text, password: passwordController.text)
-        .catchError((error) {
-          String message;
-          if (error.message == LoginScreenLocale.emailNotFound) {
-            message = LoginScreenLocale.emailNotFound.getString(context);
-          } else if (error.message == LoginScreenLocale.passwordWrong) {
-            message = LoginScreenLocale.passwordWrong.getString(context);
-          } else {
-            message = error.toString();
-          }
-          ShowToast(
-            context,
-            action: const Icon(LucideIcons.x, color: Colors.red),
-            borderColor: Colors.red,
-            description: Text(
-              message,
-              style: const TextStyle(color: Colors.red),
-            ),
-          );
-        });
+    Map<String, dynamic>? loginApi;
 
-    if (loginApi["success"]) {
+    try {
+      loginApi = await ref
+          .read(loginProvider.notifier)
+          .login(
+            email: emailController.text,
+            password: passwordController.text,
+          );
+    } catch (error) {
+      debugPrint("message of error 👧 $error");
+
+      if (!mounted) return; // 👈 widget unmount ဖြစ်နေရင် ဒီမှာ ရပ်လိုက်တယ်
+
+      String message;
+      if (error.toString().contains(LoginScreenLocale.emailNotFound)) {
+        message = LoginScreenLocale.emailNotFound.getString(context);
+      } else if (error.toString().contains(LoginScreenLocale.passwordWrong)) {
+        message = LoginScreenLocale.passwordWrong.getString(context);
+      } else {
+        message = error.toString();
+      }
+
+      ShowToast(
+        context,
+        action: const Icon(LucideIcons.x, color: Colors.red),
+        borderColor: Colors.red,
+        description: Text(message, style: const TextStyle(color: Colors.red)),
+      );
+      return; // 👈 login fail ဖြစ်ရင် ဒီနေရာမှာ ရပ်ပါ
+    }
+
+    if (!mounted) return; // 👈 await ကျော်ပြီးတိုင်း mounted check ထပ်လုပ်ပါ
+
+    final secureStorage = SecureStorage();
+    final token = await secureStorage.getFirebaseToken();
+
+    if (!mounted) return; // 👈 ထပ် await ဖြတ်လို့ ထပ်စစ်ပါ
+
+    if (token != null) {
+      await ref
+          .read(userProvider.notifier)
+          .createorUpdateNotificationDeviceToken(deviceToken: token);
+    }
+
+    if (!mounted) return;
+
+    if (loginApi?["success"] == true) {
       context.pushReplacement(AppRoute.home);
     }
   }
@@ -190,7 +213,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 fontSize: FontSizeConfig.body(context),
                               ),
                             ),
-                            validator: (v) => (v == null || v.isEmpty)
+                            validator: (v) => (v.isEmpty)
                                 ? LoginScreenLocale.emailError.getString(
                                     context,
                                   )
@@ -217,7 +240,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             ),
                             obscureText: _obscurePassword,
-                            validator: (v) => (v == null || v.isEmpty)
+                            validator: (v) => (v.isEmpty)
                                 ? LoginScreenLocale.passwordError.getString(
                                     context,
                                   )
@@ -289,7 +312,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                   // ── Register link ────────────────────
                   RegisterButton(
-                    title: LoginScreenLocale.loginTitle.getString(context),
+                    title: LoginScreenLocale.register.getString(context),
                     onTap: () => context.pushNamed(AppRoute.companyProfile),
                     subColor: subColor,
                     newToPos: true,
