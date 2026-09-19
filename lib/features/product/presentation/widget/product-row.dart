@@ -13,7 +13,7 @@ class ProductRow extends StatelessWidget {
       TextSpan(
         children: [
           TextSpan(
-            text: title,
+            text: "$title - ",
             style: TextStyle(fontWeight: FontWeight.normal),
           ),
           TextSpan(

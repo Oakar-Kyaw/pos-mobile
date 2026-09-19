@@ -251,7 +251,8 @@ class ClosingReportCard extends StatelessWidget {
                   ReportRow(
                     icon: LucideIcons.repeat,
                     iconColor: isDark ? kTextSubDark : kTextSubLight,
-                    label: "Internal Transfer Amount",
+                    label: SaleReportLocale.saleReportInternalTransferAmount
+                        .getString(context),
                     amount: totalInternalTransferAmount.toString(),
                     isPositive: true,
                     isDark: isDark,
@@ -261,7 +262,8 @@ class ClosingReportCard extends StatelessWidget {
                   ReportRow(
                     icon: LucideIcons.externalLink,
                     iconColor: kRed,
-                    label: "External Transfer Amount",
+                    label: SaleReportLocale.saleReportExternalTransferAmount
+                        .getString(context),
                     amount: totalExternalTransferAmount.toString(),
                     isPositive: false,
                     isDark: isDark,

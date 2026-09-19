@@ -9,7 +9,7 @@ class CompanyInfoAsyncNotifier extends AsyncNotifier<Company> {
   @override
   Future<Company> build() async {
     _dio = ref.watch(dioServiceProvider);
-    return await getCompanys();
+    throw UnimplementedError('Use getCompanys explicitly or split providers');
   }
 
   Future<Company> getCompanys() async {

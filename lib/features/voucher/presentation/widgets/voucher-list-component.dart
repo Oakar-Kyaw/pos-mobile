@@ -132,18 +132,14 @@ class VoucherComponent extends StatelessWidget {
                             VoucherScreenLocale.createdBy.getString(context),
                           ),
                           const SizedBox(height: 8.0),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                voucher.user!.email!,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                " (${voucher.user!.phone})",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
+                          Text(
+                            voucher.user!.email!,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            voucher.user!.phone!,
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
                       ],

@@ -17,7 +17,6 @@ import flutter_secure_storage_darwin
 import flutter_thermal_printer
 import flutter_timezone
 import mobile_scanner
-import open_folder
 import print_bluetooth_thermal
 import printing
 import shared_preferences_foundation
@@ -38,7 +37,6 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FlutterThermalPrinterPlugin.register(with: registry.registrar(forPlugin: "FlutterThermalPrinterPlugin"))
   FlutterTimezonePlugin.register(with: registry.registrar(forPlugin: "FlutterTimezonePlugin"))
   MobileScannerPlugin.register(with: registry.registrar(forPlugin: "MobileScannerPlugin"))
-  OpenFolderPlugin.register(with: registry.registrar(forPlugin: "OpenFolderPlugin"))
   PrintBluetoothThermalPlugin.register(with: registry.registrar(forPlugin: "PrintBluetoothThermalPlugin"))
   PrintingPlugin.register(with: registry.registrar(forPlugin: "PrintingPlugin"))
   SharedPreferencesPlugin.register(with: registry.registrar(forPlugin: "SharedPreferencesPlugin"))

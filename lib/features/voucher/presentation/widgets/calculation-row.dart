@@ -11,23 +11,32 @@ Widget row(
 }) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      SizedBox(
-        width: 200,
+      Expanded(
+        flex: 3,
         child: Text(
           label,
           maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(fontWeight: FontWeight.w600, color: textColor),
         ),
       ),
-      Text(
-        value.toStringAsFixed(2),
-        style: TextStyle(
-          fontWeight: FontWeight.w800,
-          fontSize: highlight
-              ? FontSizeConfig.title(context)
-              : FontSizeConfig.body(context),
-          color: valueColor,
+      const SizedBox(width: 8),
+      Flexible(
+        flex: 2,
+        child: Text(
+          value.toStringAsFixed(2),
+          textAlign: TextAlign.right,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 5,
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: highlight
+                ? FontSizeConfig.title(context)
+                : FontSizeConfig.body(context),
+            color: valueColor,
+          ),
         ),
       ),
     ],

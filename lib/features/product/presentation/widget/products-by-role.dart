@@ -52,34 +52,30 @@ class ProductListByPosAndSale extends StatelessWidget {
                   maxLines: 1,
                   style: context.titleStyle,
                 ),
+                const SizedBox(height: 10),
                 ProductRow(
-                  title: "${ProductScreenLocale.barcode.getString(context)}:",
+                  title: "${ProductScreenLocale.barcode.getString(context)}",
                   text: product.barcode ?? "-",
                 ),
+                const SizedBox(height: 10),
                 ProductRow(
                   title:
-                      "${ProductScreenLocale.productPrice.getString(context)}:",
+                      "${ProductScreenLocale.productPrice.getString(context)}",
                   text: product.price.toString(),
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: ProductRow(
-                        title:
-                            "${ProductScreenLocale.productStock.getString(context)}:",
-                        text: product.stock.toString(),
-                      ),
-                    ),
-                    Expanded(
-                      child: ProductRow(
-                        title:
-                            "${ProductScreenLocale.minStock.getString(context)}:",
-                        text: product.minStock.toString(),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 10),
+                ProductRow(
+                  title:
+                      "${ProductScreenLocale.productStock.getString(context)}",
+                  text: product.stock.toString(),
                 ),
+                const SizedBox(height: 10),
+                ProductRow(
+                  title: "${ProductScreenLocale.minStock.getString(context)}",
+                  text: product.minStock.toString(),
+                ),
+
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -320,7 +316,7 @@ class _ProductListByAdminAndManagerState
     final isLockedByOther = editingId != null && editingId != product.id;
     final isThisEditing = editingId == product.id;
 
-    // 👇 Edit icon မနှိပ်ရင် field တွေ ရေးလို့မရအောင်
+    // 👇 Edit icon
     final fieldsReadOnly = !isThisEditing;
 
     return Container(

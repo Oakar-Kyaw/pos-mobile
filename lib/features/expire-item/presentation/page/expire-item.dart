@@ -54,7 +54,6 @@ class _ExpireItemsPageState extends ConsumerState<ExpireItemsPage> {
 
   @override
   void dispose() {
-    _clearSelectedData();
     _pagingController.dispose();
     super.dispose();
   }
@@ -83,47 +82,54 @@ class _ExpireItemsPageState extends ConsumerState<ExpireItemsPage> {
     final selectedData = ref.watch(selectedDataStateProvider);
     final config = InventoryActionConfig('Damage', context);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: CustomAppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(LucideIcons.arrowLeft),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) => _clearSelectedData(),
+      child: Scaffold(
+        backgroundColor: bgColor,
+        appBar: CustomAppBar(
+          leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: const Icon(LucideIcons.arrowLeft),
+          ),
+          title: config.title,
         ),
-        title: config.title,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
 
-            GradientSubmitButton(
-              onPressed: _onCreate,
-              text: DrawerScreenLocale.drawerCreate.getString(context),
-              width: 120,
-            ),
+              GradientSubmitButton(
+                onPressed: _onCreate,
+                text: DrawerScreenLocale.drawerCreate.getString(context),
+                width: 120,
+              ),
 
-            const SizedBox(height: 20),
-
-            ExpireLabel(textColor: textColor),
-            if (user != null && (isAdmin(user.role) || isManager(user.role)))
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                child: SizedBox(
+              const SizedBox(height: 20),
+              if (user != null && (isAdmin(user.role) || isManager(user.role)))
+                SizedBox(
                   width: double.infinity,
-                  child: DateRangeSelect(),
+                  child: ExpireLabel(textColor: textColor),
+                ),
+              if (user != null && (isAdmin(user.role) || isManager(user.role)))
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: DateRangeSelect(),
+                  ),
+                ),
+
+              Expanded(
+                child: ExpireDamageLists(
+                  pagingController: _pagingController,
+                  selectedData: selectedData,
                 ),
               ),
-
-            Expanded(
-              child: ExpireDamageLists(
-                pagingController: _pagingController,
-                selectedData: selectedData,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -138,12 +144,6 @@ class ExpireLabel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userStateProvider);
-    return Row(
-      children: [
-        if (user != null && (isAdmin(user.role) || isManager(user.role))) ...[
-          const UserSelect(),
-        ],
-      ],
-    );
+    return const UserSelect();
   }
 }

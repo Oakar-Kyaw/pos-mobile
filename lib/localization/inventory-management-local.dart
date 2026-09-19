@@ -143,7 +143,7 @@ mixin InventoryManagementLocale {
     inventoryConfirmDelete: 'ဖျက်ရန် အတည်ပြုမည်',
     inventoryInvalidAmount: 'ငွေပမာဏ မမှန်ကန်ပါ',
     inventoryConfirm: 'အတည်ပြုမည်',
-    updateInventory: 'ကုန်ပစ္စည်းစာရင်းကို ပြင်ဆင်မည်',
-    editInventory: 'ကုန်ပစ္စည်းစာရင်းကို တည်းဖြတ်မည်',
+    updateInventory: 'ပြင်ဆင်မည်',
+    editInventory: 'တည်းဖြတ်မည်',
   };
 }

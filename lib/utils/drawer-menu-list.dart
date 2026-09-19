@@ -121,7 +121,7 @@ List<MenuSection> menuListByAdmin(BuildContext context) => [
 
   // ───────── PROFIT ─────────
   MenuSection(
-    title: 'Profit',
+    title: DrawerScreenLocale.drawerProfit.getString(context),
     items: [
       MenuItem(
         icon: LucideIcons.chartNoAxesCombined,
@@ -219,6 +219,11 @@ List<MenuSection> menuListBySale(BuildContext context) => [
   MenuSection(
     items: [
       MenuItem(
+        icon: LucideIcons.house,
+        label: DrawerScreenLocale.drawerHome.getString(context),
+        route: AppRoute.home,
+      ),
+      MenuItem(
         icon: LucideIcons.bell,
         label: DrawerScreenLocale.drawerNotification.getString(context),
         route: AppRoute.notification,
@@ -244,6 +249,11 @@ List<MenuSection> menuListBySale(BuildContext context) => [
         icon: LucideIcons.wallet,
         label: DrawerScreenLocale.drawerDebt.getString(context),
         route: AppRoute.debt,
+      ),
+      MenuItem(
+        icon: LucideIcons.handCoins,
+        label: DrawerScreenLocale.drawerRepay.getString(context),
+        route: AppRoute.repay,
       ),
       MenuItem(
         icon: LucideIcons.clipboardList,
@@ -281,6 +291,11 @@ List<MenuSection> menuListBySale(BuildContext context) => [
 List<MenuSection> menuListByManager(BuildContext context) => [
   MenuSection(
     items: [
+      MenuItem(
+        icon: LucideIcons.house,
+        label: DrawerScreenLocale.drawerHome.getString(context),
+        route: AppRoute.home,
+      ),
       MenuItem(
         icon: LucideIcons.bell,
         label: DrawerScreenLocale.drawerNotification.getString(context),
@@ -343,16 +358,16 @@ List<MenuSection> menuListByManager(BuildContext context) => [
   // this looked like it might be a placeholder/unfinished route in the
   // source file. Flag this to Oakar; probably should be
   // AppRoute.profitAndLoss like in menuListByAdmin.
-  MenuSection(
-    title: DrawerScreenLocale.drawerSectionProfit.getString(context),
-    items: [
-      MenuItem(
-        icon: LucideIcons.coins,
-        label: DrawerScreenLocale.drawerProfit.getString(context),
-        route: AppRoute.home,
-      ),
-    ],
-  ),
+  // MenuSection(
+  //   title: DrawerScreenLocale.drawerSectionProfit.getString(context),
+  //   items: [
+  //     MenuItem(
+  //       icon: LucideIcons.coins,
+  //       label: DrawerScreenLocale.drawerProfit.getString(context),
+  //       route: AppRoute.home,
+  //     ),
+  //   ],
+  // ),
 
   // ───────── EMPLOYEE MANAGEMENT ─────────
   MenuSection(
@@ -375,11 +390,11 @@ List<MenuSection> menuListByManager(BuildContext context) => [
       //   label: DrawerScreenLocale.drawerEmployeeSalary.getString(context),
       //   route: AppRoute.payroll,
       // ),
-      MenuItem(
-        icon: LucideIcons.clipboardCheck,
-        label: DrawerScreenLocale.drawerHrRule.getString(context),
-        route: AppRoute.hrRule,
-      ),
+      // MenuItem(
+      //   icon: LucideIcons.clipboardCheck,
+      //   label: DrawerScreenLocale.drawerHrRule.getString(context),
+      //   route: AppRoute.hrRule,
+      // ),
     ],
   ),
 
@@ -412,18 +427,18 @@ List<MenuSection> menuListByManager(BuildContext context) => [
 
   // NOTE: both of these also point at AppRoute.home in the original —
   // flagging in case that's unfinished too.
-  MenuSection(
-    items: [
-      MenuItem(
-        icon: LucideIcons.rocket,
-        label: DrawerScreenLocale.drawerUpgrade.getString(context),
-        route: AppRoute.home,
-      ),
-      MenuItem(
-        icon: LucideIcons.rocket,
-        label: DrawerScreenLocale.drawerUpgradeSuggestion.getString(context),
-        route: AppRoute.home,
-      ),
-    ],
-  ),
+  // MenuSection(
+  //   items: [
+  //     MenuItem(
+  //       icon: LucideIcons.rocket,
+  //       label: DrawerScreenLocale.drawerUpgrade.getString(context),
+  //       route: AppRoute.home,
+  //     ),
+  //     MenuItem(
+  //       icon: LucideIcons.rocket,
+  //       label: DrawerScreenLocale.drawerUpgradeSuggestion.getString(context),
+  //       route: AppRoute.home,
+  //     ),
+  //   ],
+  // ),
 ];

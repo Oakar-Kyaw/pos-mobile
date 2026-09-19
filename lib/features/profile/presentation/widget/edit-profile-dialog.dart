@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pos/api/user.api.dart';
 import 'package:pos/features/profile/data/model/user.dart';
+import 'package:pos/localization/profile-local.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
@@ -214,6 +216,8 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
         width: double.maxFinite,
         child: SingleChildScrollView(
           padding: EdgeInsets.only(
+            left: 10,
+            right: 10,
             bottom: MediaQuery.of(context).viewInsets.bottom + 20,
           ),
           child: Column(
@@ -221,7 +225,7 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Edit Profile",
+                ProfileScreenLocale.profileEdit.getString(context),
                 style: TextStyle(
                   fontSize: FontSizeConfig.title(context),
                   fontWeight: FontWeight.w700,
@@ -299,19 +303,28 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
 
               const SizedBox(height: 20),
 
-              _FieldLabel("First Name", textColor),
+              _FieldLabel(
+                ProfileScreenLocale.firstName.getString(context),
+                textColor,
+              ),
               const SizedBox(height: 6),
               ShadInput(controller: _firstNameController),
 
               const SizedBox(height: 16),
 
-              _FieldLabel("Last Name", textColor),
+              _FieldLabel(
+                ProfileScreenLocale.lastName.getString(context),
+                textColor,
+              ),
               const SizedBox(height: 6),
               ShadInput(controller: _lastNameController),
 
               const SizedBox(height: 16),
 
-              _FieldLabel("Email", textColor),
+              _FieldLabel(
+                ProfileScreenLocale.email.getString(context),
+                textColor,
+              ),
               const SizedBox(height: 6),
               ShadInput(
                 controller: _emailController,
@@ -320,7 +333,10 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
 
               const SizedBox(height: 16),
 
-              _FieldLabel("Phone", textColor),
+              _FieldLabel(
+                ProfileScreenLocale.phone.getString(context),
+                textColor,
+              ),
               const SizedBox(height: 6),
               ShadInput(
                 controller: _phoneController,
@@ -329,19 +345,21 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
 
               const SizedBox(height: 16),
 
-              _FieldLabel("Address", textColor),
+              _FieldLabel(
+                ProfileScreenLocale.address.getString(context),
+                textColor,
+              ),
               const SizedBox(height: 6),
               ShadInput(controller: _addressController, maxLines: 2),
 
               const SizedBox(height: 16),
 
-              _FieldLabel("New Password (optional)", textColor),
-              const SizedBox(height: 6),
-              ShadInput(
-                controller: _passwordController,
-                obscureText: true,
-                placeholder: const Text("Leave blank to keep current password"),
+              _FieldLabel(
+                ProfileScreenLocale.newPasswordOptional.getString(context),
+                textColor,
               ),
+              const SizedBox(height: 6),
+              ShadInput(controller: _passwordController, obscureText: true),
 
               const SizedBox(height: 20),
 

@@ -117,6 +117,7 @@ class _IncomePageState extends ConsumerState<IncomePage> {
             discountAmount: data.getTodaySale.discountAmount,
             discountPercent: data.getTodaySale.discountPercent,
             refundAmount: data.getTodaySale.refundAmount,
+            repayAmount: data.getTodaySale.repayAmount,
             debtAmount: data.getTodaySale.debtAmount,
             expenseAmount: data.getTodaySale.expenseAmount,
             purchaseAmount: data.getTodaySale.purchaseAmount,
@@ -141,6 +142,7 @@ class _IncomePageState extends ConsumerState<IncomePage> {
             discountPercent: data.monthlySale.discountPercent,
             refundAmount: data.monthlySale.refundAmount,
             debtAmount: data.monthlySale.debtAmount,
+            repayAmount: data.monthlySale.repayAmount,
             expenseAmount: data.monthlySale.expenseAmount,
             purchaseAmount: data.monthlySale.purchaseAmount,
             totalPaymentAmount: data.monthlySale.totalPaymentAmount,
@@ -165,6 +167,7 @@ class _IncomePageState extends ConsumerState<IncomePage> {
             discountPercent: data.yearlySale.discountPercent,
             refundAmount: data.yearlySale.refundAmount,
             debtAmount: data.yearlySale.debtAmount,
+            repayAmount: data.yearlySale.repayAmount,
             expenseAmount: data.yearlySale.expenseAmount,
             purchaseAmount: data.yearlySale.purchaseAmount,
             totalPaymentAmount: data.yearlySale.totalPaymentAmount,
@@ -238,6 +241,7 @@ class _StatCard extends StatelessWidget {
   final String expenseAmount;
   final String purchaseAmount;
   final String totalPaymentAmount;
+  final String repayAmount;
   final String total;
   final String sub;
   final bool dark;
@@ -260,6 +264,7 @@ class _StatCard extends StatelessWidget {
     required this.debtAmount,
     required this.expenseAmount,
     required this.purchaseAmount,
+    required this.repayAmount,
     required this.totalPaymentAmount,
     required this.total,
     this.isDark = false,
@@ -337,6 +342,14 @@ class _StatCard extends StatelessWidget {
             label:
                 "${IncomeScreenLocale.incomeDebtAmount.getString(context)} :",
             value: formatAmount(double.tryParse(debtAmount) ?? 0),
+            dark: dark,
+            isDark: isDark,
+          ),
+          const SizedBox(height: 6),
+          StatCardRow(
+            label:
+                "${IncomeScreenLocale.incomeRepayAmount.getString(context)} :",
+            value: formatAmount(double.tryParse(repayAmount) ?? 0),
             dark: dark,
             isDark: isDark,
           ),

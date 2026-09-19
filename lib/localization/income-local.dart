@@ -33,6 +33,8 @@ mixin IncomeScreenLocale {
 
   static const incomeRefundAmount = 'income_refund_amount';
 
+  static const incomeRepayAmount = 'income_repay_amount';
+
   static const incomeDebtAmount = 'income_debt_amount';
 
   static const incomeExpenseAmount = 'income_expense_amount';
@@ -87,6 +89,8 @@ mixin IncomeScreenLocale {
     incomePackagingFee: 'Packaging',
 
     incomeRefundAmount: 'Refund Amount',
+
+    incomeRepayAmount: 'Repay Amount',
 
     incomeDebtAmount: 'Debt Amount',
 
@@ -143,6 +147,8 @@ mixin IncomeScreenLocale {
     incomePackagingFee: 'ထုပ်ပိုးခ',
 
     incomeRefundAmount: 'ပြန်အမ်းငွေ',
+
+    incomeRepayAmount: 'ကြွေးကျန်ပြန်ဆပ်ငွေ',
 
     incomeDebtAmount: 'အကြွေးပမာဏ',
 

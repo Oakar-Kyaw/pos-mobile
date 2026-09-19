@@ -151,6 +151,18 @@ class _ProductFormState extends ConsumerState<ProductForm> {
         );
         _clearForm();
       }
+    } on DioException catch (e) {
+      String message = "Something went wrong";
+      if (e.toString().contains(ProductScreenLocale.codeAlreadyExist)) {
+        message = ProductScreenLocale.codeAlreadyExist.getString(context);
+      }
+      if (mounted) {
+        ShowToast(
+          context,
+          isError: true,
+          description: Text(message, style: TextStyle(color: kRed)),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ShowToast(

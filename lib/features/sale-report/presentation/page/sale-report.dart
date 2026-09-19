@@ -485,8 +485,8 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
 
         const SizedBox(height: 20),
 
-        const Text(
-          "Sale Report History",
+        Text(
+          SaleReportLocale.saleReportHistory.getString(context),
           textAlign: TextAlign.start,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
@@ -497,7 +497,7 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Text(
-                  "No records for this day",
+                  SaleReportLocale.saleReportNoRecords.getString(context),
                   style: TextStyle(color: subColor, fontSize: 12),
                 ),
               );
@@ -530,8 +530,8 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
         ),
         const SizedBox(height: 20),
 
-        const Text(
-          "Transfer Datas",
+        Text(
+          SaleReportLocale.saleReportTransferDatas.getString(context),
           textAlign: TextAlign.start,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
@@ -542,7 +542,7 @@ class _SaleReportPageState extends ConsumerState<SaleReportPage> {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Text(
-                  "No transfers for this day",
+                  SaleReportLocale.saleReportNoRecords.getString(context),
                   style: TextStyle(color: subColor, fontSize: 12),
                 ),
               );

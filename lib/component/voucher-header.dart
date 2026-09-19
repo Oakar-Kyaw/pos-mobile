@@ -112,64 +112,94 @@ class VoucherCardDescription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isSmallScreen = screenWidth < 360;
+
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              voucher.voucherCode ?? '—',
-              style: TextStyle(
-                fontSize: FontSizeConfig.title(context),
-                fontWeight: FontWeight.w700,
-                color: textColor,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                voucher.voucherCode ?? '—',
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: isSmallScreen
+                      ? FontSizeConfig.body(context)
+                      : FontSizeConfig.title(context),
+                  fontWeight: FontWeight.w700,
+                  color: textColor,
+                ),
               ),
-            ),
-            const SizedBox(height: 5),
-            Row(
-              children: [
-                Icon(Icons.calendar_today_rounded, size: 12, color: subColor),
-                const SizedBox(width: 4),
-                Text(
-                  DateFormat(
-                    'dd MMM yyyy EEEE',
-                  ).format(voucher.createdAt ?? DateTime.now()),
-                  style: TextStyle(
-                    fontSize: FontSizeConfig.body(context),
+              const SizedBox(height: 5),
+              Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today_rounded,
+                    size: isSmallScreen ? 11 : 12,
                     color: subColor,
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      DateFormat(
+                        'dd MMM yyyy',
+                      ).format(voucher.createdAt ?? DateTime.now()),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: isSmallScreen
+                            ? FontSizeConfig.title(context)
+                            : FontSizeConfig.body(context),
+                        color: subColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        _TotalAmount(voucher: voucher),
+        SizedBox(width: isSmallScreen ? 8 : 16),
+        Flexible(
+          flex: 0,
+          child: _TotalAmount(voucher: voucher, isSmallScreen: isSmallScreen),
+        ),
       ],
     );
   }
 }
 
 class _TotalAmount extends StatelessWidget {
-  const _TotalAmount({required this.voucher});
+  const _TotalAmount({required this.voucher, required this.isSmallScreen});
 
   final VoucherDetailModel voucher;
+  final bool isSmallScreen;
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
           VoucherScreenLocale.total.getString(context),
-          style: const TextStyle(fontSize: 11, color: Colors.grey),
+          style: TextStyle(
+            fontSize: isSmallScreen ? 10 : 11,
+            color: Colors.grey,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
           formatAmount(voucher.total),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: FontSizeConfig.title(context) + 2,
+            fontSize: isSmallScreen
+                ? FontSizeConfig.body(context) + 1
+                : FontSizeConfig.title(context) + 2,
             fontWeight: FontWeight.w800,
             color: kPrimary,
           ),

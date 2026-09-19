@@ -53,14 +53,13 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
 
   @override
   void dispose() {
-    super.dispose();
     _pagingController.dispose();
-    _clearSelectedData();
+    super.dispose();
   }
 
-  void _clearSelectedData() {
-    ref.read(selectedDataStateProvider.notifier).clear();
-  }
+  // void _clearSelectedData() {
+  //   ref.read(selectedDataStateProvider.notifier).clear();
+  // }
 
   BoxDecoration getContainerBoxDecorationByEven(Color dividerColor) {
     return BoxDecoration(
@@ -132,45 +131,48 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
       _pagingController.refresh();
     });
 
-    return PagingListener(
-      controller: _pagingController,
-      builder: (context, state, fetchNextPage) =>
-          PagedListView<int, VoucherDetailModel>(
-            state: state,
-            fetchNextPage: fetchNextPage,
-            builderDelegate: PagedChildBuilderDelegate<VoucherDetailModel>(
-              itemBuilder: (context, voucher, index) {
-                final isEven = index % 2 == 0;
-                BoxDecoration containerDecoration = isEven
-                    ? getContainerBoxDecorationByEven(dividerColor)
-                    : getContainerBoxDecorationByOdd(isDark, dividerColor);
-                return InkWell(
-                  splashColor: kPrimary.withOpacity(0.08),
-                  highlightColor: rowHoverColor,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    decoration: containerDecoration,
-                    child: DebtAndRepayVoucherListComponent(
-                      textColor: textColor,
-                      subColor: subColor,
-                      voucher: voucher,
-                      pagingController: _pagingController,
-                      onDelete:
-                          (user != null &&
-                              (isAdmin(user.role) || isManager(user.role)))
-                          ? () => _delete(voucher, isDark)
-                          : null,
+    return RefreshIndicator(
+      onRefresh: () async {
+        _pagingController.refresh();
+      },
+      child: PagingListener(
+        controller: _pagingController,
+        builder: (context, state, fetchNextPage) =>
+            PagedListView<int, VoucherDetailModel>(
+              state: state,
+              fetchNextPage: fetchNextPage,
+              builderDelegate: PagedChildBuilderDelegate<VoucherDetailModel>(
+                itemBuilder: (context, voucher, index) {
+                  final isEven = index % 2 == 0;
+                  BoxDecoration containerDecoration = isEven
+                      ? getContainerBoxDecorationByEven(dividerColor)
+                      : getContainerBoxDecorationByOdd(isDark, dividerColor);
+                  return InkWell(
+                    splashColor: kPrimary.withOpacity(0.08),
+                    highlightColor: rowHoverColor,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: containerDecoration,
+                      child: DebtAndRepayVoucherListComponent(
+                        textColor: textColor,
+                        subColor: subColor,
+                        voucher: voucher,
+                        pagingController: _pagingController,
+                        onDelete: (user != null && (isAdmin(user.role)))
+                            ? () => _delete(voucher, isDark)
+                            : null,
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
 
-              firstPageProgressIndicatorBuilder: (_) => LoadingWidget(),
-              newPageProgressIndicatorBuilder: (_) => LoadingWidget(),
-              noItemsFoundIndicatorBuilder: (_) =>
-                  NoItemFoundWidget(subColor: subColor),
+                firstPageProgressIndicatorBuilder: (_) => LoadingWidget(),
+                newPageProgressIndicatorBuilder: (_) => LoadingWidget(),
+                noItemsFoundIndicatorBuilder: (_) =>
+                    NoItemFoundWidget(subColor: subColor),
+              ),
             ),
-          ),
+      ),
     );
   }
 }

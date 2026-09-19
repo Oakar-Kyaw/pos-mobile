@@ -32,6 +32,7 @@ mixin CompanyRegisterScreenLocal {
   static const trial = 'company_trial';
   static const notAvailable = 'company_not_available';
   static const error = 'company_error';
+  static const alreadyExists = 'company_already_exists';
 
   static const requiredError = 'required_error';
   static const emailInvalidError = 'email_invalid_error';
@@ -73,6 +74,7 @@ mixin CompanyRegisterScreenLocal {
     trial: 'TRIAL',
     notAvailable: 'N/A',
     error: 'Error',
+    alreadyExists: 'Company with this email, name, or phone already exists',
 
     requiredError: 'This field is required',
     emailInvalidError: 'Please enter a valid email address',
@@ -115,6 +117,8 @@ mixin CompanyRegisterScreenLocal {
     trial: 'အစမ်းသုံး',
     notAvailable: 'မရှိပါ',
     error: 'အမှား',
+    alreadyExists:
+        'ဤအီးမေးလ်၊ ကုမ္ပဏီအမည် သို့မဟုတ် ဖုန်းနံပါတ်ဖြင့် ကုမ္ပဏီရှိပြီးသားဖြစ်ပါသည်',
 
     requiredError: 'ဤအချက်အလက်ကို မဖြစ်မနေ ထည့်သွင်းရပါမည်',
     emailInvalidError: 'မှန်ကန်သော အီးမေးလ်လိပ်စာကို ထည့်ပါ',

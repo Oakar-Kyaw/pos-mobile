@@ -145,7 +145,7 @@ mixin VoucherScreenLocale {
     receiptDate: 'ပြေစာ ရက်စွဲ',
 
     // Customer MM
-    customerOptional: 'ဖောက်သည် (စိတ်ကြိုက်)',
+    customerOptional: 'ဖောက်သည် (မထည့်လည်းရ)',
     searchCustomerPlaceholder: 'အမည် သို့မဟုတ် ဖုန်းနံပါတ်ဖြင့် ရှာပါ...',
     noCustomerFound: 'ဖောက်သည် မတွေ့ပါ။ အသစ်ဖန်တီးပါ:',
     customerName: 'ဖောက်သည် အမည်',

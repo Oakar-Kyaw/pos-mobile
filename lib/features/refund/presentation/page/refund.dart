@@ -56,7 +56,7 @@ class _RefundPageState extends ConsumerState<RefundPage> {
                   width: 200,
                 ),
                 SizedBox(height: 20),
-                UserSelect(),
+                SizedBox(width: double.infinity, child: UserSelect()),
                 SizedBox(height: 20),
               ],
               SizedBox(width: double.infinity, child: DateRangeSelect()),

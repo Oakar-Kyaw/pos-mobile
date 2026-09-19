@@ -23,7 +23,6 @@ class DebtVoucherPage extends ConsumerStatefulWidget {
 class _DebtVoucherPageState extends ConsumerState<DebtVoucherPage> {
   @override
   void dispose() {
-    _clearSelectedData();
     super.dispose();
   }
 
@@ -37,35 +36,45 @@ class _DebtVoucherPageState extends ConsumerState<DebtVoucherPage> {
     final bgColor = isDark ? kBgDark : kBgLight;
     final textColor = isDark ? kTextDark : kTextLight;
     final selectedData = ref.watch(selectedDataStateProvider);
+    final user = ref.watch(userStateProvider);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: CustomAppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(LucideIcons.arrowLeft),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) => _clearSelectedData(),
+      child: Scaffold(
+        backgroundColor: bgColor,
+        appBar: CustomAppBar(
+          leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: const Icon(LucideIcons.arrowLeft),
+          ),
+          title: DebtLocaleScreenLocale.debtTitle.getString(context),
         ),
-        title: DebtLocaleScreenLocale.debtTitle.getString(context),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DebtLabel(textColor: textColor),
-          const SizedBox(height: 12),
-          // if (user != null && (isAdmin(user.role) || isManager(user.role)))
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: SizedBox(width: double.infinity, child: DateRangeSelect()),
-          ),
-          Expanded(
-            child: DebtListTile(
-              userId: selectedData?.userId,
-              startDate: selectedData?.startDate,
-              endDate: selectedData?.endDate,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            if (user != null && (isAdmin(user.role) || isManager(user.role)))
+              SizedBox(
+                width: double.infinity,
+                child: DebtLabel(textColor: textColor),
+              ),
+            const SizedBox(height: 12),
+            // if (user != null && (isAdmin(user.role) || isManager(user.role)))
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: SizedBox(width: double.infinity, child: DateRangeSelect()),
             ),
-          ),
-          const SizedBox(height: 12),
-        ],
+            Expanded(
+              child: DebtListTile(
+                userId: selectedData?.userId,
+                startDate: selectedData?.startDate,
+                endDate: selectedData?.endDate,
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
       ),
     );
   }
@@ -78,16 +87,9 @@ class DebtLabel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userStateProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          if (user != null && (isAdmin(user.role) || isManager(user.role))) ...[
-            const UserSelect(),
-          ],
-        ],
-      ),
+      child: const UserSelect(),
     );
   }
 }

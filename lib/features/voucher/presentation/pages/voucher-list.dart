@@ -116,7 +116,7 @@ class _VoucherListState extends ConsumerState<VoucherList> {
     bool isDark,
     VoucherDetailModel voucher,
   ) {
-    return (isAdmin(role) || isManager(role))
+    return (isAdmin(role))
         ? VoucherComponent(
             textColor: textColor,
             subColor: subColor,

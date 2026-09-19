@@ -2,7 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
-		<!-- //for sms and tel -->
+		<key>NSBluetoothAlwaysUsageDescription</key>
+		<string>POS Master uses Bluetooth to connect to receipt printers and print receipts.</string>
+
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>POS Master uses your photo library so you can select product images.</string>
+
+		<key>NSCameraUsageDescription</key>
+		<string>POS Master uses the camera to scan product barcodes and capture product images.</string>
+		
 		<key>LSApplicationQueriesSchemes</key>
 		<array>
 		<string>sms</string>
@@ -17,7 +25,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>POS Master Myanmar</string>
+		<string>POS Master</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -25,7 +33,7 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>Pos Master Myanmar</string>
+		<string>Pos Master</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>

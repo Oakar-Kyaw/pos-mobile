@@ -1189,14 +1189,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  open_folder:
-    dependency: "direct main"
-    description:
-      name: open_folder
-      sha256: "3e91229fc24e3dee16e8ee7b6dce9310d51206b35c3c7f4be5a7a3e8c1967716"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.4"
   package_config:
     dependency: transitive
     description:

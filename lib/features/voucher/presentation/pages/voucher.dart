@@ -48,24 +48,11 @@ class _VoucherCardPageState extends ConsumerState<VoucherCardPage> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Description banner
-            // if (user != null && (isAdmin(user.role) || isManager(user.role)))
-            //   Container(
-            //     margin: const EdgeInsets.symmetric(horizontal: 20),
-            //     child: DescriptionWidget(
-            //       isDark: isDark,
-            //       description: VoucherScreenLocale.viewAllVouchers.getString(
-            //         context,
-            //       ),
-            //       icon: LucideIcons.ticket,
-            //       subColor: subColor,
-            //     ),
-            //   ),
-            // const SizedBox(height: 16),
-
+            const SizedBox(height: 10),
             // // Section label
-            VoucherLabel(textColor: textColor),
             if (isAdmin(user!.role) || isManager(user.role))
+              VoucherLabel(textColor: textColor),
+            if (isAdmin(user.role) || isManager(user.role))
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: SizedBox(
@@ -103,36 +90,7 @@ class VoucherLabel extends ConsumerWidget {
     final user = ref.watch(userStateProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          // Container(
-          //   width: 4,
-          //   height: 18,
-          //   decoration: BoxDecoration(
-          //     gradient: const LinearGradient(
-          //       colors: [kPrimary, kSecondary],
-          //       begin: Alignment.topCenter,
-          //       end: Alignment.bottomCenter,
-          //     ),
-          //     borderRadius: BorderRadius.circular(2),
-          //   ),
-          // ),
-          // const SizedBox(width: 10),
-          // Text(
-          //   DrawerScreenLocale.drawerVoucher.getString(context),
-          //   style: TextStyle(
-          //     fontSize: 14,
-          //     fontWeight: FontWeight.w700,
-          //     color: textColor,
-          //     letterSpacing: -0.2,
-          //   ),
-          // ),
-          if (isAdmin(user!.role) || isManager(user.role)) ...[
-            //Spacer(),
-            UserSelect(),
-          ],
-        ],
-      ),
+      child: SizedBox(width: double.infinity, child: UserSelect()),
     );
   }
 }

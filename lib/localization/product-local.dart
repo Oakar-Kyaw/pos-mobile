@@ -17,6 +17,7 @@ mixin ProductScreenLocale {
 
   static const productCode = 'product_code';
   static const productCodePlaceholder = 'product_code_placeholder';
+  static const codeAlreadyExist = 'product_code_already_exist';
 
   static const barcode = 'product_barcode';
   static const barcodePlaceholder = 'product_barcode_placeholder';
@@ -115,6 +116,7 @@ mixin ProductScreenLocale {
 
     productCode: 'Code',
     productCodePlaceholder: 'Enter product code',
+    codeAlreadyExist: 'Product code already exists',
 
     barcode: 'Barcode',
     barcodePlaceholder: 'Enter barcode',
@@ -216,6 +218,7 @@ mixin ProductScreenLocale {
 
     productCode: 'ကုဒ်',
     productCodePlaceholder: 'ကုန်ပစ္စည်း ကုဒ် ထည့်ပါ',
+    codeAlreadyExist: 'ကုန်ပစ္စည်းကုဒ် ရှိပြီးသားဖြစ်ပါသည်',
 
     barcode: 'ဘားကုဒ်',
     barcodePlaceholder: 'ဘားကုဒ် ထည့်ပါ',

@@ -5,6 +5,10 @@ import 'package:pos/riverpod/voucher-detail.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 Widget rowTax(WidgetRef ref, String label, Color textColor) {
+  // 1. Read state safely without bang operator (!)
+  final voucher = ref.watch(voucherDetailProvider);
+  final taxValue = voucher?.tax.toString() ?? '0';
+
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
@@ -16,9 +20,11 @@ Widget rowTax(WidgetRef ref, String label, Color textColor) {
         width: 80,
         child: ShadInputFormField(
           keyboardType: TextInputType.number,
-          initialValue: ref.watch(voucherDetailProvider)!.tax.toString(),
+          initialValue: taxValue, // 2. Safe initial value
           textAlign: TextAlign.right,
-          decoration: ShadDecoration(secondaryFocusedBorder: ShadBorder.none),
+          decoration: const ShadDecoration(
+            secondaryFocusedBorder: ShadBorder.none,
+          ),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) {
             final val = double.tryParse(value) ?? 0.0;

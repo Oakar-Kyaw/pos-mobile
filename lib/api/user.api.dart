@@ -99,6 +99,22 @@ class UserAsyncNotifier extends AsyncNotifier<User> {
     throw Exception("Failed to update user");
   }
 
+  /// Delete the currently authenticated user's account.
+  /// Requires the user's current password to confirm the request.
+  Future<bool> deleteAccount({required String password}) async {
+    final response = await _dio.delete(
+      "v1/users",
+      data: {"password": password},
+    );
+    final data = response.data as Map<String, dynamic>;
+
+    if (data["success"] == true) {
+      return true;
+    }
+
+    throw Exception(data["message"] ?? "Failed to delete account");
+  }
+
   /// Search users
   Future<List<User>> searchUser({required String search}) async {
     final response = await _dio.get("v1/users", query: {"search": search});

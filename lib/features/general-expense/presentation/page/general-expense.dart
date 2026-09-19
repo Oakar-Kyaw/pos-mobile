@@ -52,9 +52,8 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
 
   @override
   void dispose() {
-    super.dispose();
     _pagingController.dispose();
-    _clearSelectedData();
+    super.dispose();
   }
 
   void _clearSelectedData() {
@@ -73,46 +72,50 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
       selectedData = next;
       _pagingController.refresh();
     });
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: CustomAppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(LucideIcons.arrowLeft),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) => _clearSelectedData(),
+      child: Scaffold(
+        backgroundColor: bgColor,
+        appBar: CustomAppBar(
+          leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: const Icon(LucideIcons.arrowLeft),
+          ),
+          title: DrawerScreenLocale.drawerExpense.getString(context),
         ),
-        title: DrawerScreenLocale.drawerExpense.getString(context),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: RefreshIndicator(
-          onRefresh: () async => _pagingController.refresh(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GradientSubmitButton(
-                onPressed: () async {
-                  await context.pushNamed(AppRoute.generalExpenseCreate);
-                  _pagingController.refresh();
-                },
-                text: GeneralExpenseLocale.expenseButton.getString(context),
-                width: 150,
-              ),
-              const SizedBox(height: 20),
-              if (isAdmin(user!.role) || isManager(user.role)) ...[
-                UserSelect(),
-                SizedBox(height: 10),
-                SizedBox(width: double.infinity, child: DateRangeSelect()),
-                SizedBox(height: 10),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: RefreshIndicator(
+            onRefresh: () async => _pagingController.refresh(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GradientSubmitButton(
+                  onPressed: () async {
+                    await context.pushNamed(AppRoute.generalExpenseCreate);
+                    _pagingController.refresh();
+                  },
+                  text: GeneralExpenseLocale.expenseButton.getString(context),
+                  width: 150,
+                ),
+                const SizedBox(height: 20),
+                if (isAdmin(user!.role) || isManager(user.role)) ...[
+                  SizedBox(width: double.infinity, child: UserSelect()),
+                  SizedBox(height: 10),
+                  SizedBox(width: double.infinity, child: DateRangeSelect()),
+                  SizedBox(height: 10),
+                ],
+                GeneralExpenseCard(
+                  pagingController: _pagingController,
+                  surfaceColor: surfaceColor,
+                  isDark: isDark,
+                  textColor: textColor,
+                  subColor: subColor,
+                ),
+                const SizedBox(height: 20),
               ],
-              GeneralExpenseCard(
-                pagingController: _pagingController,
-                surfaceColor: surfaceColor,
-                isDark: isDark,
-                textColor: textColor,
-                subColor: subColor,
-              ),
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
         ),
       ),

@@ -7,11 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/core/widgets/delete-icon.dart';
 import 'package:pos/features/voucher/presentation/pages/calculation.dart';
 import 'package:pos/features/voucher/presentation/widgets/calculation-add-product.dart';
 import 'package:pos/features/voucher/presentation/widgets/calculation-qty-button.dart';
 import 'package:pos/features/voucher/presentation/widgets/calculation-search-field.dart';
+import 'package:pos/features/voucher/presentation/widgets/item-quantity-input.dart';
 import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/models/product.dart';
 import 'package:pos/riverpod/voucher-detail.dart';
@@ -44,15 +44,13 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       if (!mounted) return;
-      ref
-          .read(productProvider.notifier)
-          .getProductLists("10", "10", search: value);
+      ref.read(productProvider.notifier).searchProducts(search: value);
     });
   }
 
   void _removeItem(VoucherDetailNotifier notifier, int id) {
     notifier.removeItem(id);
-    notifier.calculate();
+    // notifier.calculate();
   }
 
   // Future<void> _takePhoto() async {
@@ -201,19 +199,30 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
                                       }
                                     },
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                    ),
-                                    child: Text(
-                                      item.quantity.toString(),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        color: textColor,
-                                        fontSize: 15,
-                                      ),
-                                    ),
+                                  const SizedBox(width: 10),
+                                  QtyInputField(
+                                    key: ValueKey(item.id),
+                                    quantity: item.quantity,
+                                    textColor: textColor,
+                                    onChanged: (newQty) {
+                                      if (newQty < 1) {
+                                        notifier.removeItem(item.id);
+                                        notifier.calculate();
+                                        return;
+                                      }
+                                      notifier.updateVoucher(
+                                        items: voucher.items
+                                            .map(
+                                              (e) => e.id == item.id
+                                                  ? e.copyWith(quantity: newQty)
+                                                  : e,
+                                            )
+                                            .toList(),
+                                      );
+                                      notifier.calculate();
+                                    },
                                   ),
+                                  const SizedBox(width: 10),
                                   QtyButton(
                                     icon: Icons.add,
                                     onTap: () {

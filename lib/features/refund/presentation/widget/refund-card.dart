@@ -93,36 +93,41 @@ class _RefundCardState extends ConsumerState<RefundCard> {
       _pagingController.refresh();
     });
 
-    return PagingListener(
-      controller: _pagingController,
-      builder: (context, state, fetchNextPage) => PagedListView<int, Refund>(
-        state: state,
-        fetchNextPage: fetchNextPage,
-        builderDelegate: PagedChildBuilderDelegate<Refund>(
-          itemBuilder: (context, refund, index) {
-            return RefreshIndicator(
-              onRefresh: () async => _pagingController.refresh(),
-              child: _RefundCard(
-                refund: refund,
-                textColor: textColor,
-                subColor: subColor,
-                isDark: isDark,
-                onDelete: () => _delete(refund, isDark),
-              ),
-            );
-          },
-          firstPageProgressIndicatorBuilder: (_) =>
-              Center(child: CircularProgressIndicator(color: kPrimary)),
-          newPageProgressIndicatorBuilder: (_) => Padding(
-            padding: const EdgeInsets.all(16),
-            child: Center(child: CircularProgressIndicator(color: kPrimary)),
-          ),
-          noItemsFoundIndicatorBuilder: (_) => Center(
-            child: RefreshIndicator(
-              onRefresh: () async => _pagingController.refresh(),
-              child: Text(
-                RefundLocale.refundNoItems.getString(context),
-                style: TextStyle(color: subColor, fontSize: 14),
+    return RefreshIndicator(
+      onRefresh: () async {
+        _pagingController.refresh();
+      },
+      child: PagingListener(
+        controller: _pagingController,
+        builder: (context, state, fetchNextPage) => PagedListView<int, Refund>(
+          state: state,
+          fetchNextPage: fetchNextPage,
+          builderDelegate: PagedChildBuilderDelegate<Refund>(
+            itemBuilder: (context, refund, index) {
+              return RefreshIndicator(
+                onRefresh: () async => _pagingController.refresh(),
+                child: _RefundCard(
+                  refund: refund,
+                  textColor: textColor,
+                  subColor: subColor,
+                  isDark: isDark,
+                  onDelete: () => _delete(refund, isDark),
+                ),
+              );
+            },
+            firstPageProgressIndicatorBuilder: (_) =>
+                Center(child: CircularProgressIndicator(color: kPrimary)),
+            newPageProgressIndicatorBuilder: (_) => Padding(
+              padding: const EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator(color: kPrimary)),
+            ),
+            noItemsFoundIndicatorBuilder: (_) => Center(
+              child: RefreshIndicator(
+                onRefresh: () async => _pagingController.refresh(),
+                child: Text(
+                  RefundLocale.refundNoItems.getString(context),
+                  style: TextStyle(color: subColor, fontSize: 14),
+                ),
               ),
             ),
           ),
@@ -321,7 +326,7 @@ class RefundData extends StatelessWidget {
           onPressed: () =>
               context.pushNamed(AppRoute.refundUpdate, extra: refund),
           text: RefundLocale.edit.getString(context),
-          width: 100,
+          width: 130,
         ),
       ],
     );

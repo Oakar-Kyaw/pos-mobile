@@ -6,12 +6,11 @@ import 'package:pos/component/app-bar.dart';
 import 'package:pos/core/utils/date-range-select.dart';
 import 'package:pos/core/utils/user-select.dart';
 import 'package:pos/localization/repay-local.dart';
+import 'package:pos/repay/presentation/page/repay-list.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
-import 'package:pos/ui/repay-list.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/check-role.dart';
-import 'package:pos/utils/description-widget.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class RepaymentHistoryPage extends ConsumerStatefulWidget {
@@ -23,12 +22,6 @@ class RepaymentHistoryPage extends ConsumerStatefulWidget {
 }
 
 class _RepaymentHistoryPageState extends ConsumerState<RepaymentHistoryPage> {
-  @override
-  void dispose() {
-    super.dispose();
-    _clearSelectedData();
-  }
-
   void _clearSelectedData() {
     ref.read(selectedDataStateProvider.notifier).clear();
   }
@@ -38,38 +31,45 @@ class _RepaymentHistoryPageState extends ConsumerState<RepaymentHistoryPage> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
     final textColor = isDark ? kTextDark : kTextLight;
-    final subColor = isDark ? kTextSubDark : kTextSubLight;
     final user = ref.watch(userStateProvider);
     final selectedData = ref.watch(selectedDataStateProvider);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: CustomAppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(LucideIcons.arrowLeft),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) => _clearSelectedData(),
+      child: Scaffold(
+        backgroundColor: bgColor,
+        appBar: CustomAppBar(
+          leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: const Icon(LucideIcons.arrowLeft),
+          ),
+          title: RepayLocaleScreen.repayHistoryCard.getString(context),
         ),
-        title: RepayLocaleScreen.repayHistoryCard.getString(context),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          RepayLabel(textColor: textColor),
-          const SizedBox(height: 12),
-          if (user != null && (isAdmin(user.role) || isManager(user.role)))
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            if (user != null && (isAdmin(user.role) || isManager(user.role)))
+              SizedBox(
+                width: double.infinity,
+                child: RepayLabel(textColor: textColor),
+              ),
+            const SizedBox(height: 12),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: SizedBox(width: double.infinity, child: DateRangeSelect()),
             ),
-          Expanded(
-            child: RepaymentList(
-              userId: selectedData?.userId,
-              startDate: selectedData?.startDate,
-              endDate: selectedData?.endDate,
+            Expanded(
+              child: RepaymentList(
+                userId: selectedData?.userId,
+                startDate: selectedData?.startDate,
+                endDate: selectedData?.endDate,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-        ],
+            const SizedBox(height: 12),
+          ],
+        ),
       ),
     );
   }
@@ -82,16 +82,9 @@ class RepayLabel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userStateProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          if (user != null && (isAdmin(user.role) || isManager(user.role))) ...[
-            const UserSelect(),
-          ],
-        ],
-      ),
+      child: const UserSelect(),
     );
   }
 }

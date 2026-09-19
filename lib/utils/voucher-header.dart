@@ -28,41 +28,65 @@ class VoucherHeader extends StatelessWidget {
   final Color subColor;
   final VoidCallback? onDelete;
   final VoidCallback? onDetail;
+
+  // ======================================================
+  // TYPE BADGE
+  // ======================================================
+  Widget get _typeBadge => BadgeWidget(
+    icon: _typeIcon,
+    label: inventory.type.toUpperCase(),
+    color: accent,
+  );
+
+  // ======================================================
+  // CONFIRMED/PENDING BADGE
+  // ======================================================
+  Widget get _confirmedBadge => BadgeWidget(
+    icon: isConfirmed! ? Icons.check_circle_rounded : Icons.pending_rounded,
+    label: isConfirmed! ? 'CONFIRMED' : 'PENDING',
+    color: isConfirmed! ? Colors.green.shade600 : Colors.amber.shade700,
+  );
+
+  // ======================================================
+  // ACTION ICONS (Detail + Delete)
+  // ======================================================
+  Widget get _actionIcons => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      if (onDetail != null) DetailIcon(onDetail: onDetail),
+      if (onDelete != null) DeleteIcon(onDelete: onDelete),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Type icon + badge + id + date
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Badges row
-              Row(
-                children: [
-                  BadgeWidget(
-                    icon: _typeIcon,
-                    label: inventory.type.toUpperCase(),
-                    color: accent,
-                  ),
-                  const SizedBox(width: 6),
-                  isConfirmed == null
-                      ? const SizedBox()
-                      : BadgeWidget(
-                          icon: isConfirmed!
-                              ? Icons.check_circle_rounded
-                              : Icons.pending_rounded,
-                          label: isConfirmed! ? 'CONFIRMED' : 'PENDING',
-                          color: isConfirmed!
-                              ? Colors.green.shade600
-                              : Colors.amber.shade700,
-                        ),
-                  Spacer(),
-                  if (onDetail != null) DetailIcon(onDetail: onDetail),
-                  if (onDelete != null) DeleteIcon(onDelete: onDelete),
-                ],
-              ),
+              // ==============================================
+              // 👇 Badge section
+              // ==============================================
+              if (isConfirmed == null)
+                Row(children: [_typeBadge, const Spacer(), _actionIcons])
+              else
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(child: _typeBadge),
+                        _actionIcons,
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    _confirmedBadge,
+                  ],
+                ),
+
               const SizedBox(height: 8),
 
               // ID
@@ -73,15 +97,14 @@ class VoucherHeader extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '#${inventory.id ?? '—'}',
-                        style: TextStyle(
-                          fontSize: FontSizeConfig.title(context),
-                          fontWeight: FontWeight.w700,
-                          color: textColor,
-                        ),
-                      ),
-                      // Date
+                      // Text(
+                      //   '#${inventory.id ?? '—'}',
+                      //   style: TextStyle(
+                      //     fontSize: FontSizeConfig.title(context),
+                      //     fontWeight: FontWeight.w700,
+                      //     color: textColor,
+                      //   ),
+                      // ),
                       if (inventory.createdAt != null)
                         Row(
                           children: [
@@ -104,7 +127,6 @@ class VoucherHeader extends StatelessWidget {
                         ),
                     ],
                   ),
-                  // Total amount
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -122,7 +144,6 @@ class VoucherHeader extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      // Item count pill
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -133,7 +154,7 @@ class VoucherHeader extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.layers_rounded, size: 11, color: accent),
                             const SizedBox(width: 4),

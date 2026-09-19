@@ -206,15 +206,18 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
     DateTime? endDate,
   }) async {
     final url = "v1/vouchers/repay/datas";
-
+    // debugPrint(
+    //   "start Date and endDate ${startDate!.toIso8601String().split("T")[0]} $endDate",
+    // );
     final response = await _dio.get(
       url,
       query: {
         "page": page,
         "limit": limit,
         if (userId != null) "filterUserId": userId,
-        if (startDate != null) "startDate": startDate,
-        if (endDate != null) "endDate": endDate,
+        if (startDate != null)
+          "startDate": startDate.toIso8601String().split("T")[0],
+        if (endDate != null) "endDate": endDate.toIso8601String().split("T")[0],
       },
     );
     final data = response.data;

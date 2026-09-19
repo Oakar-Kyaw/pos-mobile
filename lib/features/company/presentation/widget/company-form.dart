@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,8 +28,24 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
   final phone = TextEditingController();
   final code = TextEditingController();
 
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    name.dispose();
+    password.dispose();
+    email.dispose();
+    address.dispose();
+    phone.dispose();
+    code.dispose();
+    super.dispose();
+  }
+
   Future<void> submit() async {
-    final notifier = ref.read(companyProvider.notifier);
+    if (isLoading) return;
+
+    setState(() => isLoading = true);
+
     final json = Company(
       id: 0,
       email: email.text.trim(),
@@ -38,9 +55,14 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
       phone: phone.text.trim(),
       code: code.text.trim(),
     );
+
     try {
-      final Company result = await notifier.postCompany(json.toJson());
+      final Company result = await ref
+          .read(companyProvider.notifier)
+          .postCompany(json.toJson());
+
       print("Company created: ${result.name}");
+
       if (mounted) {
         context.go(
           AppRoute.login,
@@ -49,19 +71,44 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
       }
     } catch (e) {
       print("Failed to create company: $e");
-      ShowToast(
-        context,
-        borderColor: Colors.red,
-        action: Icon(
-          LucideIcons.x,
-          color: Colors.red,
-          size: FontSizeConfig.iconSize(context),
-        ),
-        description: Text(
-          CompanyRegisterScreenLocal.createFailed.getString(context),
-          style: const TextStyle(color: Colors.red),
-        ),
-      );
+
+      if (!mounted) return;
+
+      if (e.toString().contains(
+        'Company with this email, name, or phone already exists',
+      )) {
+        ShowToast(
+          context,
+          isError: true,
+          action: Icon(
+            LucideIcons.x,
+            color: Colors.red,
+            size: FontSizeConfig.iconSize(context),
+          ),
+          description: Text(
+            CompanyRegisterScreenLocal.alreadyExists.getString(context),
+            style: const TextStyle(color: Colors.red),
+          ),
+        );
+      } else {
+        ShowToast(
+          context,
+          isError: true,
+          action: Icon(
+            LucideIcons.x,
+            color: Colors.red,
+            size: FontSizeConfig.iconSize(context),
+          ),
+          description: Text(
+            CompanyRegisterScreenLocal.createFailed.getString(context),
+            style: const TextStyle(color: Colors.red),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -73,8 +120,9 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
   }
 
   String? emailValidator(String? value, BuildContext context) {
-    if (requiredValidator(value, context) != null)
+    if (requiredValidator(value, context) != null) {
       return requiredValidator(value, context);
+    }
     final emailRegex = RegExp(r'^[\w\.-]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value!.trim())) {
       return CompanyRegisterScreenLocal.emailInvalidError.getString(context);
@@ -87,7 +135,6 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final textColor = isDark ? kTextDark : kTextLight;
 
-    // Helper to build a label widget
     Widget label(String text) => Padding(
       padding: const EdgeInsets.only(bottom: 5),
       child: Text(
@@ -100,7 +147,6 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
       ),
     );
 
-    // Helper to build a placeholder widget
     Widget placeholder(String text) =>
         Text(text, style: TextStyle(fontSize: FontSizeConfig.body(context)));
 
@@ -111,6 +157,7 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
           // ── Company Name ─────────────────────────
           ShadInputFormField(
             controller: name,
+            enabled: !isLoading,
             validator: (v) => requiredValidator(v, context),
             label: label(
               CompanyRegisterScreenLocal.companyName.getString(context),
@@ -126,6 +173,7 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
           // ── Company Code ─────────────────────────
           ShadInputFormField(
             controller: code,
+            enabled: !isLoading,
             validator: (v) => requiredValidator(v, context),
             label: label(
               CompanyRegisterScreenLocal.companyCode.getString(context),
@@ -141,6 +189,7 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
           // ── Company Email ────────────────────────
           ShadInputFormField(
             controller: email,
+            enabled: !isLoading,
             validator: (v) => emailValidator(v, context),
             keyboardType: TextInputType.emailAddress,
             label: label(
@@ -157,6 +206,7 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
           // ── Company Password ─────────────────────
           ShadInputFormField(
             controller: password,
+            enabled: !isLoading,
             validator: (v) => requiredValidator(v, context),
             obscureText: true,
             label: label(
@@ -173,6 +223,7 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
           // ── Company Phone ────────────────────────
           ShadInputFormField(
             controller: phone,
+            enabled: !isLoading,
             validator: (v) => requiredValidator(v, context),
             keyboardType: TextInputType.phone,
             label: label(
@@ -189,6 +240,7 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
           // ── Company Address ──────────────────────
           ShadInputFormField(
             controller: address,
+            enabled: !isLoading,
             validator: (v) => requiredValidator(v, context),
             maxLines: 2,
             label: label(
@@ -207,32 +259,49 @@ class _CompanyFormState extends ConsumerState<CompanyForm> {
             width: double.infinity,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [kPrimary, kSecondary],
+                gradient: LinearGradient(
+                  colors: isLoading
+                      ? [kPrimary.withOpacity(0.5), kSecondary.withOpacity(0.5)]
+                      : [kPrimary, kSecondary],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
                 borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: kPrimary.withOpacity(0.35),
-                    blurRadius: 14,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
+                boxShadow: isLoading
+                    ? []
+                    : [
+                        BoxShadow(
+                          color: kPrimary.withOpacity(0.35),
+                          blurRadius: 14,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
               ),
               child: ShadButton(
                 backgroundColor: Colors.transparent,
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) submit();
-                },
-                child: Text(
-                  CompanyRegisterScreenLocal.companyButton.getString(context),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        if (_formKey.currentState!.validate()) submit();
+                      },
+                child: isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        CompanyRegisterScreenLocal.companyButton.getString(
+                          context,
+                        ),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
               ),
             ),
           ),

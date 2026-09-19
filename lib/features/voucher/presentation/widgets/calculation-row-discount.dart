@@ -11,11 +11,16 @@ Widget rowDiscount(
   WidgetRef ref,
   String label,
   Color textColor, {
-  addDiscount,
+  required void Function(bool) addDiscount,
   bool isDiscountByPercent = true,
 }) {
-  String initialValue(bool isDiscountByPercent) {
-    final voucher = ref.read(voucherDetailProvider)!;
+  final voucher = ref.watch(voucherDetailProvider);
+
+  String initialValue() {
+    if (voucher == null) {
+      return '0';
+    }
+
     return isDiscountByPercent
         ? voucher.discountPercent.toString()
         : voucher.discountAmount.toString();
@@ -23,14 +28,17 @@ Widget rowDiscount(
 
   void onChangedSelect(bool isPercent) {
     addDiscount(isPercent);
+
     ref
         .read(voucherDetailProvider.notifier)
         .updateVoucher(discountAmount: 0, discountPercent: 0);
+
     ref.read(voucherDetailProvider.notifier).calculate();
   }
 
-  void onChangedInput(value) {
+  void onChangedInput(String value) {
     final val = double.tryParse(value) ?? 0.0;
+
     if (isDiscountByPercent) {
       ref
           .read(voucherDetailProvider.notifier)
@@ -40,26 +48,30 @@ Widget rowDiscount(
           .read(voucherDetailProvider.notifier)
           .updateVoucher(discountAmount: val);
     }
+
     ref.read(voucherDetailProvider.notifier).calculate();
   }
 
+  final isSmallScreen = MediaQuery.sizeOf(context).width < 360;
+
   return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       Expanded(
         child: Row(
           children: [
-            Text(
-              label,
-              style: TextStyle(fontWeight: FontWeight.w600, color: textColor),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontWeight: FontWeight.w600, color: textColor),
+              ),
             ),
-            SizedBox(width: 5),
+            const SizedBox(width: 5),
             SizedBox(
-              width: 100,
+              width: isSmallScreen ? 90 : 100,
               child: ShadSelect<String>(
-                key: ValueKey(
-                  isDiscountByPercent,
-                ), // ★ forces dropdown to re-show correct selection
+                key: ValueKey(isDiscountByPercent),
                 decoration: const ShadDecoration(
                   secondaryFocusedBorder: ShadBorder.none,
                 ),
@@ -69,7 +81,7 @@ Widget rowDiscount(
                       )
                     : PaymentScreenLocale.paymentDiscountAmount.getString(
                         context,
-                      ), // ★ was hardcoded
+                      ),
                 placeholder: Text(
                   PaymentScreenLocale.paymentDiscountAmount.getString(context),
                   style: const TextStyle(fontSize: 12),
@@ -81,36 +93,50 @@ Widget rowDiscount(
                     maxLines: 1,
                   );
                 },
-                options: [
-                  PaymentScreenLocale.paymentDiscountPercent.getString(context),
-                  PaymentScreenLocale.paymentDiscountAmount.getString(context),
-                ].map((e) => ShadOption(value: e, child: Text(e))),
-                onChanged: (value) =>
-                    value ==
-                        PaymentScreenLocale.paymentDiscountPercent.getString(
-                          context,
-                        )
-                    ? onChangedSelect(true)
-                    : onChangedSelect(false),
+                options:
+                    [
+                      PaymentScreenLocale.paymentDiscountPercent.getString(
+                        context,
+                      ),
+                      PaymentScreenLocale.paymentDiscountAmount.getString(
+                        context,
+                      ),
+                    ].map(
+                      (e) => ShadOption(
+                        value: e,
+                        child: Text(e, overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                onChanged: (value) {
+                  if (value ==
+                      PaymentScreenLocale.paymentDiscountPercent.getString(
+                        context,
+                      )) {
+                    onChangedSelect(true);
+                  } else {
+                    onChangedSelect(false);
+                  }
+                },
               ),
             ),
           ],
         ),
       ),
+      const SizedBox(width: 8),
       SizedBox(
-        width: 80,
+        width: isSmallScreen ? 70 : 80,
         child: ShadInputFormField(
-          key: ValueKey(
-            isDiscountByPercent,
-          ), // ★ forces field to rebuild fresh with new initialValue
+          key: ValueKey(isDiscountByPercent),
           keyboardType: TextInputType.number,
-          initialValue: initialValue(isDiscountByPercent),
+          initialValue: initialValue(),
           textAlign: TextAlign.right,
-          decoration: ShadDecoration(secondaryFocusedBorder: ShadBorder.none),
+          decoration: const ShadDecoration(
+            secondaryFocusedBorder: ShadBorder.none,
+          ),
           inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+            FilteringTextInputFormatter.allow(RegExp(r'^\d*.?\d*')),
           ],
-          onChanged: (val) => onChangedInput(val),
+          onChanged: onChangedInput,
         ),
       ),
     ],

@@ -20,6 +20,9 @@ class Session {
   bool _isShowingSubscriptionDialog = false;
 
   Future<void> sessionExpired() async {
+    debugPrint("🚨🚨🚨 SESSION EXPIRED CALLED 🚨🚨🚨");
+    debugPrint(StackTrace.current.toString());
+
     if (_isShowingDialog) return;
     _isShowingDialog = true;
 

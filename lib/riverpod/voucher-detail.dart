@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 
@@ -115,6 +116,7 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
 
   //calculate total
   void calculate() {
+    debugPrint("manu }");
     if (state != null) {
       double itemsTotal = 0;
       double paymentTotal = 0;
@@ -149,9 +151,9 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
       double remainingPaymentAmounts = totalWithTaxAndDiscount - paymentTotal;
 
       if (remainingPaymentAmounts < 0) {
-        return;
+        remainingPaymentAmounts = 0;
       }
-
+      debugPrint("calcuatlinono is ${totalWithTaxAndDiscount}");
       state = state!.copyWith(
         total: totalWithTaxAndDiscount,
         subTotal: itemsTotal,

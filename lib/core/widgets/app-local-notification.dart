@@ -1,3 +1,212 @@
+// import 'dart:convert';
+// import 'dart:io';
+
+// import 'package:flutter/services.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+// class AppLocalNotification {
+//   static final notificationPlugin = FlutterLocalNotificationsPlugin();
+//   static Future<void> initialize() async {
+//     await requestNotification();
+
+//     //for android
+//     const initSettingsAndroid = AndroidInitializationSettings(
+//       '@mipmap/ic_launcher',
+//     );
+
+//     // for iOS
+//     const initSettingsIos = DarwinInitializationSettings();
+//     // for both platforms
+//     const initSettings = InitializationSettings(
+//       android: initSettingsAndroid,
+//       iOS: initSettingsIos,
+//     );
+//     // initialize the plugin with the settings
+//     await notificationPlugin.initialize(settings: initSettings);
+//     // Added notification channel creation (required for Android 8.0+)
+//     await createNotificationChannel();
+//   }
+
+//   // notification channel creation (required for Android 8.0+)
+//   static Future<void> createNotificationChannel() async {
+//     const AndroidNotificationChannel channel = AndroidNotificationChannel(
+//       'channelId',
+//       'channelName',
+//       description: 'notification',
+//       importance: Importance.max,
+//       playSound: true, // Added sound option
+//     );
+
+//     await notificationPlugin
+//         .resolvePlatformSpecificImplementation<
+//           AndroidFlutterLocalNotificationsPlugin
+//         >()
+//         ?.createNotificationChannel(channel);
+//   }
+
+//   /// Show notification with title and body
+//   Future<void> showNotification({
+//     required int notiId,
+//     required String title,
+//     required String body,
+//     required String imageUrl,
+//     required bool isAndroidImage,
+//     required bool isIOSImage,
+//   }) async {
+//     await notificationPlugin.show(
+//       id: notiId,
+//       title: title,
+//       body: body,
+//       notificationDetails: await notificationDetails(
+//         imageUrl: imageUrl,
+//         isAndroidImage: isAndroidImage,
+//         isIOSImage: isIOSImage,
+//       ),
+//     );
+//   }
+
+//   Future<void> showProductUploadProgress({
+//     required int notiId,
+//     required String title,
+//     required String body,
+//     required int progress,
+//     required int maxProgress,
+//   }) async {
+//     await notificationPlugin.show(
+//       id: notiId,
+//       title: title,
+//       body: body,
+//       notificationDetails: NotificationDetails(
+//         android: AndroidNotificationDetails(
+//           'channelId',
+//           'channelName',
+//           channelDescription: 'notification',
+//           importance: Importance.low,
+//           priority: Priority.low,
+//           // 👇 This creates the linear progress bar
+//           showProgress: true,
+//           maxProgress: maxProgress,
+//           progress: progress,
+
+//           // Don't remove notification while processing
+//           ongoing: true,
+
+//           // Optional
+//           onlyAlertOnce: true,
+//         ),
+//       ),
+//     );
+//   }
+
+//   Future<void> showProductCompletedNotification({
+//     required int notiId,
+//     required String title,
+//     required String body,
+//   }) async {
+//     await notificationPlugin.show(
+//       id: notiId,
+//       title: title,
+//       body: body,
+//       notificationDetails: const NotificationDetails(
+//         android: AndroidNotificationDetails(
+//           'channelId',
+//           'channelName',
+//           channelDescription: 'notification',
+//           importance: Importance.high,
+//           priority: Priority.high,
+
+//           // Progress notification
+//           showProgress: false,
+
+//           ongoing: false,
+
+//           autoCancel: true,
+
+//           playSound: true,
+//         ),
+//         iOS: DarwinNotificationDetails(
+//           presentAlert: true,
+//           presentBadge: true,
+//           presentSound: true,
+//         ),
+//       ),
+//     );
+//   }
+
+//   static Future<void> requestNotification() async {
+//     await notificationPlugin
+//         .resolvePlatformSpecificImplementation<
+//           AndroidFlutterLocalNotificationsPlugin
+//         >()
+//         ?.requestNotificationsPermission();
+
+//     // for iOS
+//     await notificationPlugin
+//         .resolvePlatformSpecificImplementation<
+//           IOSFlutterLocalNotificationsPlugin
+//         >()
+//         ?.requestPermissions(alert: true, badge: true, sound: true);
+//   }
+
+//   /// Notification details for Android and iOS
+//   Future<NotificationDetails> notificationDetails({
+//     required String imageUrl,
+//     bool isAndroidImage = false,
+//     bool isIOSImage = false,
+//   }) async {
+//     // Android: large icon (round)
+//     ByteArrayAndroidBitmap? largeIcon;
+//     final androidImageUrl = isAndroidImage ? imageUrl : null;
+//     if (androidImageUrl != null && androidImageUrl.isNotEmpty) {
+//       try {
+//         final byteData = await NetworkAssetBundle(
+//           Uri.parse(androidImageUrl),
+//         ).load(androidImageUrl);
+//         final bytes = byteData.buffer.asUint8List();
+//         largeIcon = ByteArrayAndroidBitmap.fromBase64String(
+//           base64Encode(bytes),
+//         );
+//       } catch (e) {
+//         print("⚠️ Failed to load Android large icon: $e");
+//       }
+//     }
+
+//     // iOS: attachment (image)
+//     List<DarwinNotificationAttachment> iosAttachments = [];
+//     final iosImageUrl = isIOSImage ? imageUrl : null;
+//     if (iosImageUrl != null && iosImageUrl.isNotEmpty) {
+//       try {
+//         final byteData = await NetworkAssetBundle(
+//           Uri.parse(iosImageUrl),
+//         ).load(iosImageUrl);
+//         final bytes = byteData.buffer.asUint8List();
+//         final tempPath = "/tmp/ios_noti_image.png";
+//         final file = File(tempPath)..writeAsBytesSync(bytes);
+//         iosAttachments.add(DarwinNotificationAttachment(tempPath));
+//       } catch (e) {
+//         print("⚠️ Failed to load iOS attachment: $e");
+//       }
+//     }
+//     return NotificationDetails(
+//       android: AndroidNotificationDetails(
+//         'channelId',
+//         'channelName',
+//         channelDescription: 'notification',
+//         importance: Importance.max,
+//         priority: Priority.high,
+//         styleInformation: BigTextStyleInformation(''),
+//         largeIcon: largeIcon,
+//       ),
+//       iOS: DarwinNotificationDetails(
+//         presentAlert: true,
+//         presentBadge: true,
+//         presentSound: true,
+//         attachments: iosAttachments,
+//       ),
+//     );
+//   }
+// }
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -6,6 +215,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class AppLocalNotification {
   static final notificationPlugin = FlutterLocalNotificationsPlugin();
+
   static Future<void> initialize() async {
     await requestNotification();
 
@@ -23,28 +233,49 @@ class AppLocalNotification {
     );
     // initialize the plugin with the settings
     await notificationPlugin.initialize(settings: initSettings);
-    // Added notification channel creation (required for Android 8.0+)
-    await createNotificationChannel();
+
+    // ⚠️ Channel (3) ခုစလုံးကို register လုပ်ပါ — mismatch ဖြစ်ရင်
+    // notification ပေါ်မှာ မဟုတ်ပါ (Android 8.0+)
+    await createNotificationChannels();
   }
 
-  // notification channel creation (required for Android 8.0+)
-  static Future<void> createNotificationChannel() async {
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'channelId',
-      'channelName',
-      description: 'notification',
-      importance: Importance.max,
-      playSound: true, // Added sound option
-    );
+  /// Channel (3) ခု — Firebase/general, Product upload, App update
+  static Future<void> createNotificationChannels() async {
+    const channels = [
+      AndroidNotificationChannel(
+        'channelId',
+        'channelName',
+        description: 'General / Firebase notifications',
+        importance: Importance.max,
+        playSound: true,
+      ),
+      AndroidNotificationChannel(
+        'productId',
+        'Product Upload',
+        description: 'Product Excel upload progress',
+        importance: Importance.low,
+        playSound: false,
+      ),
+      AndroidNotificationChannel(
+        'updateId',
+        'App Update',
+        description: 'App update download progress',
+        importance: Importance.low,
+        playSound: false,
+      ),
+    ];
 
-    await notificationPlugin
+    final androidPlugin = notificationPlugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.createNotificationChannel(channel);
+        >();
+
+    for (final channel in channels) {
+      await androidPlugin?.createNotificationChannel(channel);
+    }
   }
 
-  /// Show notification with title and body
+  /// General notification (channelId — Firebase)
   Future<void> showNotification({
     required int notiId,
     required String title,
@@ -65,6 +296,7 @@ class AppLocalNotification {
     );
   }
 
+  /// Product upload progress (productId)
   Future<void> showProductUploadProgress({
     required int notiId,
     required String title,
@@ -78,9 +310,9 @@ class AppLocalNotification {
       body: body,
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
-          'channelId',
-          'channelName',
-          channelDescription: 'notification',
+          'productId',
+          'Product Upload',
+          channelDescription: 'Product Excel upload progress',
           importance: Importance.low,
           priority: Priority.low,
           // 👇 This creates the linear progress bar
@@ -98,6 +330,7 @@ class AppLocalNotification {
     );
   }
 
+  /// Product upload completed (productId)
   Future<void> showProductCompletedNotification({
     required int notiId,
     required String title,
@@ -109,9 +342,9 @@ class AppLocalNotification {
       body: body,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
-          'channelId',
-          'channelName',
-          channelDescription: 'notification',
+          'productId',
+          'Product Upload',
+          channelDescription: 'Product Excel upload progress',
           importance: Importance.high,
           priority: Priority.high,
 
@@ -133,6 +366,67 @@ class AppLocalNotification {
     );
   }
 
+  /// Shorebird update — indeterminate progress (updateId)
+  Future<void> showShorebirdUpdateProgress({
+    required int notiId,
+    required String title,
+    required String body,
+  }) async {
+    await notificationPlugin.show(
+      id: notiId,
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'updateId',
+          'App Update',
+          channelDescription: 'App update download progress',
+          importance: Importance.low,
+          priority: Priority.low,
+          showProgress: true,
+          indeterminate: true,
+          ongoing: true,
+          onlyAlertOnce: true,
+        ),
+      ),
+    );
+  }
+
+  /// Shorebird update ready — restart needed (updateId)
+  Future<void> showShorebirdUpdateReady({
+    required int notiId,
+    required String title,
+    required String body,
+  }) async {
+    await notificationPlugin.show(
+      id: notiId,
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'updateId',
+          'App Update',
+          channelDescription: 'App update download progress',
+          importance: Importance.high,
+          priority: Priority.high,
+          showProgress: false,
+          ongoing: false,
+          autoCancel: true,
+          playSound: true,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+    );
+  }
+
+  Future<void> cancelShorebirdNotification({required int notiId}) async {
+    await notificationPlugin.cancel(id: notiId);
+  }
+
   static Future<void> requestNotification() async {
     await notificationPlugin
         .resolvePlatformSpecificImplementation<
@@ -148,7 +442,7 @@ class AppLocalNotification {
         ?.requestPermissions(alert: true, badge: true, sound: true);
   }
 
-  /// Notification details for Android and iOS
+  /// Notification details for Android and iOS (channelId — Firebase/general)
   Future<NotificationDetails> notificationDetails({
     required String imageUrl,
     bool isAndroidImage = false,

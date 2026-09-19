@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
+import 'package:pos/features/account-upgrade/domain/entites/plan.dart';
+import 'package:pos/features/account-upgrade/presentation/widgets/upgrade-pay-dialog.dart';
+import 'package:pos/localization/account-upgrade.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/responsive.dart';
@@ -16,48 +20,99 @@ class AccountUpgradePage extends ConsumerStatefulWidget {
 }
 
 class _AccountUpgradePageState extends ConsumerState<AccountUpgradePage> {
-  static const int monthlyPrice = 59500;
-
-  final List<UpgradePlan> plans = const [
-    UpgradePlan(
-      name: "1 Month",
-      months: 1,
-      price: 59500,
-      discount: 0,
-      savingText: null,
-      popular: false,
-    ),
-    UpgradePlan(
-      name: "3 Months",
-      months: 3,
-      price: 160650,
-      discount: 10,
-      savingText: "10% OFF",
-      popular: true,
-    ),
-    UpgradePlan(
-      name: "6 Months",
-      months: 6,
-      price: 357000,
-      discount: 16,
-      savingText: "1 Month FREE",
-      popular: false,
-    ),
-    UpgradePlan(
-      name: "1 Year",
-      months: 12,
-      price: 714000,
-      discount: 17,
-      savingText: "3 Months FREE",
-      popular: false,
-    ),
-  ];
+  static const double baseMonthlyPrice = 59500;
 
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
-
     final bgColor = isDark ? kBgDark : kBgLight;
+
+    final List<UpgradePlanUI> plans = [
+      UpgradePlanUI(
+        plan: Plan(
+          id: 1,
+          name: '1 Month',
+          title: 'Basic Plan',
+          month: 1,
+          durationDays: 30,
+          priceMMK: '59500',
+          priceUSD: '20',
+          discountPercent: 0,
+          isPopular: false,
+          isActive: true,
+          existBranch: false,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          isDeleted: false,
+          planFeatures: [],
+        ),
+        nameKey: AccountUpgradeScreenLocale.monthOne,
+        savingTextKey: null,
+      ),
+      UpgradePlanUI(
+        plan: Plan(
+          id: 2,
+          name: '3 Months',
+          title: 'Standard Plan',
+          month: 3,
+          durationDays: 90,
+          priceMMK: '160650',
+          priceUSD: '55',
+          discountPercent: 10,
+          isPopular: true,
+          isActive: true,
+          existBranch: false,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          isDeleted: false,
+          planFeatures: [],
+        ),
+        nameKey: AccountUpgradeScreenLocale.monthThree,
+        savingTextKey: AccountUpgradeScreenLocale.tenPercentOff,
+      ),
+      UpgradePlanUI(
+        plan: Plan(
+          id: 3,
+          name: '6 Months',
+          title: 'Pro Plan',
+          month: 6,
+          durationDays: 180,
+          priceMMK: '357000',
+          priceUSD: '110',
+          discountPercent: 15,
+          isPopular: false,
+          isActive: true,
+          existBranch: false,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          isDeleted: false,
+          planFeatures: [],
+        ),
+        nameKey: AccountUpgradeScreenLocale.monthSix,
+        savingTextKey: AccountUpgradeScreenLocale.oneMonthFree,
+      ),
+      UpgradePlanUI(
+        plan: Plan(
+          id: 4,
+          name: '1 Year',
+          title: 'Enterprise Plan',
+          month: 12,
+          durationDays: 365,
+          priceMMK: '714000',
+          priceUSD: '220',
+          discountPercent: 25,
+          isPopular: false,
+          isActive: true,
+          existBranch: false,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          isDeleted: false,
+          planFeatures: [],
+        ),
+        nameKey: AccountUpgradeScreenLocale.monthTwelve,
+        savingTextKey: AccountUpgradeScreenLocale.threeMonthsFree,
+      ),
+    ];
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -66,12 +121,12 @@ class _AccountUpgradePageState extends ConsumerState<AccountUpgradePage> {
           onPressed: () => context.pop(),
           icon: const Icon(LucideIcons.arrowLeft),
         ),
-        title: "Upgrade Account",
+        title: AccountUpgradeScreenLocale.upgradeTitle.getString(context),
       ),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          _HeaderSection(),
+          const _HeaderSection(),
           const SizedBox(height: 20),
           LayoutBuilder(
             builder: (context, constraints) {
@@ -79,12 +134,12 @@ class _AccountUpgradePageState extends ConsumerState<AccountUpgradePage> {
 
               if (isMobile) {
                 return Column(
-                  children: plans.map((plan) {
+                  children: plans.map((planUI) {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: UpgradePlanCard(
-                        plan: plan,
-                        monthlyPrice: monthlyPrice,
+                        planUI: planUI,
+                        baseMonthlyPrice: baseMonthlyPrice,
                       ),
                     );
                   }).toList(),
@@ -98,13 +153,13 @@ class _AccountUpgradePageState extends ConsumerState<AccountUpgradePage> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 16,
-                  childAspectRatio: 1.25,
+                  childAspectRatio: 1.15,
                 ),
                 itemCount: plans.length,
                 itemBuilder: (context, index) {
                   return UpgradePlanCard(
-                    plan: plans[index],
-                    monthlyPrice: monthlyPrice,
+                    planUI: plans[index],
+                    baseMonthlyPrice: baseMonthlyPrice,
                   );
                 },
               );
@@ -127,7 +182,7 @@ class _HeaderSection extends StatelessWidget {
     return Column(
       children: [
         Text(
-          "Choose Your Plan",
+          AccountUpgradeScreenLocale.chooseYourPlan.getString(context),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: FontSizeConfig.title(context) + 4,
@@ -136,7 +191,7 @@ class _HeaderSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          "Upgrade your POS Master account and enjoy all premium features.",
+          AccountUpgradeScreenLocale.upgradeSubtitle.getString(context),
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Theme.of(context).brightness == Brightness.dark
@@ -146,7 +201,7 @@ class _HeaderSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          "59,500 MMK / month",
+          AccountUpgradeScreenLocale.mmkPerMonth.getString(context),
           textAlign: TextAlign.center,
           style: TextStyle(
             color: kGreen,
@@ -162,37 +217,45 @@ class _HeaderSection extends StatelessWidget {
 class UpgradePlanCard extends StatelessWidget {
   const UpgradePlanCard({
     super.key,
-    required this.plan,
-    required this.monthlyPrice,
+    required this.planUI,
+    required this.baseMonthlyPrice,
   });
 
-  final UpgradePlan plan;
-  final int monthlyPrice;
+  final UpgradePlanUI planUI;
+  final double baseMonthlyPrice;
 
-  String formatPrice(int price) {
-    return price.toString().replaceAllMapped(
+  String formatPrice(double price) {
+    return price.toInt().toString().replaceAllMapped(
       RegExp(r'\B(?=(\d{3})+(?!\d))'),
       (match) => ',',
     );
   }
 
-  int get originalPrice => monthlyPrice * plan.months;
-
-  int get saving => originalPrice - plan.price;
-
   @override
   Widget build(BuildContext context) {
+    final double actualPrice = double.tryParse(planUI.plan.priceMMK) ?? 0.0;
+    final double originalPrice = baseMonthlyPrice * planUI.plan.month;
+    final double saving = originalPrice - actualPrice;
+
+    final List<String> defaultFeatures = [
+      AccountUpgradeScreenLocale.featureAllPos.getString(context),
+      AccountUpgradeScreenLocale.featureCloud.getString(context),
+      AccountUpgradeScreenLocale.featureSalesInventory.getString(context),
+      AccountUpgradeScreenLocale.featureReports.getString(context),
+      AccountUpgradeScreenLocale.featureSupport.getString(context),
+    ];
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
         ShadCard(
-          border: plan.popular
+          border: planUI.plan.isPopular
               ? ShadBorder.all(width: 1.5, color: kRed)
               : ShadBorder.all(width: 1, color: Colors.transparent),
           title: Padding(
             padding: const EdgeInsets.only(right: 70),
             child: Text(
-              plan.name,
+              planUI.nameKey.getString(context),
               style: TextStyle(
                 fontSize: FontSizeConfig.title(context),
                 fontWeight: FontWeight.bold,
@@ -208,7 +271,7 @@ class UpgradePlanCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      "${formatPrice(plan.price)} MMK",
+                      "${formatPrice(actualPrice)} MMK",
                       style: TextStyle(
                         fontSize: FontSizeConfig.title(context) + 2,
                         fontWeight: FontWeight.bold,
@@ -230,7 +293,7 @@ class UpgradePlanCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        "Save ${formatPrice(saving)} MMK",
+                        "${AccountUpgradeScreenLocale.upgradeSave.getString(context)} ${formatPrice(saving)} MMK",
                         style: const TextStyle(
                           color: kGreen,
                           fontWeight: FontWeight.w600,
@@ -242,42 +305,41 @@ class UpgradePlanCard extends StatelessWidget {
                 const SizedBox(height: 16),
                 const Divider(),
                 const SizedBox(height: 10),
-                _PlanFeature(
-                  icon: LucideIcons.check,
-                  text: "All POS Master features",
-                ),
-                _PlanFeature(
-                  icon: LucideIcons.check,
-                  text: "Cloud-based POS system",
-                ),
-                _PlanFeature(
-                  icon: LucideIcons.check,
-                  text: "Sales & inventory management",
-                ),
-                _PlanFeature(
-                  icon: LucideIcons.check,
-                  text: "Reports & analytics",
-                ),
-                _PlanFeature(icon: LucideIcons.check, text: "Customer support"),
+                if (planUI.plan.planFeatures.isNotEmpty)
+                  ...planUI.plan.planFeatures.map(
+                    (feature) => _PlanFeature(
+                      icon: LucideIcons.check,
+                      text: feature.value,
+                    ),
+                  )
+                else
+                  ...defaultFeatures.map(
+                    (featureText) => _PlanFeature(
+                      icon: LucideIcons.check,
+                      text: featureText,
+                    ),
+                  ),
               ],
             ),
           ),
-          footer: SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                showShadDialog(
-                  context: context,
-                  builder: (context) {
-                    return UpgradeConfirmationDialog(plan: plan);
-                  },
-                );
-              },
-              child: const Text("Upgrade"),
-            ),
-          ),
+          // footer: SizedBox(
+          //   width: double.infinity,
+          //   child: ShadButton(
+          //     onPressed: () {
+          //       showDialog(
+          //         context: context,
+          //         builder: (context) {
+          //           return AccountUpgradeDialog(plan: planUI.plan);
+          //         },
+          //       );
+          //     },
+          //     child: Text(
+          //       AccountUpgradeScreenLocale.upgradeButton.getString(context),
+          //     ),
+          //   ),
+          // ),
         ),
-        if (plan.savingText != null)
+        if (planUI.savingTextKey != null)
           Positioned(
             top: -8,
             right: 12,
@@ -288,7 +350,7 @@ class UpgradePlanCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                plan.savingText!,
+                planUI.savingTextKey!.getString(context),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 12,
@@ -297,7 +359,7 @@ class UpgradePlanCard extends StatelessWidget {
               ),
             ),
           ),
-        if (plan.popular)
+        if (planUI.plan.isPopular)
           Positioned(
             top: 32,
             right: 12,
@@ -307,9 +369,9 @@ class UpgradePlanCard extends StatelessWidget {
                 color: kGreen,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text(
-                "POPULAR",
-                style: TextStyle(
+              child: Text(
+                AccountUpgradeScreenLocale.popular.getString(context),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
@@ -322,88 +384,14 @@ class UpgradePlanCard extends StatelessWidget {
   }
 }
 
-class _PlanFeature extends StatelessWidget {
-  const _PlanFeature({required this.icon, required this.text});
-
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: kGreenSecondary),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(text, style: const TextStyle(color: kGreen)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class UpgradeConfirmationDialog extends StatelessWidget {
-  const UpgradeConfirmationDialog({super.key, required this.plan});
-
-  final UpgradePlan plan;
-
-  String formatPrice(int price) {
-    return price.toString().replaceAllMapped(
-      RegExp(r'\B(?=(\d{3})+(?!\d))'),
-      (match) => ',',
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: ShadDialog(
-        title: Text("Upgrade to ${plan.name}"),
-        description: Text(
-          "Your selected plan costs ${formatPrice(plan.price)} MMK.",
-        ),
-        actions: [
-          ShadButton.outline(
-            onPressed: () {
-              context.pop();
-            },
-            child: const Text("Cancel"),
-          ),
-          ShadButton(
-            onPressed: () {
-              context.pop();
-
-              showShadDialog(
-                context: context,
-                builder: (context) {
-                  return const UpgradeContactDialog();
-                },
-              );
-            },
-            child: const Text("Contact Us"),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class UpgradeContactCard extends StatelessWidget {
   const UpgradeContactCard({super.key});
 
   static const String viberNumber = "+959784727952";
-
   static const String phoneNumber = "09784727952";
-
   static const String telegramUsername = "ja_7090";
-
   static const String facebookUrl =
       "https://www.facebook.com/oakar.kyaw.260188";
-
   static const String whatsappNumber = "959784727952";
 
   Future<void> _openUrl(BuildContext context, Uri uri) async {
@@ -591,20 +579,37 @@ class _ContactButton extends StatelessWidget {
   }
 }
 
-class UpgradePlan {
-  const UpgradePlan({
-    required this.name,
-    required this.months,
-    required this.price,
-    required this.discount,
-    required this.savingText,
-    required this.popular,
-  });
+class _PlanFeature extends StatelessWidget {
+  const _PlanFeature({required this.icon, required this.text});
 
-  final String name;
-  final int months;
-  final int price;
-  final int discount;
-  final String? savingText;
-  final bool popular;
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: kGreenSecondary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(text, style: const TextStyle(color: kGreen)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class UpgradePlanUI {
+  final Plan plan;
+  final String nameKey;
+  final String? savingTextKey;
+
+  const UpgradePlanUI({
+    required this.plan,
+    required this.nameKey,
+    required this.savingTextKey,
+  });
 }

@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/voucher.api.dart';
 import 'package:pos/features/customer/data/model/customer-model.dart';
-import 'package:pos/features/voucher/presentation/widgets/calculation-row-delivery-fee.dart';
 import 'package:pos/features/voucher/presentation/widgets/calculation-row-discount.dart';
 import 'package:pos/features/voucher/presentation/widgets/calculation-row-note.dart';
 import 'package:pos/features/voucher/presentation/widgets/calculation-row-packagin-fee.dart';
@@ -28,6 +27,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 
 class VoucherCalculationDialog extends ConsumerStatefulWidget {
   final List<File> photos;
+
   const VoucherCalculationDialog({super.key, required this.photos});
 
   @override
@@ -38,6 +38,7 @@ class VoucherCalculationDialog extends ConsumerStatefulWidget {
 class _VoucherCalculationDialogState
     extends ConsumerState<VoucherCalculationDialog> {
   bool isDiscountByPercent = true;
+  bool isLoading = false;
   int? customerId;
   Customer? newCustomer;
   VoucherDetailNotifier? _voucherDetail;
@@ -47,14 +48,26 @@ class _VoucherCalculationDialogState
     vd.updatePaymentAmount(voucherId, value);
   }
 
-  void _addDiscount(bool val) => setState(() {
-    isDiscountByPercent = val;
-  });
+  void _addDiscount(bool val) {
+    setState(() {
+      isDiscountByPercent = val;
+    });
+  }
 
-  void saveVoucher() async {
+  Future<void> saveVoucher() async {
+    if (isLoading) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
     try {
-      final voucher = ref.watch(voucherDetailProvider);
-      if (voucher == null) return;
+      final voucher = ref.read(voucherDetailProvider);
+
+      if (voucher == null) {
+        return;
+      }
+
       final saveVoucherApi = await ref
           .read(voucherProvider.notifier)
           .postVoucher(
@@ -63,37 +76,47 @@ class _VoucherCalculationDialogState
             customerId: customerId,
             customer: newCustomer,
           );
-      if (saveVoucherApi["success"]) {
-        ShowToast(
-          context,
-          description: Text(
-            VoucherScreenLocale.createdSuccess.getString(context),
-            style: TextStyle(fontSize: FontSizeConfig.body(context)),
-          ),
-          action: Icon(
-            LucideIcons.circleCheck,
-            color: kGreen,
-            size: FontSizeConfig.iconSize(context),
-          ),
-        );
 
-        _voucherDetail!.clearVoucher();
-        context.pushReplacement(AppRoute.receipt, extra: saveVoucherApi["id"]);
+      if (saveVoucherApi["success"]) {
+        if (mounted) {
+          ShowToast(
+            context,
+            description: Text(
+              VoucherScreenLocale.createdSuccess.getString(context),
+              style: TextStyle(fontSize: FontSizeConfig.body(context)),
+            ),
+            action: Icon(
+              LucideIcons.circleCheck,
+              color: kGreen,
+              size: FontSizeConfig.iconSize(context),
+            ),
+          );
+        }
+
+        _voucherDetail?.clearVoucher();
+
+        if (mounted) {
+          context.pushReplacement(
+            AppRoute.receipt,
+            extra: saveVoucherApi["id"],
+          );
+        }
       } else {
-        ShowToast(
-          context,
-          isError: true,
-          description: Text(
-            VoucherScreenLocale.successFailed.getString(context),
-            style: TextStyle(fontSize: FontSizeConfig.body(context)),
-          ),
-          action: Icon(
-            LucideIcons.circleCheck,
-            color: kRed,
-            size: FontSizeConfig.iconSize(context),
-          ),
-        );
-        return;
+        if (mounted) {
+          ShowToast(
+            context,
+            isError: true,
+            description: Text(
+              VoucherScreenLocale.successFailed.getString(context),
+              style: TextStyle(fontSize: FontSizeConfig.body(context)),
+            ),
+            action: Icon(
+              LucideIcons.circleCheck,
+              color: kRed,
+              size: FontSizeConfig.iconSize(context),
+            ),
+          );
+        }
       }
     } on DioException catch (e) {
       String errorMessage = 'Voucher creation failed';
@@ -105,7 +128,6 @@ class _VoucherCalculationDialogState
 
       debugPrint("Voucher Creation Failed 😣 $errorMessage");
 
-      // Show it to the user
       if (context.mounted) {
         ShowToast(
           context,
@@ -125,24 +147,32 @@ class _VoucherCalculationDialogState
         );
       }
     } catch (e) {
-      debugPrint(
-        "Voucher Creation Failed 😣 ${e.toString()} ${e.toString() == "Insufficient stock for item L'Oreal ခရမ်"}",
-      );
+      debugPrint("Voucher Creation Failed 😣 ${e.toString()}");
 
-      ShowToast(
-        context,
-        isError: true,
-        description: Text(
-          VoucherScreenLocale.somethingWentWrong.getString(context),
-          style: TextStyle(fontSize: FontSizeConfig.body(context), color: kRed),
-        ),
-        action: Icon(
-          LucideIcons.circleCheck,
-          color: kRed,
-          size: FontSizeConfig.iconSize(context),
-        ),
-      );
-      return;
+      if (context.mounted) {
+        ShowToast(
+          context,
+          isError: true,
+          description: Text(
+            VoucherScreenLocale.somethingWentWrong.getString(context),
+            style: TextStyle(
+              fontSize: FontSizeConfig.body(context),
+              color: kRed,
+            ),
+          ),
+          action: Icon(
+            LucideIcons.circleCheck,
+            color: kRed,
+            size: FontSizeConfig.iconSize(context),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -168,7 +198,24 @@ class _VoucherCalculationDialogState
     final dividerColor = isDark
         ? Colors.white.withOpacity(0.08)
         : const Color(0xFFE5E7EB);
-    // print("by discount $isDiscountByPercent");
+
+    if (voucher == null) {
+      return AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 24),
+        backgroundColor: surfaceColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        content: const SizedBox(
+          width: double.maxFinite,
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ),
+      );
+    }
+
     return AlertDialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 24),
       backgroundColor: surfaceColor,
@@ -183,7 +230,6 @@ class _VoucherCalculationDialogState
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Totals card ────────────────────
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
@@ -207,20 +253,12 @@ class _VoucherCalculationDialogState
                       textColor,
                     ),
                     const SizedBox(height: 10),
-                    rowDeliveryFee(
-                      ref,
-                      PaymentScreenLocale.deliveryFee.getString(context),
-                      textColor,
-                    ),
-                    const SizedBox(height: 10),
-
                     rowPackaginFee(
                       ref,
                       VoucherScreenLocale.packagingFee.getString(context),
                       textColor,
                     ),
                     const SizedBox(height: 10),
-
                     rowDiscount(
                       context,
                       ref,
@@ -233,7 +271,7 @@ class _VoucherCalculationDialogState
                     row(
                       context,
                       VoucherScreenLocale.total.getString(context),
-                      voucher!.total,
+                      voucher.total,
                       textColor,
                       kPrimary,
                       highlight: true,
@@ -241,17 +279,12 @@ class _VoucherCalculationDialogState
                   ],
                 ),
               ),
-
               const SizedBox(height: 10),
-
-              // ── Section label ──────────────────
               sectionLabel(
                 PaymentScreenLocale.paymentTitle.getString(context),
                 textColor,
               ),
               const SizedBox(height: 12),
-
-              // ── Payment card ────────────────────
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -270,52 +303,6 @@ class _VoucherCalculationDialogState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(
-                      width: double.infinity,
-                      child: PaymentSelectComponent(),
-                    ),
-                    const SizedBox(height: 12),
-
-                    ...voucher.payments.map(
-                      (e) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            rowPayment(
-                              e.paymentData!.id.toString(),
-                              e.paymentData?.accountName ?? "None",
-                              e.amount,
-                              textColor,
-                              Colors.black,
-                              handleChangeAmount: (id, val) =>
-                                  handleChangeAmount(id, val),
-                            ),
-                            Positioned(
-                              top: -10,
-                              right: -8,
-                              child: GestureDetector(
-                                onTap: () => notifier.removePaymentByid(
-                                  e.paymentDataId.toString(),
-                                ),
-                                child: const CircleAvatar(
-                                  radius: 12,
-                                  backgroundColor: Colors.red,
-                                  child: Icon(
-                                    LucideIcons.x,
-                                    size: 14,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    Divider(height: 24, color: dividerColor),
-
                     row(
                       context,
                       PaymentScreenLocale.paidAmount.getString(context),
@@ -333,42 +320,79 @@ class _VoucherCalculationDialogState
                       textColor,
                       kAmber,
                     ),
+                    Divider(height: 24, color: dividerColor),
+                    const SizedBox(
+                      width: double.infinity,
+                      child: PaymentSelectComponent(),
+                    ),
+                    const SizedBox(height: 12),
+                    ...voucher.payments.map(
+                      (e) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            rowPayment(
+                              e.paymentData?.id.toString() ?? '',
+                              e.paymentData?.accountName ?? "None",
+                              e.amount,
+                              textColor,
+                              Colors.black,
+                              handleChangeAmount: (id, val) =>
+                                  handleChangeAmount(id, val),
+                            ),
+                            Positioned(
+                              top: -15,
+                              right: -8,
+                              child: GestureDetector(
+                                onTap: isLoading
+                                    ? null
+                                    : () {
+                                        if (e.paymentDataId != null) {
+                                          notifier.removePaymentByid(
+                                            e.paymentDataId.toString(),
+                                          );
+                                        }
+                                      },
+                                child: const CircleAvatar(
+                                  radius: 12,
+                                  backgroundColor: Colors.red,
+                                  child: Icon(
+                                    LucideIcons.x,
+                                    size: 14,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-
-              // // ── Photo section ──────────────────
-              // sectionLabel(
-              //   PaymentScreenLocale.paymentPhoto.getString(context),
-              //   textColor,
-              // ),
-              // const SizedBox(height: 12),
-
-              // // --- Payment Photo (placeholder, add back when ready) ---
-              // const SizedBox(height: 16),
               const SizedBox(height: 16),
               CustomerVoucher(
                 onChanged: (Customer customer) {
                   setState(() {
-                    //if customerId = 0 then this is local value then sendCustomer
-                    customer.id == 0
-                        ? newCustomer = customer
-                        : customerId = customer.id;
+                    if (customer.id == 0) {
+                      newCustomer = customer;
+                      customerId = null;
+                    } else {
+                      customerId = customer.id;
+                      newCustomer = null;
+                    }
                   });
                 },
               ),
               const SizedBox(height: 16),
-
-              // ── Note ──────────────────────────
               rowNote(
                 ref,
                 VoucherScreenLocale.note.getString(context),
                 textColor,
               ),
-
               const SizedBox(height: 16),
-
-              // ── Save button ───────────────────
               SizedBox(
                 width: double.infinity,
                 child: DecoratedBox(
@@ -389,20 +413,71 @@ class _VoucherCalculationDialogState
                   ),
                   child: ShadButton(
                     backgroundColor: Colors.transparent,
-                    onPressed: () => saveVoucher(),
-                    child: Text(
-                      VoucherScreenLocale.save.getString(context),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    onPressed: isLoading ? null : saveVoucher,
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            VoucherScreenLocale.save.getString(context),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                   ),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _dashedDivider({double thickness = 1}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          const dashWidth = 4.0;
+          const dashSpace = 3.0;
+
+          final dashCount = (constraints.maxWidth / (dashWidth + dashSpace))
+              .floor();
+
+          return Flex(
+            direction: Axis.horizontal,
+            children: List.generate(dashCount, (_) {
+              return SizedBox(
+                width: dashWidth,
+                height: thickness,
+                child: const DecoratedBox(
+                  decoration: BoxDecoration(color: Colors.black54),
+                ),
+              );
+            }).expand((w) => [w, const SizedBox(width: dashSpace)]).toList(),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _totalRow(String label, String value, {required TextStyle style}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(label, style: style, overflow: TextOverflow.ellipsis),
+          ),
+          Text(value, style: style),
+        ],
       ),
     );
   }

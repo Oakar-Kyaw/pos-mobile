@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/api/user.api.dart';
 import 'package:pos/core/service/firebase-service.dart';
 import 'package:pos/core/widgets/app-local-notification.dart';
 import 'package:pos/localization/localization.dart';
@@ -31,7 +30,7 @@ void main() async {
   //   GoogleFonts.merriweather(),
   //   //GoogleFonts.notoSansMyanmar(),
   // ]);
-  AppLocalNotification.initialize();
+  await AppLocalNotification.initialize();
   runApp(ProviderScope(child: const MyApp()));
 }
 
@@ -94,8 +93,9 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   Future<void> _checkForShorebirdUpdate() async {
     final updater = ShorebirdUpdater();
+    final notifier = AppLocalNotification();
+    const shorebirdNotiId = 2001;
 
-    // Check if updates are available on this platform.
     if (!updater.isAvailable) {
       print('Shorebird is not available on this platform.');
       return;
@@ -108,15 +108,28 @@ class _MyAppState extends ConsumerState<MyApp> {
       if (status == UpdateStatus.outdated) {
         print('Downloading Shorebird patch...');
 
+        await notifier.showShorebirdUpdateProgress(
+          notiId: shorebirdNotiId,
+          title: 'Updating POS Master',
+          body: 'Downloading the latest update…',
+        );
+
         await updater.update();
 
         print('Patch downloaded successfully.');
         print('Restart the app to apply the patch.');
+
+        await notifier.showShorebirdUpdateReady(
+          notiId: shorebirdNotiId,
+          title: 'Update ready',
+          body: 'Restart the app to apply the latest update.',
+        );
       } else {
         print('No patch available.');
       }
     } catch (e) {
       print('Shorebird update error: $e');
+      await notifier.cancelShorebirdNotification(notiId: shorebirdNotiId);
     }
   }
 

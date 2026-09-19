@@ -53,6 +53,7 @@ class SaleSummary {
   final String subTotal;
   final String refundAmount;
   final String debtAmount;
+  final String repayAmount;
   final String expenseAmount;
   final String purchaseAmount;
   final String netIncome;
@@ -69,6 +70,7 @@ class SaleSummary {
     required this.tax,
     required this.subTotal,
     required this.refundAmount,
+    required this.repayAmount,
     required this.debtAmount,
     required this.expenseAmount,
     required this.purchaseAmount,
@@ -89,6 +91,7 @@ class SaleSummary {
       tax: json['tax'],
       subTotal: json['subTotal'],
       refundAmount: json['refundAmount'],
+      repayAmount: json['repayAmount'],
       debtAmount: json['debtAmount'],
       expenseAmount: json['expenseAmount'],
       purchaseAmount: json['purchaseAmount'],

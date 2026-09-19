@@ -1,4 +1,3 @@
-// features/voucher/presentation/widgets/receipt-voucher-widget.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,10 +30,6 @@ class ReceiptVoucherWidget extends ConsumerStatefulWidget {
 
 class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
   bool _isPrinting = false;
-
-  // ======================================================
-  // STYLES
-  // ======================================================
 
   static const TextStyle _companyTitleStyle = TextStyle(
     fontFamily: 'NotoSerif',
@@ -71,6 +66,7 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
         widget.voucher,
         PaperSize.mm58,
       );
+
       await ref
           .read(printerProvider.notifier)
           .printTest(PrinterType.bluetooth, bytes);
@@ -88,6 +84,9 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
   @override
   Widget build(BuildContext context) {
     final voucher = widget.voucher;
+    final company = voucher.company;
+    final customer = voucher.customer;
+    final createdAt = voucher.createdAt;
 
     return Container(
       width: double.infinity,
@@ -106,27 +105,28 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ================= HEADER =================
-          if (voucher.company?.name != null && voucher.company!.name.isNotEmpty)
+          if ((company?.name ?? '').isNotEmpty)
             Text(
-              voucher.company!.name,
+              company?.name ?? '',
               textAlign: TextAlign.center,
               style: _companyTitleStyle,
             ),
 
-          if ((voucher.company?.phone ?? "").isNotEmpty) ...[
+          if ((company?.phone ?? '').isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
-              "${CompanyRegisterScreenLocal.companyPhone.getString(context)}: ${voucher.company!.phone!}",
+              "${CompanyRegisterScreenLocal.companyPhone.getString(context)}: "
+              "${company?.phone ?? ''}",
               textAlign: TextAlign.center,
               style: _bodyStyle,
             ),
           ],
 
-          if ((voucher.company?.address ?? "").isNotEmpty) ...[
+          if ((company?.address ?? '').isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
-              "${CompanyRegisterScreenLocal.companyAddress.getString(context)}: ${voucher.company!.address!}",
+              "${CompanyRegisterScreenLocal.companyAddress.getString(context)}: "
+              "${company?.address ?? ''}",
               textAlign: TextAlign.center,
               maxLines: 4,
               style: _bodyStyle,
@@ -134,22 +134,28 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
           ],
 
           const SizedBox(height: 6),
+
           Text(
-            "${VoucherScreenLocale.receiptNo.getString(context)}: ${voucher.voucherCode}",
+            "${VoucherScreenLocale.receiptNo.getString(context)}: "
+            "${voucher.voucherCode}",
             style: _bodyStyle,
           ),
+
           Text(
-            "${VoucherScreenLocale.receiptDate.getString(context)}: ${voucher.createdAt != null ? DateFormat('d MMM yyyy').format(voucher.createdAt!) : ''}",
+            "${VoucherScreenLocale.receiptDate.getString(context)}: "
+            "${createdAt != null ? DateFormat('d MMM yyyy').format(createdAt) : '-'}",
             style: _bodyStyle,
           ),
+
           Text(
-            "${VoucherScreenLocale.customerName.getString(context)}: ${voucher.customer!.name}(${voucher.customer!.phone ?? "-"})",
+            "${VoucherScreenLocale.customerName.getString(context)}: "
+            "${customer?.name ?? '-'}"
+            "(${customer?.phone ?? '-'})",
             style: _bodyStyle,
           ),
 
           _dashedDivider(),
 
-          // ================= ITEM TABLE HEADER =================
           Row(
             children: [
               Expanded(
@@ -180,7 +186,6 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
 
           _dashedDivider(),
 
-          // ================= ITEM ROWS =================
           ...voucher.items.map(
             (item) => Padding(
               padding: const EdgeInsets.only(bottom: 4),
@@ -226,7 +231,6 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
 
           _dashedDivider(),
 
-          // ================= TOTALS =================
           _totalRow(
             VoucherScreenLocale.subtotal.getString(context),
             formatAmount(voucher.subTotal),
@@ -237,13 +241,6 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
             _totalRow(
               VoucherScreenLocale.tax.getString(context),
               formatAmount(voucher.tax),
-              style: _bodyStyle,
-            ),
-
-          if (voucher.deliveryFee > 0)
-            _totalRow(
-              PaymentScreenLocale.deliveryFee.getString(context),
-              formatAmount(voucher.deliveryFee),
               style: _bodyStyle,
             ),
 
@@ -273,7 +270,6 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
 
           _dashedDivider(thickness: 2),
 
-          // ================= GRAND TOTAL =================
           _totalRow(
             VoucherScreenLocale.total.getString(context),
             formatAmount(voucher.total),
@@ -282,14 +278,12 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
 
           _dashedDivider(),
 
-          // ================= THANK YOU =================
           Text(
             VoucherScreenLocale.thankYouMessage.getString(context),
             textAlign: TextAlign.center,
             style: _boldBodyStyle,
           ),
 
-          // ================= PRINT BUTTON (optional) =================
           if (widget.showPrintButton) ...[
             const SizedBox(height: 24),
             ShadButton(
@@ -318,8 +312,10 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
         builder: (context, constraints) {
           const dashWidth = 4.0;
           const dashSpace = 3.0;
+
           final dashCount = (constraints.maxWidth / (dashWidth + dashSpace))
               .floor();
+
           return Flex(
             direction: Axis.horizontal,
             children: List.generate(dashCount, (_) {

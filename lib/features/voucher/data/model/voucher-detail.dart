@@ -282,7 +282,7 @@ class VoucherDetailModel {
       total: double.parse(json['total'].toString()),
       tax: double.parse(json['tax'].toString()),
       totalPaymentAmount: double.parse(json['totalPaymentAmount'].toString()),
-      deliveryFee: double.parse(json['deliveryFee'].toString()),
+      deliveryFee: double.tryParse(json['deliveryFee']?.toString() ?? '0') ?? 0,
       discountAmount: double.parse(json["discountAmount"].toString()),
       discountPercent: double.parse(json["discountPercent"].toString()),
       packagingFee: double.parse(json["packagingFee"].toString()),

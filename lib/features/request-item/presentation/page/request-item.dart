@@ -7,7 +7,6 @@ import 'package:pos/core/utils/date-range-select.dart';
 import 'package:pos/core/utils/user-select.dart';
 import 'package:pos/features/request-item/presentation/page/request-item-list.dart';
 import 'package:pos/localization/drawer-local.dart';
-import 'package:pos/localization/inventory-management-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
@@ -25,12 +24,6 @@ class RequestItemPage extends ConsumerStatefulWidget {
 }
 
 class _RequestItemPageState extends ConsumerState<RequestItemPage> {
-  @override
-  void dispose() {
-    super.dispose();
-    _clearSelectedData();
-  }
-
   void _clearSelectedData() {
     ref.read(selectedDataStateProvider.notifier).clear();
   }
@@ -44,55 +37,65 @@ class _RequestItemPageState extends ConsumerState<RequestItemPage> {
     final selectedData = ref.watch(selectedDataStateProvider);
     final config = InventoryActionConfig('Request', context);
     //print("expire item is ${InventoryActionType.damaged}");
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: CustomAppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(LucideIcons.arrowLeft),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) => _clearSelectedData(),
+      child: Scaffold(
+        backgroundColor: bgColor,
+        appBar: CustomAppBar(
+          leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: const Icon(LucideIcons.arrowLeft),
+          ),
+          title: config.title,
         ),
-        title: config.title,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Description Banner ──────────────────
-            // DescriptionWidget(
-            //   isDark: isDark,
-            //   description: config.description,
-            //   icon: config.icon,
-            //   subColor: subColor,
-            // ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Description Banner ──────────────────
+              // DescriptionWidget(
+              //   isDark: isDark,
+              //   description: config.description,
+              //   icon: config.icon,
+              //   subColor: subColor,
+              // ),
 
-            // const SizedBox(height: 20),
-            GradientSubmitButton(
-              onPressed: () => context.pushNamed(
-                AppRoute.inventoryItem,
-                extra: {'type': 'Request'},
-              ),
-              text: DrawerScreenLocale.drawerCreate.getString(context),
-              width: 120,
-            ),
-
-            const SizedBox(height: 20),
-
-            RequestLabel(textColor: textColor),
-            if (user != null && (isAdmin(user.role) || isManager(user.role)))
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                child: DateRangeSelect(),
+              // const SizedBox(height: 20),
+              GradientSubmitButton(
+                onPressed: () => context.pushNamed(
+                  AppRoute.inventoryItem,
+                  extra: {'type': 'Request'},
+                ),
+                text: DrawerScreenLocale.drawerCreate.getString(context),
+                width: 120,
               ),
 
-            Expanded(
-              child: RequestItemLists(
-                userId: selectedData?.userId,
-                startDate: selectedData?.startDate,
-                endDate: selectedData?.endDate,
+              const SizedBox(height: 20),
+              if (user != null && (isAdmin(user.role) || isManager(user.role)))
+                SizedBox(
+                  width: double.infinity,
+                  child: RequestLabel(textColor: textColor),
+                ),
+              if (user != null && (isAdmin(user.role) || isManager(user.role)))
+                SizedBox(
+                  width: double.infinity,
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: DateRangeSelect(),
+                  ),
+                ),
+
+              Expanded(
+                child: RequestItemLists(
+                  userId: selectedData?.userId,
+                  startDate: selectedData?.startDate,
+                  endDate: selectedData?.endDate,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -106,13 +109,6 @@ class RequestLabel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userStateProvider);
-    return Row(
-      children: [
-        if (user != null && (isAdmin(user.role) || isManager(user.role))) ...[
-          const UserSelect(),
-        ],
-      ],
-    );
+    return const UserSelect();
   }
 }

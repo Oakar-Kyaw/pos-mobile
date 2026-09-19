@@ -7,7 +7,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:open_folder/open_folder.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
@@ -37,51 +36,51 @@ class _ProductPageState extends ConsumerState<ProductPage> {
   bool _isUploading = false;
   bool _uploadCompleted = false;
 
-  Future<void> _openExcelFolder() async {
-    try {
-      if (Platform.isIOS) {
-        if (!mounted) return;
+  // Future<void> _openExcelFolder() async {
+  //   try {
+  //     if (Platform.isIOS) {
+  //       if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              _downloadedPath != null
-                  ? "${ProductScreenLocale.savedTo.getString(context)}: $_downloadedPath\n${ProductScreenLocale.openFilesApp.getString(context)}"
-                  : ProductScreenLocale.fileSavedSuccessfully.getString(
-                      context,
-                    ),
-            ),
-            duration: const Duration(seconds: 5),
-          ),
-        );
-        return;
-      }
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text(
+  //             _downloadedPath != null
+  //                 ? "${ProductScreenLocale.savedTo.getString(context)}: $_downloadedPath\n${ProductScreenLocale.openFilesApp.getString(context)}"
+  //                 : ProductScreenLocale.fileSavedSuccessfully.getString(
+  //                     context,
+  //                   ),
+  //           ),
+  //           duration: const Duration(seconds: 5),
+  //         ),
+  //       );
+  //       return;
+  //     }
 
-      final result = await OpenFolder.openFolder(
-        "/storage/emulated/0/Download/POS Master/Excel/",
-      );
+  //     final result = await OpenFolder.openFolder(
+  //       "/storage/emulated/0/Download/POS Master/Excel/",
+  //     );
 
-      if (!result.isSuccess && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "${ProductScreenLocale.couldNotOpenFolder.getString(context)}: ${result.message}",
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      if (!mounted) return;
+  //     if (!result.isSuccess && mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text(
+  //             "${ProductScreenLocale.couldNotOpenFolder.getString(context)}: ${result.message}",
+  //           ),
+  //         ),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "${ProductScreenLocale.couldNotOpenFolder.getString(context)}: $e",
-          ),
-        ),
-      );
-    }
-  }
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(
+  //           "${ProductScreenLocale.couldNotOpenFolder.getString(context)}: $e",
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
 
   Future<bool> _requestStoragePermission() async {
     if (!Platform.isAndroid) return true;
@@ -239,9 +238,9 @@ class _ProductPageState extends ConsumerState<ProductPage> {
           cancelLabel: RefundLocale.cancel.getString(context),
         );
 
-        if (openFolder == true) {
-          await _openExcelFolder();
-        }
+        // if (openFolder == true) {
+        //   await _openExcelFolder();
+        // }
       },
       onDownloadError: (String error) async {
         debugPrint("🔴 DOWNLOAD ERROR: $error");
@@ -461,15 +460,15 @@ class _ProductPageState extends ConsumerState<ProductPage> {
           children: [
             Row(
               children: [
-                Expanded(
-                  child: GradientSubmitButton(
-                    onPressed: _downloadFromNetwork,
-                    text: _isDownloading
-                        ? ProductScreenLocale.downloading.getString(context)
-                        : ProductScreenLocale.getExcel.getString(context),
-                    width: double.infinity,
-                  ),
-                ),
+                // Expanded(
+                //   child: GradientSubmitButton(
+                //     onPressed: _downloadFromNetwork,
+                //     text: _isDownloading
+                //         ? ProductScreenLocale.downloading.getString(context)
+                //         : ProductScreenLocale.getExcel.getString(context),
+                //     width: double.infinity,
+                //   ),
+                // ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: GradientSubmitButton(

@@ -120,32 +120,40 @@ class _RepaymentListState extends ConsumerState<RepaymentList> {
       _pagingController.refresh();
     });
 
-    return PagingListener(
-      controller: _pagingController,
-      builder: (context, state, fetchNextPage) => PagedListView<int, Repay>(
-        state: state,
-        fetchNextPage: fetchNextPage,
-        builderDelegate: PagedChildBuilderDelegate<Repay>(
-          itemBuilder: (context, repayment, index) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: RepaymentCard(
-                repayment: repayment,
-                textColor: textColor,
-                subColor: subColor,
-                onDelete:
-                    (user != null &&
-                            (isAdmin(user.role) || isManager(user.role)))
-                        ? () => _delete(repayment, isDark)
-                        : null,
-              ),
-            );
-          },
+    return RefreshIndicator(
+      onRefresh: () async {
+        _pagingController.refresh();
+      },
+      child: PagingListener(
+        controller: _pagingController,
+        builder: (context, state, fetchNextPage) => PagedListView<int, Repay>(
+          state: state,
+          fetchNextPage: fetchNextPage,
+          builderDelegate: PagedChildBuilderDelegate<Repay>(
+            itemBuilder: (context, repayment, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                child: RepaymentCard(
+                  repayment: repayment,
+                  textColor: textColor,
+                  subColor: subColor,
+                  // onDelete:
+                  //     (user != null &&
+                  //         (isAdmin(user.role) || isManager(user.role)))
+                  //     ? () => _delete(repayment, isDark)
+                  //     : null,
+                ),
+              );
+            },
 
-          firstPageProgressIndicatorBuilder: (_) => LoadingWidget(),
-          newPageProgressIndicatorBuilder: (_) => LoadingWidget(),
-          noItemsFoundIndicatorBuilder: (_) =>
-              NoItemFoundWidget(subColor: subColor),
+            firstPageProgressIndicatorBuilder: (_) => LoadingWidget(),
+            newPageProgressIndicatorBuilder: (_) => LoadingWidget(),
+            noItemsFoundIndicatorBuilder: (_) =>
+                NoItemFoundWidget(subColor: subColor),
+          ),
         ),
       ),
     );

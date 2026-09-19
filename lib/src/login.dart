@@ -35,6 +35,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -53,6 +54,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void submit() async {
+    setState(() => isLoading = true);
+
     Map<String, dynamic>? loginApi;
 
     try {
@@ -65,32 +68,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } catch (error) {
       debugPrint("message of error 👧 $error");
 
-      if (!mounted) return; // 👈 widget unmount ဖြစ်နေရင် ဒီမှာ ရပ်လိုက်တယ်
+      if (!mounted) return;
+
+      setState(() => isLoading = false);
 
       String message;
-      if (error.toString().contains(LoginScreenLocale.emailNotFound)) {
+      if (error.toString().contains("User with this email not found") ||
+          error.toString().contains("not found")) {
         message = LoginScreenLocale.emailNotFound.getString(context);
-      } else if (error.toString().contains(LoginScreenLocale.passwordWrong)) {
+      } else if (error.toString().contains("Password was wrong")) {
         message = LoginScreenLocale.passwordWrong.getString(context);
       } else {
-        message = error.toString();
+        message = error.toString().replaceFirst(
+          RegExp(r'^DioException\s*\[.*?\]:\s*'),
+          '',
+        );
       }
 
       ShowToast(
         context,
         action: const Icon(LucideIcons.x, color: Colors.red),
+        isError: true,
         borderColor: Colors.red,
         description: Text(message, style: const TextStyle(color: Colors.red)),
       );
-      return; // 👈 login fail ဖြစ်ရင် ဒီနေရာမှာ ရပ်ပါ
+      return;
     }
 
-    if (!mounted) return; // 👈 await ကျော်ပြီးတိုင်း mounted check ထပ်လုပ်ပါ
+    if (!mounted) return;
 
     final secureStorage = SecureStorage();
     final token = await secureStorage.getFirebaseToken();
 
-    if (!mounted) return; // 👈 ထပ် await ဖြတ်လို့ ထပ်စစ်ပါ
+    if (!mounted) return;
 
     if (token != null) {
       await ref
@@ -100,7 +110,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (!mounted) return;
 
-    if (loginApi?["success"] == true) {
+    setState(() => isLoading = false);
+
+    if (loginApi["success"] == true) {
       context.pushReplacement(AppRoute.home);
     }
   }
@@ -287,19 +299,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: ShadButton(
                                 size: ShadButtonSize.lg,
                                 backgroundColor: Colors.transparent,
-                                onPressed: () {
-                                  if (_formKey.currentState!
-                                      .saveAndValidate()) {
-                                    submit();
-                                  }
-                                },
-                                child: Text(
-                                  LoginScreenLocale.signIn.getString(context),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
+                                onPressed: isLoading
+                                    ? null
+                                    : () {
+                                        if (_formKey.currentState!
+                                            .saveAndValidate()) {
+                                          submit();
+                                        }
+                                      },
+                                child: isLoading
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                        ),
+                                      )
+                                    : Text(
+                                        LoginScreenLocale.signIn.getString(
+                                          context,
+                                        ),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
                               ),
                             ),
                           ),

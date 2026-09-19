@@ -25,6 +25,7 @@ import 'package:pos/utils/drawer.dart';
 import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/secure-storage.dart';
+import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
@@ -164,10 +165,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   //Product On Tap
   void _productOntap(VoucherDetailModel? voucher, Product item) {
-    if (voucher == null) return null;
+    if (voucher == null) {
+      _onChangedProduct(true, item);
+      return;
+    }
     final exists = voucher.items.any((s) => s.id == item.id);
     if (exists) {
       ref.read(voucherDetailProvider.notifier).updateQuantity(item.id, 1);
+    } else {
+      _onChangedProduct(true, item);
     }
   }
 
@@ -195,6 +201,22 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         clearSelectedItem(item.id);
       }
     });
+  }
+
+  void _createVoucher(VoucherDetailModel? voucher) {
+    if (voucher == null || voucher.items.isEmpty) {
+      ShowToast(
+        context,
+        isError: true,
+        description: Text(
+          HomeScreenLocale.pleaseAddProduct.getString(context),
+          style: TextStyle(color: kRed),
+        ),
+      );
+      return;
+    } else {
+      context.pushNamed(AppRoute.createVoucher);
+    }
   }
 
   @override
@@ -273,7 +295,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                       ? [
                           const SizedBox(height: 20),
                           SizedBox(
-                            height: 90,
+                            height: 110,
                             child: GridView.builder(
                               scrollDirection: Axis.horizontal,
                               padding: const EdgeInsets.symmetric(
@@ -288,8 +310,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               itemCount: voucher!.items.length,
                               itemBuilder: (context, index) {
                                 final selectedItem = voucher.items[index];
+
                                 return SizedBox(
-                                  width: 70,
+                                  width: 90,
                                   child: Stack(
                                     children: [
                                       Positioned.fill(
@@ -348,13 +371,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                             ),
                                             child: const Icon(
                                               Icons.close,
-                                              size: 20,
+                                              size: 25,
                                               color: Colors.white,
                                             ),
                                           ),
                                         ),
                                       ),
-                                      // Bottom label
                                       Positioned(
                                         left: 0,
                                         right: 0,
@@ -411,10 +433,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                           right: 8,
                         ),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: Responsive.isTablet(context) ? 6 : 4,
+                          crossAxisCount: Responsive.isTablet(context) ? 5 : 3,
                           mainAxisExtent: Responsive.isTablet(context)
-                              ? 150
-                              : 120,
+                              ? 180
+                              : 160,
                           crossAxisSpacing: 8,
                           mainAxisSpacing: 8,
                         ),
@@ -458,54 +480,62 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           ),
 
           // ── Bottom Action Bar ─────────────────────────
-          voucher != null && voucher.items.isNotEmpty
-              ? Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(30),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? Colors.white.withOpacity(0.08)
-                                : Colors.black.withOpacity(0.06),
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: isDark
-                                  ? Colors.white.withOpacity(0.12)
-                                  : Colors.black.withOpacity(0.08),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              GradientSubmitButton(
-                                onPressed: () =>
-                                    context.pushNamed(AppRoute.createVoucher),
-                                text: HomeScreenLocale.createVoucher.getString(
-                                  context,
-                                ),
-                                width: 200,
-                                circularNo: 20,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              : const SizedBox(),
+          // voucher != null && voucher.items.isNotEmpty
+          //     ? Positioned(
+          //         bottom: 20,
+          //         left: 0,
+          //         right: 0,
+          //         child: Center(
+          //           child: ClipRRect(
+          //             borderRadius: BorderRadius.circular(30),
+          //             child: BackdropFilter(
+          //               filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          //               child: Container(
+          //                 padding: const EdgeInsets.symmetric(
+          //                   vertical: 8,
+          //                   horizontal: 10,
+          //                 ),
+          //                 decoration: BoxDecoration(
+          //                   color: isDark
+          //                       ? Colors.white.withOpacity(0.08)
+          //                       : Colors.black.withOpacity(0.06),
+          //                   borderRadius: BorderRadius.circular(30),
+          //                   border: Border.all(
+          //                     color: isDark
+          //                         ? Colors.white.withOpacity(0.12)
+          //                         : Colors.black.withOpacity(0.08),
+          //                     width: 1,
+          //                   ),
+          //                 ),
+          //                 child: Row(
+          //                   mainAxisSize: MainAxisSize.min,
+          //                   children: [
+          //                     GradientSubmitButton(
+          //                       onPressed: () =>
+          //                           context.pushNamed(AppRoute.createVoucher),
+          //                       text: HomeScreenLocale.createVoucher.getString(
+          //                         context,
+          //                       ),
+          //                       width: 200,
+          //                       circularNo: 20,
+          //                     ),
+          //                   ],
+          //                 ),
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //       )
+          //     : const SizedBox(),
         ],
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: FloatingActionButton(
+          onPressed: () => _createVoucher(voucher),
+          backgroundColor: kPrimary,
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
       ),
     );
   }
@@ -575,7 +605,7 @@ class _ProductCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 color: isSelected ? kPrimary : Colors.white.withOpacity(0.9),
                 child: Padding(
-                  padding: const EdgeInsets.all(2),
+                  padding: const EdgeInsets.all(4),
                   child: ShadCheckbox(value: isSelected, onChanged: onChanged),
                 ),
               ),
@@ -626,8 +656,8 @@ class _ProductCard extends StatelessWidget {
     return item.photoUrl != null
         ? CachedNetworkImage(
             imageUrl: item.photoUrl ?? "",
-            width: 65,
-            height: 70,
+            width: 80,
+            height: 80,
             fit: BoxFit.cover,
             placeholder: (context, url) =>
                 Container(width: 65, height: 70, color: Colors.grey.shade200),

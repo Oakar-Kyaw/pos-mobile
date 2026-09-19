@@ -1,11 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pos/features/company/presentation/provider/company.riverpod.dart';
 import 'package:pos/features/profile/data/model/user.dart';
+import 'package:pos/features/profile/presentation/widget/delete-user-dialog.dart';
 import 'package:pos/features/profile/presentation/widget/edit-profile-dialog.dart';
+import 'package:pos/localization/profile-local.dart';
+import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
+import 'package:pos/utils/secure-storage.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class UserProfileTab extends StatelessWidget {
@@ -123,7 +130,7 @@ class UserProfileTab extends StatelessWidget {
                   children: [
                     _InfoRow(
                       icon: LucideIcons.user,
-                      label: "First Name",
+                      label: ProfileScreenLocale.firstName.getString(context),
                       value: user.firstName ?? "-",
                       textColor: textColor,
                       subColor: subColor,
@@ -131,7 +138,7 @@ class UserProfileTab extends StatelessWidget {
                     const Divider(height: 24),
                     _InfoRow(
                       icon: LucideIcons.user,
-                      label: "Last Name",
+                      label: ProfileScreenLocale.lastName.getString(context),
                       value: user.lastName ?? "-",
                       textColor: textColor,
                       subColor: subColor,
@@ -139,7 +146,7 @@ class UserProfileTab extends StatelessWidget {
                     const Divider(height: 24),
                     _InfoRow(
                       icon: LucideIcons.mail,
-                      label: "Email",
+                      label: ProfileScreenLocale.email.getString(context),
                       value: user.email,
                       textColor: textColor,
                       subColor: subColor,
@@ -147,7 +154,7 @@ class UserProfileTab extends StatelessWidget {
                     const Divider(height: 24),
                     _InfoRow(
                       icon: LucideIcons.phone,
-                      label: "Phone",
+                      label: ProfileScreenLocale.phone.getString(context),
                       value: user.phone ?? "-",
                       textColor: textColor,
                       subColor: subColor,
@@ -155,7 +162,7 @@ class UserProfileTab extends StatelessWidget {
                     const Divider(height: 24),
                     _InfoRow(
                       icon: LucideIcons.mapPin,
-                      label: "Address",
+                      label: ProfileScreenLocale.address.getString(context),
                       value: user.address ?? "-",
                       textColor: textColor,
                       subColor: subColor,
@@ -186,8 +193,51 @@ class UserProfileTab extends StatelessWidget {
                         ref.invalidate(userStateProvider);
                       }
                     },
-                    child: const Text(
-                      "Edit Profile",
+                    child: Text(
+                      ProfileScreenLocale.profileEdit.getString(context),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              SizedBox(
+                width: double.infinity,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [kRed, kRed]),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: ShadButton(
+                    backgroundColor: Colors.transparent,
+                    onPressed: () async {
+                      final deleted = await showDialog<bool>(
+                        context: context,
+                        builder: (_) => const DeleteAccountDialog(),
+                      );
+
+                      if (deleted == true) {
+                        final storage = SecureStorage();
+                        await storage.deleteLoginData();
+                        await storage.saveAcessAndRefreshToken(
+                          accessToken: '',
+                          refreshToken: '',
+                        );
+                        ref.read(checkLoginProvider.notifier).logout();
+                        ref.read(companyStateProvider.notifier).clear();
+
+                        if (context.mounted) {
+                          context.go('/login');
+                        }
+                      }
+                    },
+                    child: Text(
+                      ProfileScreenLocale.deleteAccount.getString(context),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,

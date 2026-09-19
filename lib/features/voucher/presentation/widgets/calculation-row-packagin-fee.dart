@@ -5,6 +5,8 @@ import 'package:pos/riverpod/voucher-detail.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 Widget rowPackaginFee(WidgetRef ref, String label, Color textColor) {
+  final voucherDetail = ref.watch(voucherDetailProvider);
+
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
@@ -16,18 +18,17 @@ Widget rowPackaginFee(WidgetRef ref, String label, Color textColor) {
         width: 80,
         child: ShadInputFormField(
           keyboardType: TextInputType.number,
-          initialValue: ref
-              .watch(voucherDetailProvider)!
-              .packagingFee
-              .toString(),
+          initialValue: voucherDetail?.packagingFee.toString() ?? '0',
           textAlign: TextAlign.right,
           decoration: ShadDecoration(secondaryFocusedBorder: ShadBorder.none),
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (value) {
             final val = double.tryParse(value) ?? 0.0;
+
             ref
                 .read(voucherDetailProvider.notifier)
                 .updateVoucher(packagingFee: val);
+
             ref.read(voucherDetailProvider.notifier).calculate();
           },
         ),
