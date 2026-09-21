@@ -22,13 +22,20 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
     String page,
     String limit, {
     String? search,
+    int? categoryId,
   }) async {
     state = const AsyncLoading();
+    debugPrint("categori $categoryId");
     try {
       final url = "v1/products";
       final response = await _dio.get(
         url,
-        query: {"page": page, "limit": limit, "search": search},
+        query: {
+          "page": page,
+          "limit": limit,
+          "search": search,
+          if (categoryId != null) "categoryId": categoryId,
+        },
       );
       final Map<String, dynamic> data = response.data;
       // print("data 👨‍🏭 $data");

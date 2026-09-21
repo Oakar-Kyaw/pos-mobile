@@ -11,10 +11,12 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/core/network/socket/socket-provider.dart';
+import 'package:pos/core/utils/categories-select.dart';
 import 'package:pos/core/widgets/app-local-notification.dart';
 import 'package:pos/features/company/presentation/provider/company.riverpod.dart';
 import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/localization/home-local.dart';
+import 'package:pos/localization/product-local.dart';
 import 'package:pos/models/product.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/riverpod/voucher-detail.dart';
@@ -38,6 +40,8 @@ class MyHomePage extends ConsumerStatefulWidget {
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
   late final PagingController<int, Product> _pagingController;
+  int? categoryId;
+
   String limit = "40";
   @override
   void initState() {
@@ -51,6 +55,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             pageKey.toString(),
             limit,
             search: _searchQuery.isEmpty ? null : _searchQuery,
+            categoryId: categoryId,
           ),
     );
     _connect();
@@ -160,6 +165,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       } catch (e) {
         print('❌ Product progress notification error: $e');
       }
+    });
+  }
+
+  //categories on change
+  void _onChangedCate(v) {
+    debugPrint("val is $v");
+    setState(() {
+      categoryId = v is String ? int.tryParse(v) : v as int?;
+      _pagingController.refresh();
     });
   }
 
@@ -283,200 +297,226 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 ),
               ],
             ),
-      body: Stack(
+      body: Column(
         children: [
           // ── Product Grid ─────────────────────────────
-          PagingListener(
-            controller: _pagingController,
-            builder: (context, state, fetchNextPage) {
-              return Column(
-                children: [
-                  ...(voucher?.items.isNotEmpty ?? false)
-                      ? [
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            height: 110,
-                            child: GridView.builder(
-                              scrollDirection: Axis.horizontal,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 1,
-                                    mainAxisSpacing: 8,
-                                    childAspectRatio: 0.9,
-                                  ),
-                              itemCount: voucher!.items.length,
-                              itemBuilder: (context, index) {
-                                final selectedItem = voucher.items[index];
+          Expanded(
+            child: PagingListener(
+              controller: _pagingController,
+              builder: (context, state, fetchNextPage) {
+                return Column(
+                  children: [
+                    ...(voucher?.items.isNotEmpty ?? false)
+                        ? [
+                            const SizedBox(height: 20),
+                            SizedBox(
+                              height: 110,
+                              child: GridView.builder(
+                                scrollDirection: Axis.horizontal,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 1,
+                                      mainAxisSpacing: 8,
+                                      childAspectRatio: 0.9,
+                                    ),
+                                itemCount: voucher!.items.length,
+                                itemBuilder: (context, index) {
+                                  final selectedItem = voucher.items[index];
 
-                                return SizedBox(
-                                  width: 90,
-                                  child: Stack(
-                                    children: [
-                                      Positioned.fill(
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                          child: selectedItem.photoUrl != null
-                                              ? CachedNetworkImage(
-                                                  imageUrl:
-                                                      selectedItem.photoUrl ??
-                                                      "",
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : Image.asset(
-                                                  "assets/default.jpg",
-                                                  fit: BoxFit.cover,
-                                                ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        top: 2,
-                                        left: 2,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 5,
-                                            vertical: 1,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: kPrimary,
+                                  return SizedBox(
+                                    width: 90,
+                                    child: Stack(
+                                      children: [
+                                        Positioned.fill(
+                                          child: ClipRRect(
                                             borderRadius: BorderRadius.circular(
-                                              6,
+                                              10,
                                             ),
-                                          ),
-                                          child: Text(
-                                            'x${selectedItem.quantity}',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 9,
-                                            ),
+                                            child: selectedItem.photoUrl != null
+                                                ? CachedNetworkImage(
+                                                    imageUrl:
+                                                        selectedItem.photoUrl ??
+                                                        "",
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                : Image.asset(
+                                                    "assets/default.jpg",
+                                                    fit: BoxFit.cover,
+                                                  ),
                                           ),
                                         ),
-                                      ),
-                                      Positioned(
-                                        top: 2,
-                                        right: 2,
-                                        child: GestureDetector(
-                                          onTap: () => clearSelectedItem(
-                                            selectedItem.id,
-                                          ),
+                                        Positioned(
+                                          top: 2,
+                                          left: 2,
                                           child: Container(
-                                            padding: const EdgeInsets.all(3),
-                                            decoration: const BoxDecoration(
-                                              color: Colors.black54,
-                                              shape: BoxShape.circle,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 5,
+                                              vertical: 1,
                                             ),
-                                            child: const Icon(
-                                              Icons.close,
-                                              size: 25,
-                                              color: Colors.white,
+                                            decoration: BoxDecoration(
+                                              color: kPrimary,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              'x${selectedItem.quantity}',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 9,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      Positioned(
-                                        left: 0,
-                                        right: 0,
-                                        bottom: 0,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 5,
-                                            horizontal: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Colors.black.withOpacity(0.7),
-                                                Colors.black.withOpacity(0.4),
-                                              ],
-                                              begin: Alignment.bottomCenter,
-                                              end: Alignment.topCenter,
+                                        Positioned(
+                                          top: 2,
+                                          right: 2,
+                                          child: GestureDetector(
+                                            onTap: () => clearSelectedItem(
+                                              selectedItem.id,
                                             ),
-                                          ),
-                                          child: Text(
-                                            selectedItem.name,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 11,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(3),
+                                              decoration: const BoxDecoration(
+                                                color: Colors.black54,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.close,
+                                                size: 25,
+                                                color: Colors.white,
+                                              ),
                                             ),
-                                            textAlign: TextAlign.center,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
+                                        Positioned(
+                                          left: 0,
+                                          right: 0,
+                                          bottom: 0,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 5,
+                                              horizontal: 6,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  Colors.black.withOpacity(0.7),
+                                                  Colors.black.withOpacity(0.4),
+                                                ],
+                                                begin: Alignment.bottomCenter,
+                                                end: Alignment.topCenter,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              selectedItem.name,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 11,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            const Divider(),
+                            const SizedBox(height: 10),
+                          ]
+                        : <Widget>[],
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            ProductScreenLocale.productTitle.getString(context),
+                          ),
+                          Spacer(),
+                          Expanded(
+                            child: CategoriesSelect(
+                              onChanged: (v) => _onChangedCate(v),
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          const Divider(),
-                          const SizedBox(height: 10),
-                        ]
-                      : <Widget>[],
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: () async {
-                        _pagingController.refresh();
-                      },
-                      child: PagedGridView<int, Product>(
-                        padding: const EdgeInsets.only(
-                          bottom: 100,
-                          top: 8,
-                          left: 8,
-                          right: 8,
-                        ),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: Responsive.isTablet(context) ? 5 : 3,
-                          mainAxisExtent: Responsive.isTablet(context)
-                              ? 180
-                              : 160,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                        ),
-                        state: state,
-                        fetchNextPage: fetchNextPage,
-                        builderDelegate: PagedChildBuilderDelegate<Product>(
-                          itemBuilder: (context, item, index) {
-                            return InkWell(
-                              onTap: () => _productOntap(voucher, item),
-                              child: _ProductCard(
-                                item: item,
-                                isDark: isDark,
-                                isSelected:
-                                    voucher?.items.any(
-                                      (s) => s.id == item.id,
-                                    ) ??
-                                    false,
-                                onChanged: (value) =>
-                                    _onChangedProduct(value, item),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          _pagingController.refresh();
+                        },
+                        child: PagedGridView<int, Product>(
+                          padding: const EdgeInsets.only(
+                            bottom: 100,
+                            top: 8,
+                            left: 8,
+                            right: 8,
+                          ),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: Responsive.isTablet(context)
+                                    ? 5
+                                    : 3,
+                                mainAxisExtent: Responsive.isTablet(context)
+                                    ? 180
+                                    : 160,
+                                crossAxisSpacing: 8,
+                                mainAxisSpacing: 8,
                               ),
-                            );
-                          },
-                          firstPageProgressIndicatorBuilder: (_) => Center(
-                            child: CircularProgressIndicator(color: kPrimary),
-                          ),
-                          newPageProgressIndicatorBuilder: (_) => Center(
-                            child: CircularProgressIndicator(color: kPrimary),
-                          ),
-                          noItemsFoundIndicatorBuilder: (_) => Center(
-                            child: Text(
-                              HomeScreenLocale.noItemFound.getString(context),
+                          state: state,
+                          fetchNextPage: fetchNextPage,
+                          builderDelegate: PagedChildBuilderDelegate<Product>(
+                            itemBuilder: (context, item, index) {
+                              return InkWell(
+                                onTap: () => _productOntap(voucher, item),
+                                child: _ProductCard(
+                                  item: item,
+                                  isDark: isDark,
+                                  isSelected:
+                                      voucher?.items.any(
+                                        (s) => s.id == item.id,
+                                      ) ??
+                                      false,
+                                  onChanged: (value) =>
+                                      _onChangedProduct(value, item),
+                                ),
+                              );
+                            },
+                            firstPageProgressIndicatorBuilder: (_) => Center(
+                              child: CircularProgressIndicator(color: kPrimary),
+                            ),
+                            newPageProgressIndicatorBuilder: (_) => Center(
+                              child: CircularProgressIndicator(color: kPrimary),
+                            ),
+                            noItemsFoundIndicatorBuilder: (_) => Center(
+                              child: Text(
+                                HomeScreenLocale.noItemFound.getString(context),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           ),
 
           // ── Bottom Action Bar ─────────────────────────

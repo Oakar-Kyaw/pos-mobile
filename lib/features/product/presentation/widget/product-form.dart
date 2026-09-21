@@ -233,18 +233,22 @@ class _ProductFormState extends ConsumerState<ProductForm> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             child: cateAsync.when(
-              data: (data) => ShadSelect<Category>(
-                placeholder: Text(
-                  CategoryScreenLocale.selectCategory.getString(context),
+              data: (data) => SizedBox(
+                width: double.infinity,
+                child: ShadSelect<Category>(
+                  placeholder: Text(
+                    CategoryScreenLocale.selectCategory.getString(context),
+                  ),
+                  options: data
+                      .map((e) => ShadOption(value: e, child: Text(e.title)))
+                      .toList(),
+                  selectedOptionBuilder: (context, value) => Text(value.title),
+                  onChanged: (value) {
+                    setState(() => categoryId = value?.id);
+                  },
                 ),
-                options: data
-                    .map((e) => ShadOption(value: e, child: Text(e.title)))
-                    .toList(),
-                selectedOptionBuilder: (context, value) => Text(value.title),
-                onChanged: (value) {
-                  setState(() => categoryId = value?.id);
-                },
               ),
+
               error: (error, stackTrace) => const SizedBox(),
               loading: () => const Center(
                 child: SizedBox(
