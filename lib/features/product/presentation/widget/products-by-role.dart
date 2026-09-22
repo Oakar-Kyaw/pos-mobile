@@ -7,11 +7,14 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/bar-code.dart';
 import 'package:pos/features/product/presentation/provider/edit-product.provider.dart';
 import 'package:pos/features/product/presentation/widget/product-image-with-remove.dart';
 import 'package:pos/features/product/presentation/widget/product-row.dart';
+import 'package:pos/localization/brand-local.dart';
+import 'package:pos/localization/category-local.dart';
 import 'package:pos/localization/product-local.dart';
 import 'package:pos/models/product.dart';
 import 'package:pos/utils/extension.dart';
@@ -56,6 +59,22 @@ class ProductListByPosAndSale extends StatelessWidget {
                 ProductRow(
                   title: "${ProductScreenLocale.barcode.getString(context)}",
                   text: product.barcode ?? "-",
+                ),
+                const SizedBox(height: 10),
+                //brand name
+                ProductRow(
+                  title: BrandScreenLocale.brandTitle.getString(context),
+                  text:
+                      product.brand?.name ??
+                      BrandScreenLocale.brandNotExist.getString(context),
+                ),
+                const SizedBox(height: 10),
+                //category name
+                ProductRow(
+                  title: CategoryScreenLocale.categoryTitle.getString(context),
+                  text:
+                      product.category?.title ??
+                      CategoryScreenLocale.categoryNotExist.getString(context),
                 ),
                 const SizedBox(height: 10),
                 ProductRow(
@@ -112,10 +131,12 @@ class ProductListByAdminAndManager extends ConsumerStatefulWidget {
     super.key,
     required this.product,
     required this.containerDecoration,
+    required this.pagingController,
   });
 
   final Product product;
   final BoxDecoration containerDecoration;
+  final PagingController<int, Product> pagingController; // Paging controller
 
   @override
   ConsumerState<ProductListByAdminAndManager> createState() =>
@@ -133,6 +154,8 @@ class _ProductListByAdminAndManagerState
   late final TextEditingController _minStockController;
   bool active = false;
   String? imageUrl;
+  int? categoryId;
+  int? brandId;
 
   final _resetVersion = 0;
   File? imageFile;
@@ -221,6 +244,8 @@ class _ProductListByAdminAndManagerState
       _costPriceController.text != widget.product.costPrice.toString() ||
       _stockController.text != widget.product.stock.toString() ||
       _minStockController.text != widget.product.minStock.toString() ||
+      categoryId != widget.product.categoryId ||
+      brandId != widget.product.brandId ||
       active != widget.product.isActive ||
       imageUrl != widget.product.photoUrl ||
       imageUrl != widget.product.photoUrl ||
@@ -264,6 +289,8 @@ class _ProductListByAdminAndManagerState
       "vipSellingPrice": 0,
       "vvipSellingPrice": 0,
       "isActive": active,
+      if (categoryId != null) "categoryId": categoryId,
+      if (brandId != null) "brandId": brandId,
     };
 
     FormData formData = FormData.fromMap(productPayload);
@@ -293,6 +320,7 @@ class _ProductListByAdminAndManagerState
         ),
       );
       ref.read(editingProductIdProvider.notifier).clearEdit();
+      widget.pagingController.refresh();
     }
   }
 
@@ -383,6 +411,50 @@ class _ProductListByAdminAndManagerState
                       : () => scanBarCode(product.id),
                 ),
                 const SizedBox(height: 10),
+                //brand select
+                fieldsReadOnly
+                    ? ProductRow(
+                        title: BrandScreenLocale.brandTitle.getString(context),
+                        text:
+                            product.brand?.name ??
+                            BrandScreenLocale.brandNotExist.getString(context),
+                      )
+                    : ProductRowByBrandSelect(
+                        title: BrandScreenLocale.brandTitle.getString(context),
+                        brandId: product.brandId.toString(),
+                        onChanged: (value) {
+                          setState(() {
+                            brandId = int.tryParse(value);
+                          });
+                        },
+                      ),
+                const SizedBox(height: 10),
+
+                //categories select
+                fieldsReadOnly
+                    ? ProductRow(
+                        title: CategoryScreenLocale.categoryTitle.getString(
+                          context,
+                        ),
+                        text:
+                            product.category?.title ??
+                            CategoryScreenLocale.categoryNotExist.getString(
+                              context,
+                            ),
+                      )
+                    : ProductRowByCategorySelect(
+                        title: CategoryScreenLocale.categoryTitle.getString(
+                          context,
+                        ),
+                        categoryId: product.categoryId.toString(),
+                        onChanged: (value) {
+                          setState(() {
+                            categoryId = int.tryParse(value);
+                          });
+                        },
+                      ),
+                const SizedBox(height: 10),
+
                 ProductRowByTextField(
                   key: ValueKey('price-$_resetVersion'),
                   controller: _priceController,

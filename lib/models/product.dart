@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pos/features/brand/data/model/brand.dart';
+import 'package:pos/features/category/data/model/category.dart';
 
 class Product {
   final int id;
@@ -18,6 +20,9 @@ class Product {
   final bool isActive;
   final bool isDeleted;
   final int? categoryId;
+  final Category? category;
+  final Brand? brand;
+  final int? brandId;
   final int userId;
   final int companyId;
   final int? branchId;
@@ -29,6 +34,8 @@ class Product {
     required this.name,
     required this.code,
     this.barcode,
+    this.brand,
+    this.brandId,
     this.description,
     this.photoUrl,
     required this.price,
@@ -42,6 +49,7 @@ class Product {
     required this.isActive,
     required this.isDeleted,
     this.categoryId,
+    this.category,
     required this.userId,
     required this.companyId,
     this.branchId,
@@ -75,6 +83,13 @@ class Product {
       categoryId: json['categoryId'] != null
           ? int.parse(json['categoryId'].toString())
           : null,
+      category: json['category'] != null
+          ? Category.fromJson(json['category'])
+          : null,
+      brand: json['brand'] != null ? Brand.fromJson(json['brand']) : null,
+      brandId: json['brandId'] != null
+          ? int.parse(json['brandId'].toString())
+          : null,
       userId: int.parse(json['userId'].toString()),
       companyId: int.parse(json['companyId'].toString()),
       branchId: json['branchId'] != null
@@ -107,6 +122,7 @@ class Product {
       'isActive': isActive,
       'isDeleted': isDeleted,
       'categoryId': categoryId,
+      'brandId': brandId,
       'userId': userId,
       'companyId': companyId,
       'branchId': branchId,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pos/core/utils/brand-select.dart';
+import 'package:pos/core/utils/categories-select.dart';
 import 'package:pos/utils/extension.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -79,6 +81,86 @@ class ProductRowByTextField extends StatelessWidget {
                     icon: const Icon(LucideIcons.barcode, size: 28),
                   )
                 : null,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ProductRowByCategorySelect extends StatelessWidget {
+  final String title;
+  final String? categoryId;
+  final ValueChanged<String>? onChanged;
+
+  const ProductRowByCategorySelect({
+    super.key,
+    required this.title,
+    this.categoryId,
+    this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 5,
+          child: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.normal),
+          ),
+        ),
+
+        Expanded(
+          flex: 10,
+          child: CategoriesSelect(
+            initialValue: categoryId,
+            allCategories: false,
+            onChanged: (v) {
+              if (v == null) return;
+              onChanged?.call(v);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ProductRowByBrandSelect extends StatelessWidget {
+  final String title;
+  final String? brandId;
+  final ValueChanged<String>? onChanged;
+
+  const ProductRowByBrandSelect({
+    super.key,
+    required this.title,
+    this.brandId,
+    this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 5,
+          child: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.normal),
+          ),
+        ),
+
+        Expanded(
+          flex: 10,
+          child: BrandSelect(
+            initialValue: brandId,
+            allBrands: false,
+            onChanged: (v) {
+              if (v == null) return;
+              onChanged?.call(v);
+            },
           ),
         ),
       ],

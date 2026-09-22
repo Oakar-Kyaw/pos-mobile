@@ -3,28 +3,28 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
-import 'package:pos/features/category/data/model/category.dart';
-import 'package:pos/features/category/presentation/widget/category-card.dart';
-import 'package:pos/features/category/presentation/widget/category-form.dart';
-import 'package:pos/localization/category-local.dart';
+import 'package:pos/features/brand/data/model/brand.dart';
+import 'package:pos/features/brand/presentation/widget/brand-card.dart';
+import 'package:pos/features/brand/presentation/widget/brand-form.dart';
+import 'package:pos/localization/brand-local.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-class CategoryPage extends ConsumerStatefulWidget {
-  const CategoryPage({super.key});
+class BrandPage extends ConsumerStatefulWidget {
+  const BrandPage({super.key});
 
   @override
-  ConsumerState<CategoryPage> createState() => _CategoryPageState();
+  ConsumerState<BrandPage> createState() => _BrandPageState();
 }
 
-class _CategoryPageState extends ConsumerState<CategoryPage> {
-  Category? categoryData;
+class _BrandPageState extends ConsumerState<BrandPage> {
+  Brand? brandData;
 
   Future<void> _onRefresh() async {
     if (!mounted) return;
 
     setState(() {
-      categoryData = null;
+      brandData = null;
     });
 
     await Future.delayed(const Duration(milliseconds: 300));
@@ -38,7 +38,7 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
     final bgColor = isDark ? kBgDark : kBgLight;
     final textColor = isDark ? kTextDark : kTextLight;
 
-    final categoryFormBoxDecoration = BoxDecoration(
+    final brandFormBoxDecoration = BoxDecoration(
       color: isDark ? kSurfaceDark : kSurfaceLight,
       borderRadius: BorderRadius.circular(16),
       boxShadow: [
@@ -59,7 +59,7 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
           onPressed: () => context.pop(),
           icon: const Icon(LucideIcons.arrowLeft),
         ),
-        title: CategoryScreenLocale.categoryTitle.getString(context),
+        title: BrandScreenLocale.brandTitle.getString(context),
       ),
       body: RefreshIndicator(
         onRefresh: _onRefresh,
@@ -68,20 +68,20 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             children: [
-              CategoryFormTitle(textColor: textColor),
+              BrandFormTitle(textColor: textColor),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: categoryFormBoxDecoration,
-                child: CategoryForm(
-                  category: categoryData,
+                decoration: brandFormBoxDecoration,
+                child: BrandForm(
+                  brand: brandData,
                   onClear: () => setState(() {
-                    categoryData = null;
+                    brandData = null;
                   }),
                 ),
               ),
               const SizedBox(height: 20),
-              CategoriesNameTitle(textColor: textColor),
+              BrandNameTitle(textColor: textColor),
               const SizedBox(height: 12),
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.55,
@@ -90,10 +90,10 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: CategoryCard(
-                    onEdit: (Category value) {
+                  child: BrandCard(
+                    onEdit: (Brand value) {
                       setState(() {
-                        categoryData = value;
+                        brandData = value;
                       });
                     },
                   ),
@@ -108,8 +108,8 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
   }
 }
 
-class CategoriesNameTitle extends StatelessWidget {
-  const CategoriesNameTitle({super.key, required this.textColor});
+class BrandNameTitle extends StatelessWidget {
+  const BrandNameTitle({super.key, required this.textColor});
 
   final Color textColor;
 
@@ -131,7 +131,7 @@ class CategoriesNameTitle extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Text(
-          CategoryScreenLocale.categoryName.getString(context),
+          BrandScreenLocale.brandTitle.getString(context),
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
@@ -160,8 +160,8 @@ class CategoriesNameTitle extends StatelessWidget {
   }
 }
 
-class CategoryFormTitle extends StatelessWidget {
-  const CategoryFormTitle({super.key, required this.textColor});
+class BrandFormTitle extends StatelessWidget {
+  const BrandFormTitle({super.key, required this.textColor});
 
   final Color textColor;
 
@@ -183,7 +183,7 @@ class CategoryFormTitle extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Text(
-          CategoryScreenLocale.categoryTitle.getString(context),
+          BrandScreenLocale.brandTitle.getString(context),
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,

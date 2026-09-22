@@ -84,39 +84,45 @@ class _ProductListPageState extends ConsumerState<ProductLists> {
 
     final user = ref.watch(userStateProvider);
 
-    return PagingListener(
-      controller: _pagingController,
-      builder: (context, state, fetchNextPage) => PagedListView<int, Product>(
-        state: state,
-        fetchNextPage: fetchNextPage,
-        builderDelegate: PagedChildBuilderDelegate<Product>(
-          itemBuilder: (context, product, index) {
-            final isEven = index % 2 == 0;
-            BoxDecoration containerDecoration = isEven
-                ? getContainerBoxDecorationByEven(dividerColor)
-                : getContainerBoxDecorationByOdd(isDark, dividerColor);
-            return Material(
-              type: MaterialType.transparency,
-              child: InkWell(
-                splashColor: kPrimary.withOpacity(0.08),
-                highlightColor: rowHoverColor,
-                child: (user!.role == "ADMIN")
-                    ? ProductListByAdminAndManager(
-                        key: ValueKey(product.id),
-                        product: product,
-                        containerDecoration: containerDecoration,
-                      )
-                    : ProductListByPosAndSale(
-                        product: product,
-                        containerDecoration: containerDecoration,
-                      ),
-              ),
-            );
-          },
-          firstPageProgressIndicatorBuilder: (_) => LoadingWidget(),
-          newPageProgressIndicatorBuilder: (_) => LoadingWidget(),
-          noItemsFoundIndicatorBuilder: (_) =>
-              NoItemFoundWidget(subColor: subColor),
+    return RefreshIndicator(
+      onRefresh: () async {
+        _pagingController.refresh();
+      },
+      child: PagingListener(
+        controller: _pagingController,
+        builder: (context, state, fetchNextPage) => PagedListView<int, Product>(
+          state: state,
+          fetchNextPage: fetchNextPage,
+          builderDelegate: PagedChildBuilderDelegate<Product>(
+            itemBuilder: (context, product, index) {
+              final isEven = index % 2 == 0;
+              BoxDecoration containerDecoration = isEven
+                  ? getContainerBoxDecorationByEven(dividerColor)
+                  : getContainerBoxDecorationByOdd(isDark, dividerColor);
+              return Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  splashColor: kPrimary.withOpacity(0.08),
+                  highlightColor: rowHoverColor,
+                  child: (user!.role == "ADMIN")
+                      ? ProductListByAdminAndManager(
+                          key: ValueKey(product.id),
+                          pagingController: _pagingController,
+                          product: product,
+                          containerDecoration: containerDecoration,
+                        )
+                      : ProductListByPosAndSale(
+                          product: product,
+                          containerDecoration: containerDecoration,
+                        ),
+                ),
+              );
+            },
+            firstPageProgressIndicatorBuilder: (_) => LoadingWidget(),
+            newPageProgressIndicatorBuilder: (_) => LoadingWidget(),
+            noItemsFoundIndicatorBuilder: (_) =>
+                NoItemFoundWidget(subColor: subColor),
+          ),
         ),
       ),
     );

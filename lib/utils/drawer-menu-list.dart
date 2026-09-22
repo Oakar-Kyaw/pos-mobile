@@ -52,11 +52,19 @@ List<MenuSection> menuListByAdmin(BuildContext context) => [
         label: DrawerScreenLocale.drawerBankAccount.getString(context),
         route: AppRoute.account,
       ),
+      // Brand Menu
+      MenuItem(
+        icon: LucideIcons.baggageClaim,
+        label: DrawerScreenLocale.drawerBrand.getString(context),
+        route: AppRoute.brand,
+      ),
+      //Category Menu
       MenuItem(
         icon: LucideIcons.tag,
         label: DrawerScreenLocale.drawerCategory.getString(context),
         route: AppRoute.category,
       ),
+
       MenuItem(
         icon: LucideIcons.packageOpen,
         label: DrawerScreenLocale.drawerViewProducts.getString(context),
@@ -236,6 +244,11 @@ List<MenuSection> menuListBySale(BuildContext context) => [
     title: DrawerScreenLocale.drawerSectionSaleManagement.getString(context),
     items: [
       MenuItem(
+        icon: LucideIcons.packageOpen,
+        label: DrawerScreenLocale.drawerViewProducts.getString(context),
+        route: AppRoute.productList,
+      ),
+      MenuItem(
         icon: LucideIcons.ticket,
         label: DrawerScreenLocale.drawerVoucher.getString(context),
         route: AppRoute.vouchers,
@@ -300,6 +313,11 @@ List<MenuSection> menuListByManager(BuildContext context) => [
         icon: LucideIcons.bell,
         label: DrawerScreenLocale.drawerNotification.getString(context),
         route: AppRoute.notification,
+      ),
+      MenuItem(
+        icon: LucideIcons.packageOpen,
+        label: DrawerScreenLocale.drawerViewProducts.getString(context),
+        route: AppRoute.productList,
       ),
     ],
   ),

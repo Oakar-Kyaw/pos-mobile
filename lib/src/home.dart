@@ -8,13 +8,18 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:pos/api/category.api.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/core/network/socket/socket-provider.dart';
+import 'package:pos/core/utils/brand-select.dart';
 import 'package:pos/core/utils/categories-select.dart';
 import 'package:pos/core/widgets/app-local-notification.dart';
+import 'package:pos/features/brand/presentation/provider/brand-provider.dart';
 import 'package:pos/features/company/presentation/provider/company.riverpod.dart';
 import 'package:pos/features/voucher/data/model/voucher-detail.dart';
+import 'package:pos/localization/brand-local.dart';
+import 'package:pos/localization/category-local.dart';
 import 'package:pos/localization/home-local.dart';
 import 'package:pos/localization/product-local.dart';
 import 'package:pos/models/product.dart';
@@ -24,6 +29,7 @@ import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/drawer.dart';
+import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/secure-storage.dart';
@@ -41,6 +47,7 @@ class MyHomePage extends ConsumerStatefulWidget {
 class _MyHomePageState extends ConsumerState<MyHomePage> {
   late final PagingController<int, Product> _pagingController;
   int? categoryId;
+  int? brandId;
 
   String limit = "40";
   @override
@@ -56,6 +63,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             limit,
             search: _searchQuery.isEmpty ? null : _searchQuery,
             categoryId: categoryId,
+            brandId: brandId,
           ),
     );
     _connect();
@@ -173,6 +181,15 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     debugPrint("val is $v");
     setState(() {
       categoryId = v is String ? int.tryParse(v) : v as int?;
+      _pagingController.refresh();
+    });
+  }
+
+  //brand on change
+  void _onChangedBrand(v) {
+    debugPrint("val is $v");
+    setState(() {
+      brandId = v is String ? int.tryParse(v) : v as int?;
       _pagingController.refresh();
     });
   }
@@ -297,170 +314,321 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 ),
               ],
             ),
-      body: Column(
-        children: [
-          // ── Product Grid ─────────────────────────────
-          Expanded(
-            child: PagingListener(
-              controller: _pagingController,
-              builder: (context, state, fetchNextPage) {
-                return Column(
-                  children: [
-                    ...(voucher?.items.isNotEmpty ?? false)
-                        ? [
-                            const SizedBox(height: 20),
-                            SizedBox(
-                              height: 110,
-                              child: GridView.builder(
-                                scrollDirection: Axis.horizontal,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                ),
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 1,
-                                      mainAxisSpacing: 8,
-                                      childAspectRatio: 0.9,
-                                    ),
-                                itemCount: voucher!.items.length,
-                                itemBuilder: (context, index) {
-                                  final selectedItem = voucher.items[index];
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(brandProvider);
+          ref.invalidate(categoryProvider);
+          _pagingController.refresh();
+        },
+        child: Column(
+          children: [
+            // ── Product Grid ─────────────────────────────
+            Expanded(
+              child: PagingListener(
+                controller: _pagingController,
+                builder: (context, state, fetchNextPage) {
+                  return Column(
+                    children: [
+                      ...(voucher?.items.isNotEmpty ?? false)
+                          ? [
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                height: 110,
+                                child: GridView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 1,
+                                        mainAxisSpacing: 8,
+                                        childAspectRatio: 0.9,
+                                      ),
+                                  itemCount: voucher!.items.length,
+                                  itemBuilder: (context, index) {
+                                    final selectedItem = voucher.items[index];
 
-                                  return SizedBox(
-                                    width: 90,
-                                    child: Stack(
-                                      children: [
-                                        Positioned.fill(
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            child: selectedItem.photoUrl != null
-                                                ? CachedNetworkImage(
-                                                    imageUrl:
-                                                        selectedItem.photoUrl ??
-                                                        "",
-                                                    fit: BoxFit.cover,
-                                                  )
-                                                : Image.asset(
-                                                    "assets/default.jpg",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: 2,
-                                          left: 2,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 5,
-                                              vertical: 1,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: kPrimary,
+                                    return SizedBox(
+                                      width: 90,
+                                      child: Stack(
+                                        children: [
+                                          Positioned.fill(
+                                            child: ClipRRect(
                                               borderRadius:
-                                                  BorderRadius.circular(6),
-                                            ),
-                                            child: Text(
-                                              'x${selectedItem.quantity}',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 9,
-                                              ),
+                                                  BorderRadius.circular(10),
+                                              child:
+                                                  selectedItem.photoUrl != null
+                                                  ? CachedNetworkImage(
+                                                      imageUrl:
+                                                          selectedItem
+                                                              .photoUrl ??
+                                                          "",
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : Image.asset(
+                                                      "assets/default.jpg",
+                                                      fit: BoxFit.cover,
+                                                    ),
                                             ),
                                           ),
-                                        ),
-                                        Positioned(
-                                          top: 2,
-                                          right: 2,
-                                          child: GestureDetector(
-                                            onTap: () => clearSelectedItem(
-                                              selectedItem.id,
-                                            ),
+                                          Positioned(
+                                            top: 2,
+                                            left: 2,
                                             child: Container(
-                                              padding: const EdgeInsets.all(3),
-                                              decoration: const BoxDecoration(
-                                                color: Colors.black54,
-                                                shape: BoxShape.circle,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 5,
+                                                    vertical: 1,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: kPrimary,
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
                                               ),
-                                              child: const Icon(
-                                                Icons.close,
-                                                size: 25,
-                                                color: Colors.white,
+                                              child: Text(
+                                                'x${selectedItem.quantity}',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 9,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        Positioned(
-                                          left: 0,
-                                          right: 0,
-                                          bottom: 0,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 5,
-                                              horizontal: 6,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  Colors.black.withOpacity(0.7),
-                                                  Colors.black.withOpacity(0.4),
-                                                ],
-                                                begin: Alignment.bottomCenter,
-                                                end: Alignment.topCenter,
+                                          Positioned(
+                                            top: 2,
+                                            right: 2,
+                                            child: GestureDetector(
+                                              onTap: () => clearSelectedItem(
+                                                selectedItem.id,
                                               ),
-                                            ),
-                                            child: Text(
-                                              selectedItem.name,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 11,
+                                              child: Container(
+                                                padding: const EdgeInsets.all(
+                                                  3,
+                                                ),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.black54,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.close,
+                                                  size: 25,
+                                                  color: Colors.white,
+                                                ),
                                               ),
-                                              textAlign: TextAlign.center,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
+                                          Positioned(
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 5,
+                                                    horizontal: 6,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.black.withOpacity(
+                                                      0.7,
+                                                    ),
+                                                    Colors.black.withOpacity(
+                                                      0.4,
+                                                    ),
+                                                  ],
+                                                  begin: Alignment.bottomCenter,
+                                                  end: Alignment.topCenter,
+                                                ),
+                                              ),
+                                              child: Text(
+                                                selectedItem.name,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 11,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
+                              const SizedBox(height: 10),
+                              const Divider(),
+                              const SizedBox(height: 10),
+                            ]
+                          : <Widget>[],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 10,
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  flex: 4,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        BrandScreenLocale.brandTitle.getString(
+                                          context,
+                                        ),
+                                        style: TextStyle(
+                                          fontSize: FontSizeConfig.body(
+                                            context,
+                                          ),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: BrandSelect(
+                                          noSelect: false,
+                                          onChanged: (v) => _onChangedBrand(v),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        CategoryScreenLocale.categoryTitle
+                                            .getString(context),
+                                        style: TextStyle(
+                                          fontSize: FontSizeConfig.body(
+                                            context,
+                                          ),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: CategoriesSelect(
+                                          onChanged: (v) => _onChangedCate(v),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 10),
-                            const Divider(),
-                            const SizedBox(height: 10),
-                          ]
-                        : <Widget>[],
+                          ],
+                        ),
+                      ),
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 10,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            ProductScreenLocale.productTitle.getString(context),
-                          ),
-                          Spacer(),
-                          Expanded(
-                            child: CategoriesSelect(
-                              onChanged: (v) => _onChangedCate(v),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          _pagingController.refresh();
-                        },
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(
+                      //     horizontal: 10,
+                      //     vertical: 10,
+                      //   ),
+                      //   child: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.start,
+                      //     crossAxisAlignment: CrossAxisAlignment.center,
+                      //     children: [
+                      //       Expanded(
+                      //         flex: 3,
+                      //         child: Text(
+                      //           ProductScreenLocale.productTitle.getString(
+                      //             context,
+                      //           ),
+                      //           style: TextStyle(fontWeight: FontWeight.bold),
+                      //         ),
+                      //       ),
+                      //       const SizedBox(width: 5),
+                      //       Expanded(
+                      //         flex: 10,
+                      //         child: Row(
+                      //           crossAxisAlignment: CrossAxisAlignment.center,
+                      //           children: [
+                      //             Expanded(
+                      //               flex: 4,
+                      //               child: Column(
+                      //                 crossAxisAlignment:
+                      //                     CrossAxisAlignment.center,
+                      //                 mainAxisAlignment: MainAxisAlignment.center,
+                      //                 children: [
+                      //                   Text(
+                      //                     BrandScreenLocale.brandTitle.getString(
+                      //                       context,
+                      //                     ),
+                      //                     style: TextStyle(
+                      //                       fontSize: FontSizeConfig.body(
+                      //                         context,
+                      //                       ),
+                      //                       fontWeight: FontWeight.w600,
+                      //                     ),
+                      //                   ),
+                      //                   const SizedBox(height: 6),
+                      //                   SizedBox(
+                      //                     width: double.infinity,
+                      //                     child: BrandSelect(
+                      //                       noSelect: false,
+                      //                       onChanged: (v) => _onChangedBrand(v),
+                      //                     ),
+                      //                   ),
+                      //                 ],
+                      //               ),
+                      //             ),
+                      //             const SizedBox(width: 4),
+                      //             Expanded(
+                      //               flex: 3,
+                      //               child: Column(
+                      //                 crossAxisAlignment:
+                      //                     CrossAxisAlignment.center,
+                      //                 mainAxisAlignment: MainAxisAlignment.center,
+                      //                 children: [
+                      //                   Text(
+                      //                     CategoryScreenLocale.categoryTitle
+                      //                         .getString(context),
+                      //                     style: TextStyle(
+                      //                       fontSize: FontSizeConfig.body(
+                      //                         context,
+                      //                       ),
+                      //                       fontWeight: FontWeight.w600,
+                      //                     ),
+                      //                   ),
+                      //                   const SizedBox(height: 6),
+
+                      //                   SizedBox(
+                      //                     width: double.infinity,
+                      //                     child: CategoriesSelect(
+                      //                       onChanged: (v) => _onChangedCate(v),
+                      //                     ),
+                      //                   ),
+                      //                 ],
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      const SizedBox(height: 10),
+                      Expanded(
                         child: PagedGridView<int, Product>(
                           padding: const EdgeInsets.only(
                             bottom: 100,
@@ -512,62 +680,62 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
 
-          // ── Bottom Action Bar ─────────────────────────
-          // voucher != null && voucher.items.isNotEmpty
-          //     ? Positioned(
-          //         bottom: 20,
-          //         left: 0,
-          //         right: 0,
-          //         child: Center(
-          //           child: ClipRRect(
-          //             borderRadius: BorderRadius.circular(30),
-          //             child: BackdropFilter(
-          //               filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          //               child: Container(
-          //                 padding: const EdgeInsets.symmetric(
-          //                   vertical: 8,
-          //                   horizontal: 10,
-          //                 ),
-          //                 decoration: BoxDecoration(
-          //                   color: isDark
-          //                       ? Colors.white.withOpacity(0.08)
-          //                       : Colors.black.withOpacity(0.06),
-          //                   borderRadius: BorderRadius.circular(30),
-          //                   border: Border.all(
-          //                     color: isDark
-          //                         ? Colors.white.withOpacity(0.12)
-          //                         : Colors.black.withOpacity(0.08),
-          //                     width: 1,
-          //                   ),
-          //                 ),
-          //                 child: Row(
-          //                   mainAxisSize: MainAxisSize.min,
-          //                   children: [
-          //                     GradientSubmitButton(
-          //                       onPressed: () =>
-          //                           context.pushNamed(AppRoute.createVoucher),
-          //                       text: HomeScreenLocale.createVoucher.getString(
-          //                         context,
-          //                       ),
-          //                       width: 200,
-          //                       circularNo: 20,
-          //                     ),
-          //                   ],
-          //                 ),
-          //               ),
-          //             ),
-          //           ),
-          //         ),
-          //       )
-          //     : const SizedBox(),
-        ],
+            // ── Bottom Action Bar ─────────────────────────
+            // voucher != null && voucher.items.isNotEmpty
+            //     ? Positioned(
+            //         bottom: 20,
+            //         left: 0,
+            //         right: 0,
+            //         child: Center(
+            //           child: ClipRRect(
+            //             borderRadius: BorderRadius.circular(30),
+            //             child: BackdropFilter(
+            //               filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            //               child: Container(
+            //                 padding: const EdgeInsets.symmetric(
+            //                   vertical: 8,
+            //                   horizontal: 10,
+            //                 ),
+            //                 decoration: BoxDecoration(
+            //                   color: isDark
+            //                       ? Colors.white.withOpacity(0.08)
+            //                       : Colors.black.withOpacity(0.06),
+            //                   borderRadius: BorderRadius.circular(30),
+            //                   border: Border.all(
+            //                     color: isDark
+            //                         ? Colors.white.withOpacity(0.12)
+            //                         : Colors.black.withOpacity(0.08),
+            //                     width: 1,
+            //                   ),
+            //                 ),
+            //                 child: Row(
+            //                   mainAxisSize: MainAxisSize.min,
+            //                   children: [
+            //                     GradientSubmitButton(
+            //                       onPressed: () =>
+            //                           context.pushNamed(AppRoute.createVoucher),
+            //                       text: HomeScreenLocale.createVoucher.getString(
+            //                         context,
+            //                       ),
+            //                       width: 200,
+            //                       circularNo: 20,
+            //                     ),
+            //                   ],
+            //                 ),
+            //               ),
+            //             ),
+            //           ),
+            //         ),
+            //       )
+            //     : const SizedBox(),
+          ],
+        ),
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 20),

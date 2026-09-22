@@ -5,6 +5,7 @@ import 'package:pos/core/utils/inventory/inventory-detail-page.dart';
 import 'package:pos/core/utils/inventory/inventory-edit.dart';
 import 'package:pos/core/utils/inventory/inventory-items-create.dart';
 import 'package:pos/features/account-upgrade/presentation/pages/account-upgrade.dart';
+import 'package:pos/features/brand/presentation/page/brand.dart';
 import 'package:pos/features/category/presentation/page/category.dart';
 import 'package:pos/features/company/presentation/page/company-profile.dart';
 import 'package:pos/features/employee/presentation/page/employee.dart';
@@ -135,6 +136,12 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.category,
         name: AppRoute.category,
         builder: (context, state) => const CategoryPage(),
+      ),
+      //brand
+      GoRoute(
+        path: AppRoute.brand,
+        name: AppRoute.brand,
+        builder: (context, state) => const BrandPage(),
       ),
       GoRoute(
         path: AppRoute.companyProfile,

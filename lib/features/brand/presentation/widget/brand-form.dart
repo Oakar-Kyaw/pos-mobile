@@ -1,48 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/api/category.api.dart';
-import 'package:pos/localization/category-local.dart';
+import 'package:pos/features/brand/data/model/brand.dart';
+import 'package:pos/features/brand/presentation/provider/brand-provider.dart';
+import 'package:pos/localization/brand-local.dart';
 import 'package:pos/localization/error-local.dart';
-import 'package:pos/models/category.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-class CategoryForm extends ConsumerStatefulWidget {
-  final Category? category;
+class BrandForm extends ConsumerStatefulWidget {
+  final Brand? brand;
   final Function onClear;
-  const CategoryForm({super.key, required this.onClear, this.category});
+  const BrandForm({super.key, required this.onClear, this.brand});
 
   @override
-  ConsumerState<CategoryForm> createState() => _CategoryFormState();
+  ConsumerState<BrandForm> createState() => _BrandFormState();
 }
 
-class _CategoryFormState extends ConsumerState<CategoryForm> {
+class _BrandFormState extends ConsumerState<BrandForm> {
   final _formKey = GlobalKey<ShadFormState>();
-  final TextEditingController title = TextEditingController();
+  final TextEditingController name = TextEditingController();
 
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    if (widget.category != null) {
-      title.text = widget.category!.title;
+    if (widget.brand != null) {
+      name.text = widget.brand!.name;
     }
   }
 
   @override
   @override
-  void didUpdateWidget(covariant CategoryForm oldWidget) {
+  void didUpdateWidget(covariant BrandForm oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Update text whenever category title changes
-    if (widget.category?.id != oldWidget.category?.id ||
-        widget.category?.title != oldWidget.category?.title) {
-      title.text = widget.category?.title ?? '';
+    // Update text whenever brand name changes
+    if (widget.brand?.id != oldWidget.brand?.id ||
+        widget.brand?.name != oldWidget.brand?.name) {
+      name.text = widget.brand?.name ?? '';
     }
   }
 
@@ -53,21 +53,18 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
       isLoading = true;
     });
 
-    final isEdit = widget.category != null;
+    final isEdit = widget.brand != null;
 
     try {
       bool result;
 
       if (isEdit) {
         result = await ref
-            .read(categoryProvider.notifier)
-            .updateCategory(
-              id: widget.category!.id!,
-              json: {"title": title.text},
-            );
+            .read(brandProvider.notifier)
+            .updateBrand(id: widget.brand!.id!, json: {"name": name.text});
       } else {
-        result = await ref.read(categoryProvider.notifier).postCategory({
-          "title": title.text,
+        result = await ref.read(brandProvider.notifier).postBrand({
+          "name": name.text,
         });
       }
 
@@ -78,15 +75,15 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
           borderColor: kGreen,
           description: Text(
             isEdit
-                ? CategoryScreenLocale.categoryUpdateSuccess.getString(context)
-                : CategoryScreenLocale.categoryCreateSuccess.getString(context),
+                ? BrandScreenLocale.brandUpdateSuccess.getString(context)
+                : BrandScreenLocale.brandCreateSuccess.getString(context),
           ),
         );
 
-        title.clear();
+        name.clear();
         _formKey.currentState?.reset();
-        ref.invalidate(categoryProvider);
-        //category data clear
+        ref.invalidate(brandProvider);
+        //brand data clear
         widget.onClear.call();
       }
     } catch (error) {
@@ -116,21 +113,21 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final labelColor = isDark ? kTextDark : kTextLight;
 
-    final isEdit = widget.category != null;
+    final isEdit = widget.brand != null;
 
     return ShadForm(
       key: _formKey,
       child: Column(
         children: [
           ShadInputFormField(
-            controller: title,
+            controller: name,
             validator: (v) => (v.isEmpty)
-                ? CategoryScreenLocale.categoryTitleError.getString(context)
+                ? BrandScreenLocale.brandTitleError.getString(context)
                 : null,
             label: Padding(
               padding: const EdgeInsets.only(bottom: 5),
               child: Text(
-                CategoryScreenLocale.categoryName.getString(context),
+                BrandScreenLocale.brandName.getString(context),
                 style: TextStyle(
                   fontSize: FontSizeConfig.body(context),
                   fontWeight: FontWeight.bold,
@@ -139,9 +136,7 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
               ),
             ),
             placeholder: Text(
-              CategoryScreenLocale.categoryDescriptionPlaceholder.getString(
-                context,
-              ),
+              BrandScreenLocale.brandDescriptionPlaceholder.getString(context),
               style: TextStyle(fontSize: FontSizeConfig.body(context)),
             ),
           ),
@@ -160,8 +155,8 @@ class _CategoryFormState extends ConsumerState<CategoryForm> {
               return;
             },
             text: isEdit
-                ? CategoryScreenLocale.categoryEditButton.getString(context)
-                : CategoryScreenLocale.categoryButton.getString(context),
+                ? BrandScreenLocale.brandEditButton.getString(context)
+                : BrandScreenLocale.brandButton.getString(context),
             width: double.infinity,
           ),
         ],

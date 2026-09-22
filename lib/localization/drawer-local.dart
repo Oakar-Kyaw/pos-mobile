@@ -1,6 +1,7 @@
 mixin DrawerScreenLocale {
   static const drawerHome = 'drawer_home';
   static const drawerCategory = 'drawer_category';
+  static const drawerBrand = 'drawer_brand';
   static const drawerCompany = 'drawer_company';
   static const drawerProduct = 'drawer_product';
   static const drawerAddProduct = 'drawer_add_product';
@@ -55,6 +56,7 @@ mixin DrawerScreenLocale {
   static const EN = {
     drawerHome: 'Home',
     drawerCategory: 'Categories',
+    drawerBrand: 'Brands',
     drawerCompany: 'Register Company',
     drawerProduct: 'Products',
     drawerAddProduct: 'Add Product',
@@ -108,6 +110,7 @@ mixin DrawerScreenLocale {
   static const MM = {
     drawerHome: 'ပင်မ',
     drawerCategory: 'အမျိုးအစားများ',
+    drawerBrand: 'တံဆိပ်များ',
     drawerCompany: 'ကုမ္ပဏီမှတ်ပုံတင်ခြင်း',
     drawerProduct: 'ကုန်ပစ္စည်းများ',
     drawerAddProduct: 'ကုန်ပစ္စည်း ထည့်ရန်',

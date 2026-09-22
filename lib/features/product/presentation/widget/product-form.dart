@@ -9,8 +9,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/category.api.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/bar-code.dart';
+import 'package:pos/core/utils/brand-select.dart';
 import 'package:pos/core/widgets/input.dart';
-import 'package:pos/models/category.dart';
+import 'package:pos/features/category/data/model/category.dart';
+import 'package:pos/localization/brand-local.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -43,6 +45,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
   bool isLoading = false;
   File? imageFile;
   int? categoryId;
+  int? brandId;
   String? barCodeString;
 
   void uploadPhoto() async {
@@ -82,6 +85,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
     setState(() {
       imageFile = null;
       categoryId = null;
+      brandId = null;
       barCodeString = null;
     });
   }
@@ -123,6 +127,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
         "vvipSellingPrice": 0,
         "isActive": isActive,
         if (categoryId != null) "categoryId": categoryId,
+        if (brandId != null) "brandId": brandId,
       };
 
       FormData formData = FormData.fromMap(productPayload);
@@ -221,6 +226,33 @@ class _ProductFormState extends ConsumerState<ProductForm> {
 
           customGap(),
 
+          /// Brand
+          Padding(
+            padding: const EdgeInsets.only(left: 10, bottom: 5),
+            child: customLabel(
+              context,
+              BrandScreenLocale.brandTitle,
+              labelColor,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10, bottom: 5),
+            child: SizedBox(
+              width: double.infinity,
+              child: BrandSelect(
+                onChanged: (v) {
+                  if (v == null) return;
+                  setState(() {
+                    brandId = int.tryParse(v);
+                  });
+                },
+                allBrands: false,
+              ),
+            ),
+          ),
+
+          customGap(),
+
           /// Category
           Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 5),
@@ -282,6 +314,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
               labelColor,
             ),
           ),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Container(

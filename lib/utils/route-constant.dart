@@ -4,6 +4,7 @@ class AppRoute {
   static const String settings = '/settings';
   static const String profile = '/profile';
   static const String category = '/category';
+  static const String brand = '/brand';
   static const String product = '/product';
   static const String productList = '/product-list';
   static const String companyProfile = "/company-profile";

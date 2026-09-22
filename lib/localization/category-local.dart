@@ -20,6 +20,7 @@ mixin CategoryScreenLocale {
 
   static const categoryListEmpty = 'category_list_empty';
   static const selectCategory = 'select_category';
+  static const categoryNotExist = 'category_not_exist';
 
   static const EN = {
     categoryTitle: 'Categories',
@@ -46,6 +47,7 @@ mixin CategoryScreenLocale {
 
     selectCategory: "Please select category",
     categoryListEmpty: 'No categories found',
+    categoryNotExist: 'Category does not exist',
   };
 
   static const MM = {
@@ -73,5 +75,6 @@ mixin CategoryScreenLocale {
 
     selectCategory: 'အမျိုးအစား ရွေးပါ',
     categoryListEmpty: 'အမျိုးအစား မတွေ့ပါ',
+    categoryNotExist: 'အမျိုးအစား မရှိပါ',
   };
 }

@@ -1,34 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/api/category.api.dart';
 import 'package:pos/component/loading-component.dart';
-import 'package:pos/features/supplier/presentation/provider/supplier-provider.dart';
-import 'package:pos/localization/category-local.dart';
+import 'package:pos/features/brand/presentation/provider/brand-provider.dart';
 import 'package:pos/localization/general-local.dart';
-import 'package:pos/localization/product-local.dart';
-import 'package:pos/localization/purchase-local.dart';
+import 'package:pos/localization/brand-local.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-class CategoriesSelect extends ConsumerStatefulWidget {
-  CategoriesSelect({
+class BrandSelect extends ConsumerStatefulWidget {
+  BrandSelect({
     super.key,
     required this.onChanged,
-    this.allCategories = true,
+    this.allBrands = true,
+    this.noSelect = true,
     this.initialValue,
   });
   final ValueChanged<String?> onChanged;
 
-  ///check all supplier or not
-  bool allCategories;
+  ///check all brand or not
+  bool allBrands;
+
+  //check select or not
+  bool noSelect;
+
   //initial value
   final String? initialValue;
 
   @override
-  ConsumerState<CategoriesSelect> createState() => _CategoriesSelectState();
+  ConsumerState<BrandSelect> createState() => _BrandSelectState();
 }
 
-class _CategoriesSelectState extends ConsumerState<CategoriesSelect> {
+class _BrandSelectState extends ConsumerState<BrandSelect> {
   String? selectedValue;
 
   @override
@@ -39,7 +41,7 @@ class _CategoriesSelectState extends ConsumerState<CategoriesSelect> {
   }
 
   @override
-  void didUpdateWidget(covariant CategoriesSelect oldWidget) {
+  void didUpdateWidget(covariant BrandSelect oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.initialValue != widget.initialValue) {
@@ -59,22 +61,20 @@ class _CategoriesSelectState extends ConsumerState<CategoriesSelect> {
 
   @override
   Widget build(BuildContext context) {
-    final categoriesAsync = ref.watch(categoryProvider);
+    final brandsAsync = ref.watch(brandProvider);
 
-    return categoriesAsync.when(
-      data: (categories) {
+    return brandsAsync.when(
+      data: (brands) {
         /// Build options list
         final List<ShadOption<String>> shadOptions = [
-          if (widget.allCategories)
+          if (widget.allBrands)
             ShadOption<String>(
               value: '',
               child: Text(GeneralScreenLocale.all.getString(context)),
             ),
-          ...categories.map(
-            (s) => ShadOption<String>(
-              value: s.id.toString(),
-              child: Text(s.title),
-            ),
+          ...brands.map(
+            (b) =>
+                ShadOption<String>(value: b.id.toString(), child: Text(b.name)),
           ),
         ];
 
@@ -82,19 +82,21 @@ class _CategoriesSelectState extends ConsumerState<CategoriesSelect> {
         if (shadOptions.isEmpty) {
           return SizedBox(
             width: 200,
-            child: Text(
-              CategoryScreenLocale.categoryListEmpty.getString(context),
-            ),
+            child: Text(BrandScreenLocale.brandListEmpty.getString(context)),
           );
         }
 
-        /// default selection
-        selectedValue ??= shadOptions.first.value;
+        // 👇 noSelect == false ဖြစ်မှသာ default selection (first value) ကို auto-set လုပ်ပါ
+        // noSelect == true ဆိုရင် placeholder ကိုပဲ ပြပြီး, user select မှသာ value ရှိအောင်ပါ
+        if (widget.noSelect == false) {
+          selectedValue ??= shadOptions.first.value;
+        }
+
         return ShadSelect<String>(
           initialValue: selectedValue,
           options: shadOptions,
           placeholder: Text(
-            CategoryScreenLocale.selectCategory.getString(context),
+            BrandScreenLocale.brandSelectPlaceholder.getString(context),
           ),
           onChanged: _onChanged,
           selectedOptionBuilder: (context, value) {
@@ -103,7 +105,7 @@ class _CategoriesSelectState extends ConsumerState<CategoriesSelect> {
               orElse: () => ShadOption<String>(
                 value: '',
                 child: Text(
-                  CategoryScreenLocale.selectCategory.getString(context),
+                  BrandScreenLocale.brandSelectPlaceholder.getString(context),
                 ),
               ),
             );

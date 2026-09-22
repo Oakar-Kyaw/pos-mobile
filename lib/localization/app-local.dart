@@ -1,5 +1,6 @@
 import 'package:pos/localization/account-upgrade.dart';
 import 'package:pos/localization/attendance-local.dart';
+import 'package:pos/localization/brand-local.dart';
 import 'package:pos/localization/category-local.dart';
 import 'package:pos/localization/company-local.dart';
 import 'package:pos/localization/customer-local.dart';
@@ -67,6 +68,7 @@ mixin AppLocale {
     ...ProfitAndLossScreenLocale.EN,
     ...NotificationScreenLocale.EN,
     ...ProfileScreenLocale.EN,
+    ...BrandScreenLocale.EN,
   };
 
   static const Map<String, dynamic> MM = {
@@ -103,5 +105,6 @@ mixin AppLocale {
     ...ProfitAndLossScreenLocale.MM,
     ...NotificationScreenLocale.MM,
     ...ProfileScreenLocale.MM,
+    ...BrandScreenLocale.MM,
   };
 }

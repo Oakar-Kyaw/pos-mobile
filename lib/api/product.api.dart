@@ -23,6 +23,7 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
     String limit, {
     String? search,
     int? categoryId,
+    int? brandId,
   }) async {
     state = const AsyncLoading();
     debugPrint("categori $categoryId");
@@ -35,6 +36,7 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
           "limit": limit,
           "search": search,
           if (categoryId != null) "categoryId": categoryId,
+          if (brandId != null) "brandId": brandId,
         },
       );
       final Map<String, dynamic> data = response.data;
