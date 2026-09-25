@@ -55,7 +55,7 @@ mixin GeneralExpenseLocale {
     editSuccess: 'Expense updated successfully',
     editFail: 'Failed to update expense',
 
-    deleteExpense: 'Delete Expense',
+    deleteExpense: 'Delete',
     deleteSuccess: 'Expense deleted successfully',
     deleteFail: 'Failed to delete expense',
     doYouWantToDelete: 'Do you want to delete this expense?',
@@ -90,7 +90,7 @@ mixin GeneralExpenseLocale {
     editSuccess: 'အသုံးစရိတ်ကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ',
     editFail: 'အသုံးစရိတ် ပြင်ဆင်မှု မအောင်မြင်ပါ',
 
-    deleteExpense: 'အသုံးစရိတ် ဖျက်မည်',
+    deleteExpense: 'ဖျက်မည်',
     deleteSuccess: 'အသုံးစရိတ်ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
     deleteFail: 'အသုံးစရိတ် ဖျက်ရန် မအောင်မြင်ပါ',
     doYouWantToDelete: 'ဤအသုံးစရိတ်ကို ဖျက်လိုပါသလား။',

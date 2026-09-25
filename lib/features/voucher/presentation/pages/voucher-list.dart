@@ -150,14 +150,13 @@ class _VoucherListState extends ConsumerState<VoucherList> {
     final mainAxisExtent = Responsive.isDesktop(context)
         ? 650.0
         : Responsive.isTablet(context)
-        ? 600.0
-        : 550.0;
+        ? 650.0
+        : 620.0;
 
     return PagingListener(
       controller: _pagingController,
       builder: (context, state, fetchNextPage) =>
           PagedGridView<int, VoucherDetailModel>(
-            padding: const EdgeInsets.all(12),
             state: state,
             fetchNextPage: fetchNextPage,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

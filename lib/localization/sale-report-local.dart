@@ -113,7 +113,7 @@ mixin SaleReportLocale {
   static const MM = {
     saleReportTitle: 'ရောင်းအားအစီရင်ခံစာ',
     saleReportDate: 'နေ့စွဲ',
-    saleReportChange: 'ပြောင်းလဲရန်',
+    saleReportChange: 'ပြောင်းလဲ',
     saleReportClosingReport: 'နေ့စဉ်ပိတ်သိမ်းအစီရင်ခံစာ',
     saleReportDailySummary: 'နေ့စဉ်အကျဉ်းချုပ်',
     saleReportTodaySales: 'ယနေ့ရောင်းအား',

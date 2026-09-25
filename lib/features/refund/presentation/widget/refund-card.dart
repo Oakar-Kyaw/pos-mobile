@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/core/utils/confirm-dialog.dart';
+import 'package:pos/core/widgets/delete-icon.dart';
 import 'package:pos/features/refund/data/model/refund.dart';
 import 'package:pos/features/refund/presentation/provider/refund.api.dart';
 import 'package:pos/localization/refund-local.dart';
@@ -11,6 +12,7 @@ import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
+import 'package:pos/utils/check-role.dart';
 import 'package:pos/utils/formatAmount.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/route-constant.dart';
@@ -184,8 +186,12 @@ class _RefundCard extends ConsumerWidget {
             textColor: textColor,
             subColor: subColor,
           ),
-          // if (onDelete != null && (isAdmin(user!.role) || isManager(user.role)))
-          // DeleteIcon(onDelete: onDelete, top: -10),
+          if (onDelete != null && (isAdmin(user!.role)))
+            Positioned(
+              top: -10,
+              right: 0,
+              child: DeleteIcon(onDelete: onDelete),
+            ),
         ],
       ),
     );

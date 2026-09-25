@@ -148,15 +148,26 @@ class _GeneralExpenseCardState extends ConsumerState<GeneralExpenseCard> {
 
               const SizedBox(height: 10),
               if (user != null && (isAdmin(user.role) || isManager(user.role)))
-                GradientSubmitButton(
-                  onPressed: () => _edit(expense),
-                  text: GeneralExpenseLocale.editExpense.getString(context),
-                  width: 150,
+                Row(
+                  children: [
+                    GradientSubmitButton(
+                      onPressed: () => _edit(expense),
+                      text: GeneralExpenseLocale.editExpense.getString(context),
+                      width: 150,
+                    ),
+                    const Spacer(),
+                    GradientSubmitButton(
+                      onPressed: () => _delete(expense.id),
+                      decoration: BoxDecoration(color: kRed),
+                      text: GeneralExpenseLocale.deleteExpense.getString(
+                        context,
+                      ),
+                      width: 150,
+                    ),
+                  ],
                 ),
             ],
           ),
-          // if (user != null && (isAdmin(user.role) || isManager(user.role)))
-          //   DeleteIcon(onDelete: () => _delete(expense.id), top: -10, right: 0),
         ],
       ),
     );
