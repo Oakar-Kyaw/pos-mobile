@@ -224,7 +224,8 @@ class OSVoucherService {
                         height: 90,
                         child: pw.BarcodeWidget(
                           barcode: pw.Barcode.qrCode(),
-                          data: 'https://flutter.dev',
+                          data:
+                              '${voucher.company?.name}:${voucher.company?.address}',
                           color: PdfColors.black,
                           backgroundColor: PdfColors.white,
                         ),
