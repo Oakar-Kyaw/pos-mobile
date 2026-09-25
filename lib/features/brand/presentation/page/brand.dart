@@ -8,6 +8,7 @@ import 'package:pos/features/brand/presentation/widget/brand-card.dart';
 import 'package:pos/features/brand/presentation/widget/brand-form.dart';
 import 'package:pos/localization/brand-local.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class BrandPage extends ConsumerStatefulWidget {
@@ -91,6 +92,11 @@ class _BrandPageState extends ConsumerState<BrandPage> {
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: BrandCard(
+                    crossAxisCount: Responsive.isDesktop(context)
+                        ? 4
+                        : Responsive.isTablet(context)
+                        ? 2
+                        : 1,
                     onEdit: (Brand value) {
                       setState(() {
                         brandData = value;

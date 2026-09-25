@@ -16,6 +16,7 @@ import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/check-role.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/formatAmount.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -180,10 +181,22 @@ class _PaymentDataPageState extends ConsumerState<PaymentDataPage> {
               );
             }
 
-            return ListView.builder(
+            final crossAxisCount = Responsive.isDesktop(context)
+                ? 3
+                : Responsive.isTablet(context)
+                ? 2
+                : 1;
+
+            return GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: accounts.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                mainAxisExtent: 180,
+              ),
               itemBuilder: (context, index) {
                 final account = accounts[index];
 
@@ -235,7 +248,7 @@ class _AccountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
+      // margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
       decoration: BoxDecoration(
         color: isDark ? kSurfaceDark : kSurfaceLight,
         borderRadius: BorderRadius.circular(16),

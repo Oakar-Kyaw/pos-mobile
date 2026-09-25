@@ -8,6 +8,7 @@ import 'package:pos/features/category/presentation/widget/category-card.dart';
 import 'package:pos/features/category/presentation/widget/category-form.dart';
 import 'package:pos/localization/category-local.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class CategoryPage extends ConsumerStatefulWidget {
@@ -91,6 +92,11 @@ class _CategoryPageState extends ConsumerState<CategoryPage> {
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: CategoryCard(
+                    crossAxisCount: Responsive.isDesktop(context)
+                        ? 4
+                        : Responsive.isTablet(context)
+                        ? 2
+                        : 1,
                     onEdit: (Category value) {
                       setState(() {
                         categoryData = value;

@@ -9,6 +9,7 @@ import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/drawer-menu-list.dart';
 import 'package:pos/utils/font-size.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/secure-storage.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:pos/localization/drawer-local.dart';
@@ -67,7 +68,13 @@ class CustomerDrawer {
           'mm': DrawerScreenLocale.drawerMyanmar.getString(context),
         };
 
+        final widthData = Responsive.isDesktop(context)
+            ? 450.0
+            : Responsive.isTablet(context)
+            ? 400.0
+            : 250.0;
         return Drawer(
+          width: widthData,
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           backgroundColor: bgColor,
           child: Material(

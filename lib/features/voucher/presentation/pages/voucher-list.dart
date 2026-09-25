@@ -15,6 +15,7 @@ import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/check-role.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/shad-toaster.dart';
 
 class VoucherList extends ConsumerStatefulWidget {
@@ -55,22 +56,11 @@ class _VoucherListState extends ConsumerState<VoucherList> {
     _pagingController.dispose();
   }
 
-  BoxDecoration getContainerBoxDecorationByEven(Color dividerColor) {
+  BoxDecoration getContainerBoxDecoration(bool isDark, Color dividerColor) {
     return BoxDecoration(
-      color: Colors.transparent,
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
-    );
-  }
-
-  BoxDecoration getContainerBoxDecorationByOdd(
-    bool isDark,
-    Color dividerColor,
-  ) {
-    return BoxDecoration(
-      color: (isDark
-          ? Colors.white.withOpacity(0.02)
-          : Colors.black.withOpacity(0.01)),
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
+      // color: isDark ? kSurfaceDark : kSurfaceLight,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: dividerColor, width: 0.5),
     );
   }
 
@@ -151,23 +141,46 @@ class _VoucherListState extends ConsumerState<VoucherList> {
       _pagingController.refresh();
     });
 
+    final crossAxisCount = Responsive.isDesktop(context)
+        ? 3
+        : Responsive.isTablet(context)
+        ? 2
+        : 1;
+
+    final mainAxisExtent = Responsive.isDesktop(context)
+        ? 650.0
+        : Responsive.isTablet(context)
+        ? 600.0
+        : 550.0;
+
     return PagingListener(
       controller: _pagingController,
       builder: (context, state, fetchNextPage) =>
-          PagedListView<int, VoucherDetailModel>(
+          PagedGridView<int, VoucherDetailModel>(
+            padding: const EdgeInsets.all(12),
             state: state,
             fetchNextPage: fetchNextPage,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              mainAxisExtent: mainAxisExtent,
+            ),
             builderDelegate: PagedChildBuilderDelegate<VoucherDetailModel>(
               itemBuilder: (context, voucher, index) {
-                final isEven = index % 2 == 0;
-                BoxDecoration containerDecoration = isEven
-                    ? getContainerBoxDecorationByEven(dividerColor)
-                    : getContainerBoxDecorationByOdd(isDark, dividerColor);
+                final containerDecoration = getContainerBoxDecoration(
+                  isDark,
+                  dividerColor,
+                );
                 return InkWell(
+                  borderRadius: BorderRadius.circular(12),
                   splashColor: kPrimary.withOpacity(0.08),
                   highlightColor: rowHoverColor,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: containerDecoration,
                     child: getVoucherComponentByRole(
                       user!.role,

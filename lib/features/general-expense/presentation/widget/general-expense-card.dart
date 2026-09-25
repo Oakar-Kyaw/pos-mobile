@@ -273,10 +273,9 @@ class GeneralExpenseTitle extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         SizedBox(
-          width: MediaQuery.of(context).size.width * 0.6,
           child: Text(
             expense.title,
-            maxLines: 5,
+            maxLines: 10,
             style: TextStyle(
               fontSize: FontSizeConfig.title(context),
               fontWeight: FontWeight.w700,

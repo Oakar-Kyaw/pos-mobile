@@ -9,6 +9,7 @@ import 'package:pos/features/product/presentation/widget/products-by-role.dart';
 import 'package:pos/models/product.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/responsive.dart';
 
 class ProductLists extends ConsumerStatefulWidget {
   const ProductLists({super.key, this.searchQuery = ""});
@@ -52,22 +53,11 @@ class _ProductListPageState extends ConsumerState<ProductLists> {
     _pagingController.dispose();
   }
 
-  BoxDecoration getContainerBoxDecorationByEven(Color dividerColor) {
+  BoxDecoration getContainerBoxDecoration(bool isDark, Color dividerColor) {
     return BoxDecoration(
-      color: Colors.transparent,
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
-    );
-  }
-
-  BoxDecoration getContainerBoxDecorationByOdd(
-    bool isDark,
-    Color dividerColor,
-  ) {
-    return BoxDecoration(
-      color: (isDark
-          ? Colors.white.withOpacity(0.02)
-          : Colors.black.withOpacity(0.01)),
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
+      color: isDark ? kSurfaceDark : kSurfaceLight,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: dividerColor, width: 0.5),
     );
   }
 
@@ -84,21 +74,40 @@ class _ProductListPageState extends ConsumerState<ProductLists> {
 
     final user = ref.watch(userStateProvider);
 
+    final crossAxisCount = Responsive.isDesktop(context)
+        ? 3
+        : Responsive.isTablet(context)
+        ? 2
+        : 1;
+
+    final mainAxisExtent = Responsive.isDesktop(context)
+        ? 750.0
+        : Responsive.isTablet(context)
+        ? 600.0
+        : 550.0;
+
     return RefreshIndicator(
       onRefresh: () async {
         _pagingController.refresh();
       },
       child: PagingListener(
         controller: _pagingController,
-        builder: (context, state, fetchNextPage) => PagedListView<int, Product>(
+        builder: (context, state, fetchNextPage) => PagedGridView<int, Product>(
+          padding: const EdgeInsets.all(12),
           state: state,
           fetchNextPage: fetchNextPage,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            mainAxisExtent: mainAxisExtent,
+          ),
           builderDelegate: PagedChildBuilderDelegate<Product>(
             itemBuilder: (context, product, index) {
-              final isEven = index % 2 == 0;
-              BoxDecoration containerDecoration = isEven
-                  ? getContainerBoxDecorationByEven(dividerColor)
-                  : getContainerBoxDecorationByOdd(isDark, dividerColor);
+              final containerDecoration = getContainerBoxDecoration(
+                isDark,
+                dividerColor,
+              );
               return Material(
                 type: MaterialType.transparency,
                 child: InkWell(

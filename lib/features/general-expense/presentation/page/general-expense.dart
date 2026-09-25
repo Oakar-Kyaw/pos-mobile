@@ -16,6 +16,7 @@ import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/check-role.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -68,6 +69,9 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
     final subColor = isDark ? kTextSubDark : kTextSubLight;
     final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
     final user = ref.watch(userStateProvider);
+    final isWide =
+        Responsive.isTablet(context) || Responsive.isDesktop(context);
+
     ref.listen<SelectedData?>(selectedDataStateProvider, (prev, next) {
       selectedData = next;
       _pagingController.refresh();
@@ -85,7 +89,7 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
           title: DrawerScreenLocale.drawerExpense.getString(context),
         ),
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: RefreshIndicator(
             onRefresh: () async => _pagingController.refresh(),
             child: Column(
@@ -99,12 +103,32 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
                   text: GeneralExpenseLocale.expenseButton.getString(context),
                   width: 150,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 if (isAdmin(user!.role) || isManager(user.role)) ...[
-                  SizedBox(width: double.infinity, child: UserSelect()),
-                  SizedBox(height: 10),
-                  SizedBox(width: double.infinity, child: DateRangeSelect()),
-                  SizedBox(height: 10),
+                  isWide
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: UserSelect()),
+                            const SizedBox(width: 12),
+                            Expanded(child: DateRangeSelect()),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: UserSelect(),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              child: DateRangeSelect(),
+                            ),
+                          ],
+                        ),
+                  const SizedBox(height: 10),
                 ],
                 GeneralExpenseCard(
                   pagingController: _pagingController,
@@ -113,7 +137,7 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
                   textColor: textColor,
                   subColor: subColor,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
               ],
             ),
           ),

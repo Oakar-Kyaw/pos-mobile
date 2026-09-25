@@ -11,6 +11,7 @@ import 'package:pos/localization/income-local.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/date-ui.dart';
 import 'package:pos/utils/formatAmount.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class IncomePage extends ConsumerStatefulWidget {
@@ -76,146 +77,266 @@ class _IncomePageState extends ConsumerState<IncomePage> {
   ) {
     final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
+    final isWide =
+        Responsive.isTablet(context) || Responsive.isDesktop(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DateSelectorCard(
-            formattedDate: formattedDate,
-            onTap: _pickDate,
-            isDark: isDark,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.isDesktop(context) ? 1100 : double.infinity,
           ),
-          const SizedBox(height: 24),
-          _SectionHeader(
-            title: IncomeScreenLocale.incomeMonthlyRevenue.getString(context),
-            textColor: textColor,
-          ),
-          const SizedBox(height: 14),
-          _MonthlyBarChart(monthlyData: data.getMonthByMonth, isDark: isDark),
-
-          SizedBox(height: 20),
-          Text(
-            IncomeScreenLocale.incomeOverview.getString(context),
-            style: TextStyle(
-              color: subColor,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 2,
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // ── Today ──────────────────────────────────────
-          _StatCard(
-            label: IncomeScreenLocale.incomeToday.getString(context),
-            netIncome: data.getTodaySale.netIncome,
-            taxValue: data.getTodaySale.tax,
-            deliveryFeeValue: data.getTodaySale.deliveryFee,
-            packagingFeeValue: data.getTodaySale.packagingFee,
-            discountAmount: data.getTodaySale.discountAmount,
-            discountPercent: data.getTodaySale.discountPercent,
-            refundAmount: data.getTodaySale.refundAmount,
-            repayAmount: data.getTodaySale.repayAmount,
-            debtAmount: data.getTodaySale.debtAmount,
-            expenseAmount: data.getTodaySale.expenseAmount,
-            purchaseAmount: data.getTodaySale.purchaseAmount,
-            totalPaymentAmount: data.getTodaySale.totalPaymentAmount,
-            total: data.getTodaySale.total,
-            sub:
-                '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.getTodaySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.getTodaySale.deliveryFee) ?? 0)}',
-            dark: true,
-            icon: Icons.trending_up_rounded,
-            fullWidth: true,
-          ),
-          const SizedBox(height: 12),
-
-          // ── This Month ─────────────────────────────────
-          _StatCard(
-            label: IncomeScreenLocale.incomeThisMonth.getString(context),
-            netIncome: data.monthlySale.netIncome,
-            taxValue: data.monthlySale.tax,
-            deliveryFeeValue: data.monthlySale.deliveryFee,
-            packagingFeeValue: data.monthlySale.packagingFee,
-            discountAmount: data.monthlySale.discountAmount,
-            discountPercent: data.monthlySale.discountPercent,
-            refundAmount: data.monthlySale.refundAmount,
-            debtAmount: data.monthlySale.debtAmount,
-            repayAmount: data.monthlySale.repayAmount,
-            expenseAmount: data.monthlySale.expenseAmount,
-            purchaseAmount: data.monthlySale.purchaseAmount,
-            totalPaymentAmount: data.monthlySale.totalPaymentAmount,
-            total: data.monthlySale.total,
-            sub:
-                '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.monthlySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.monthlySale.deliveryFee) ?? 0)}',
-            dark: false,
-            isDark: isDark,
-            icon: Icons.calendar_today_rounded,
-          ),
-
-          const SizedBox(height: 20),
-
-          // ── This Year ──────────────────────────────────
-          _StatCard(
-            label: IncomeScreenLocale.incomeThisYear.getString(context),
-            netIncome: data.yearlySale.netIncome,
-            taxValue: data.yearlySale.tax,
-            deliveryFeeValue: data.yearlySale.deliveryFee,
-            packagingFeeValue: data.yearlySale.packagingFee,
-            discountAmount: data.yearlySale.discountAmount,
-            discountPercent: data.yearlySale.discountPercent,
-            refundAmount: data.yearlySale.refundAmount,
-            debtAmount: data.yearlySale.debtAmount,
-            repayAmount: data.yearlySale.repayAmount,
-            expenseAmount: data.yearlySale.expenseAmount,
-            purchaseAmount: data.yearlySale.purchaseAmount,
-            totalPaymentAmount: data.yearlySale.totalPaymentAmount,
-            total: data.yearlySale.total,
-            sub:
-                '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.deliveryFee) ?? 0)}',
-            dark: true,
-            icon: Icons.trending_up_rounded,
-          ),
-
-          const SizedBox(height: 20),
-
-          Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _ItemRankCard(
-                  title: IncomeScreenLocale.incomeTopSeller.getString(context),
-                  icon: Icons.local_fire_department_rounded,
-                  dark: true,
-                  isDark: isDark,
-                  items: data.mostSellingItem,
+              DateSelectorCard(
+                formattedDate: formattedDate,
+                onTap: _pickDate,
+                isDark: isDark,
+              ),
+              const SizedBox(height: 24),
+              _SectionHeader(
+                title: IncomeScreenLocale.incomeMonthlyRevenue.getString(
+                  context,
+                ),
+                textColor: textColor,
+              ),
+              const SizedBox(height: 14),
+              _MonthlyBarChart(
+                monthlyData: data.getMonthByMonth,
+                isDark: isDark,
+              ),
+
+              SizedBox(height: 20),
+              Text(
+                IncomeScreenLocale.incomeOverview.getString(context),
+                style: TextStyle(
+                  color: subColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _ItemRankCard(
-                  title: IncomeScreenLocale.incomeLeastSold.getString(context),
-                  icon: Icons.arrow_downward_rounded,
+              const SizedBox(height: 12),
+
+              // ── Today / This Month / This Year ────────────
+              if (isWide)
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: _StatCard(
+                          label: IncomeScreenLocale.incomeToday.getString(
+                            context,
+                          ),
+                          netIncome: data.getTodaySale.netIncome,
+                          taxValue: data.getTodaySale.tax,
+                          deliveryFeeValue: data.getTodaySale.deliveryFee,
+                          packagingFeeValue: data.getTodaySale.packagingFee,
+                          discountAmount: data.getTodaySale.discountAmount,
+                          discountPercent: data.getTodaySale.discountPercent,
+                          refundAmount: data.getTodaySale.refundAmount,
+                          repayAmount: data.getTodaySale.repayAmount,
+                          debtAmount: data.getTodaySale.debtAmount,
+                          expenseAmount: data.getTodaySale.expenseAmount,
+                          purchaseAmount: data.getTodaySale.purchaseAmount,
+                          totalPaymentAmount:
+                              data.getTodaySale.totalPaymentAmount,
+                          total: data.getTodaySale.total,
+                          sub:
+                              '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.getTodaySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.getTodaySale.deliveryFee) ?? 0)}',
+                          dark: true,
+                          icon: Icons.trending_up_rounded,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _StatCard(
+                          label: IncomeScreenLocale.incomeThisMonth.getString(
+                            context,
+                          ),
+                          netIncome: data.monthlySale.netIncome,
+                          taxValue: data.monthlySale.tax,
+                          deliveryFeeValue: data.monthlySale.deliveryFee,
+                          packagingFeeValue: data.monthlySale.packagingFee,
+                          discountAmount: data.monthlySale.discountAmount,
+                          discountPercent: data.monthlySale.discountPercent,
+                          refundAmount: data.monthlySale.refundAmount,
+                          debtAmount: data.monthlySale.debtAmount,
+                          repayAmount: data.monthlySale.repayAmount,
+                          expenseAmount: data.monthlySale.expenseAmount,
+                          purchaseAmount: data.monthlySale.purchaseAmount,
+                          totalPaymentAmount:
+                              data.monthlySale.totalPaymentAmount,
+                          total: data.monthlySale.total,
+                          sub:
+                              '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.monthlySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.monthlySale.deliveryFee) ?? 0)}',
+                          dark: false,
+                          isDark: isDark,
+                          icon: Icons.calendar_today_rounded,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _StatCard(
+                          label: IncomeScreenLocale.incomeThisYear.getString(
+                            context,
+                          ),
+                          netIncome: data.yearlySale.netIncome,
+                          taxValue: data.yearlySale.tax,
+                          deliveryFeeValue: data.yearlySale.deliveryFee,
+                          packagingFeeValue: data.yearlySale.packagingFee,
+                          discountAmount: data.yearlySale.discountAmount,
+                          discountPercent: data.yearlySale.discountPercent,
+                          refundAmount: data.yearlySale.refundAmount,
+                          debtAmount: data.yearlySale.debtAmount,
+                          repayAmount: data.yearlySale.repayAmount,
+                          expenseAmount: data.yearlySale.expenseAmount,
+                          purchaseAmount: data.yearlySale.purchaseAmount,
+                          totalPaymentAmount:
+                              data.yearlySale.totalPaymentAmount,
+                          total: data.yearlySale.total,
+                          sub:
+                              '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.deliveryFee) ?? 0)}',
+                          dark: true,
+                          icon: Icons.trending_up_rounded,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else ...[
+                _StatCard(
+                  label: IncomeScreenLocale.incomeToday.getString(context),
+                  netIncome: data.getTodaySale.netIncome,
+                  taxValue: data.getTodaySale.tax,
+                  deliveryFeeValue: data.getTodaySale.deliveryFee,
+                  packagingFeeValue: data.getTodaySale.packagingFee,
+                  discountAmount: data.getTodaySale.discountAmount,
+                  discountPercent: data.getTodaySale.discountPercent,
+                  refundAmount: data.getTodaySale.refundAmount,
+                  repayAmount: data.getTodaySale.repayAmount,
+                  debtAmount: data.getTodaySale.debtAmount,
+                  expenseAmount: data.getTodaySale.expenseAmount,
+                  purchaseAmount: data.getTodaySale.purchaseAmount,
+                  totalPaymentAmount: data.getTodaySale.totalPaymentAmount,
+                  total: data.getTodaySale.total,
+                  sub:
+                      '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.getTodaySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.getTodaySale.deliveryFee) ?? 0)}',
+                  dark: true,
+                  icon: Icons.trending_up_rounded,
+                  fullWidth: true,
+                ),
+                const SizedBox(height: 12),
+                _StatCard(
+                  label: IncomeScreenLocale.incomeThisMonth.getString(context),
+                  netIncome: data.monthlySale.netIncome,
+                  taxValue: data.monthlySale.tax,
+                  deliveryFeeValue: data.monthlySale.deliveryFee,
+                  packagingFeeValue: data.monthlySale.packagingFee,
+                  discountAmount: data.monthlySale.discountAmount,
+                  discountPercent: data.monthlySale.discountPercent,
+                  refundAmount: data.monthlySale.refundAmount,
+                  debtAmount: data.monthlySale.debtAmount,
+                  repayAmount: data.monthlySale.repayAmount,
+                  expenseAmount: data.monthlySale.expenseAmount,
+                  purchaseAmount: data.monthlySale.purchaseAmount,
+                  totalPaymentAmount: data.monthlySale.totalPaymentAmount,
+                  total: data.monthlySale.total,
+                  sub:
+                      '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.monthlySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.monthlySale.deliveryFee) ?? 0)}',
                   dark: false,
                   isDark: isDark,
-                  items: data.leastSellingItem,
+                  icon: Icons.calendar_today_rounded,
                 ),
+                const SizedBox(height: 20),
+                _StatCard(
+                  label: IncomeScreenLocale.incomeThisYear.getString(context),
+                  netIncome: data.yearlySale.netIncome,
+                  taxValue: data.yearlySale.tax,
+                  deliveryFeeValue: data.yearlySale.deliveryFee,
+                  packagingFeeValue: data.yearlySale.packagingFee,
+                  discountAmount: data.yearlySale.discountAmount,
+                  discountPercent: data.yearlySale.discountPercent,
+                  refundAmount: data.yearlySale.refundAmount,
+                  debtAmount: data.yearlySale.debtAmount,
+                  repayAmount: data.yearlySale.repayAmount,
+                  expenseAmount: data.yearlySale.expenseAmount,
+                  purchaseAmount: data.yearlySale.purchaseAmount,
+                  totalPaymentAmount: data.yearlySale.totalPaymentAmount,
+                  total: data.yearlySale.total,
+                  sub:
+                      '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.deliveryFee) ?? 0)}',
+                  dark: true,
+                  icon: Icons.trending_up_rounded,
+                ),
+              ],
+
+              const SizedBox(height: 20),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: _ItemRankCard(
+                      title: IncomeScreenLocale.incomeTopSeller.getString(
+                        context,
+                      ),
+                      icon: Icons.local_fire_department_rounded,
+                      dark: true,
+                      isDark: isDark,
+                      items: data.mostSellingItem,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _ItemRankCard(
+                      title: IncomeScreenLocale.incomeLeastSold.getString(
+                        context,
+                      ),
+                      icon: Icons.arrow_downward_rounded,
+                      dark: false,
+                      isDark: isDark,
+                      items: data.leastSellingItem,
+                    ),
+                  ),
+                ],
               ),
+
+              const SizedBox(height: 24),
+              _SectionHeader(
+                title: IncomeScreenLocale.incomeTopSalesStaff.getString(
+                  context,
+                ),
+                textColor: textColor,
+              ),
+              const SizedBox(height: 12),
+              if (isWide)
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: data.getMonthlyTopSaleUser.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: Responsive.isDesktop(context) ? 3 : 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    mainAxisExtent: 110,
+                  ),
+                  itemBuilder: (context, index) => _TopUserCard(
+                    user: data.getMonthlyTopSaleUser[index],
+                    isDark: isDark,
+                  ),
+                )
+              else
+                ...data.getMonthlyTopSaleUser.map(
+                  (u) => _TopUserCard(user: u, isDark: isDark),
+                ),
+
+              const SizedBox(height: 20),
             ],
           ),
-
-          const SizedBox(height: 24),
-          _SectionHeader(
-            title: IncomeScreenLocale.incomeTopSalesStaff.getString(context),
-            textColor: textColor,
-          ),
-          const SizedBox(height: 12),
-          ...data.getMonthlyTopSaleUser.map(
-            (u) => _TopUserCard(user: u, isDark: isDark),
-          ),
-
-          const SizedBox(height: 20),
-        ],
+        ),
       ),
     );
   }
@@ -223,10 +344,6 @@ class _IncomePageState extends ConsumerState<IncomePage> {
 
 // ─────────────────────────────────────────
 // Stat Card
-// All amount-related fields here are RAW (unformatted) strings straight
-// from the API. formatAmount() is only ever called at display time,
-// right before a Text widget — never on a value that gets re-parsed
-// or used in arithmetic afterwards.
 // ─────────────────────────────────────────
 class _StatCard extends StatelessWidget {
   final String label;
@@ -299,6 +416,7 @@ class _StatCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -335,9 +453,6 @@ class _StatCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
 
-          // tax / deliveryFee / packagingFee / discountAmount / discountPercent
-          // intentionally left off the card — order-composition detail,
-          // not income-health detail. Move to a "Sale detail" screen if needed.
           StatCardRow(
             label:
                 "${IncomeScreenLocale.incomeDebtAmount.getString(context)} :",

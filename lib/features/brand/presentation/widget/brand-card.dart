@@ -12,7 +12,9 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 
 class BrandCard extends ConsumerWidget {
   final ValueChanged<Brand> onEdit;
-  const BrandCard({super.key, required this.onEdit});
+  final int crossAxisCount;
+
+  const BrandCard({super.key, required this.onEdit, this.crossAxisCount = 1});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -65,12 +67,18 @@ class BrandCard extends ConsumerWidget {
           });
     }
 
-    return ListView.builder(
+    // crossAxisCount == 1 ဆိုရင် ListView အတိုင်း full width ဖြစ်ပါမယ်
+    return GridView.builder(
       itemCount: data.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        mainAxisExtent: 64, // 👈 Card တစ်ခုချင်း အမြင့် — content အလိုက် ညှိပါ
+      ),
       itemBuilder: (context, index) {
         final brand = data[index];
         return Container(
-          margin: const EdgeInsets.symmetric(vertical: 6),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: isDark ? kSurfaceDark : kSurfaceLight,
@@ -113,6 +121,8 @@ class BrandCard extends ConsumerWidget {
                     fontWeight: FontWeight.w700,
                     color: textColor,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               Row(
