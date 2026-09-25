@@ -72,7 +72,7 @@ class CustomerDrawer {
             ? 450.0
             : Responsive.isTablet(context)
             ? 400.0
-            : 250.0;
+            : 300.0;
         return Drawer(
           width: widthData,
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
