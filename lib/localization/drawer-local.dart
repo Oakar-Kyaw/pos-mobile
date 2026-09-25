@@ -10,6 +10,7 @@ mixin DrawerScreenLocale {
   static const drawerExpense = 'drawer_general_expense';
   static const drawerProfit = 'drawer_profit';
   static const drawerVoucher = 'drawer_voucher';
+  static const drawerReceiptVoucher = 'drawer_receipt_voucher';
   static const drawerLogin = 'drawer_login';
   static const drawerProfile = 'drawer_profile';
   static const drawerSelectLanguage = 'drawer_select_language';
@@ -42,7 +43,7 @@ mixin DrawerScreenLocale {
   static const drawerLogout = 'drawer_logout';
   static const drawerNotification = 'drawer_notification';
 
-  // ✅ Section headers (used to group items in the drawer menu)
+  // ✅ Section headers
   static const drawerSectionProduct = 'drawer_section_product';
   static const drawerSectionSaleManagement = 'drawer_section_sale_management';
   static const drawerSectionFinance = 'drawer_section_finance';
@@ -65,6 +66,7 @@ mixin DrawerScreenLocale {
     drawerExpense: 'General Expenses',
     drawerProfit: 'Profit',
     drawerVoucher: 'Vouchers',
+    drawerReceiptVoucher: 'Receipt Voucher',
     drawerLogin: 'Login',
     drawerProfile: 'Profile',
     drawerSelectLanguage: 'Select Language',
@@ -119,6 +121,7 @@ mixin DrawerScreenLocale {
     drawerExpense: 'အထွေထွေ အသုံးစရိတ်များ',
     drawerProfit: 'အမြတ်အစွန်း',
     drawerVoucher: 'ဘောက်ချာများ',
+    drawerReceiptVoucher: 'လက်ခံဘောက်ချာ',
     drawerLogin: 'လော့ဂ်အင်',
     drawerProfile: 'ပရိုဖိုင်း',
     drawerSelectLanguage: 'ဘာသာစကားရွေးချယ်ရန်',

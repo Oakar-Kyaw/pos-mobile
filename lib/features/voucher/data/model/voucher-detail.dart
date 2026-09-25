@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:pos/features/company/data/model/company.dart';
 import 'package:pos/features/customer/data/model/customer-model.dart';
 import 'package:pos/models/payment-data.dart';
@@ -178,6 +179,7 @@ class VoucherDetailModel {
   double subTotal;
   double totalPaymentAmount;
   double deliveryFee;
+  double debt;
   double discountPercent;
   double discountAmount;
   double remainingPaymentAmount;
@@ -206,6 +208,7 @@ class VoucherDetailModel {
     this.discountPercent = 0,
     this.total = 0,
     this.subTotal = 0,
+    this.debt = 0,
     this.tax = 0,
     this.note,
     this.existDebt,
@@ -220,8 +223,9 @@ class VoucherDetailModel {
     List<VoucherPayment>? payments,
     Customer? customer,
     Company? company,
-    VoucherUser? user, // ← Added to copyWith
+    VoucherUser? user,
     double? total,
+    double? debt,
     double? totalPaymentAmount,
     double? deliveryFee,
     double? packagingFee,
@@ -247,6 +251,7 @@ class VoucherDetailModel {
       totalPaymentAmount: totalPaymentAmount ?? this.totalPaymentAmount,
       deliveryFee: deliveryFee ?? this.deliveryFee,
       packagingFee: packagingFee ?? this.packagingFee,
+      debt: debt ?? this.debt,
       discountAmount: discountAmount ?? this.discountAmount,
       discountPercent: discountPercent ?? this.discountPercent,
       remainingPaymentAmount:
@@ -261,6 +266,7 @@ class VoucherDetailModel {
 
   // From JSON
   factory VoucherDetailModel.fromJson(Map<String, dynamic> json) {
+    //debugPrint("💃🏿 user is ${json["user"]}");
     return VoucherDetailModel(
       id: json['id'],
       voucherCode: json['voucherCode'] ?? "",
@@ -280,6 +286,7 @@ class VoucherDetailModel {
           : null, // ← Added json parsing
       subTotal: double.parse(json['subTotal'].toString()),
       total: double.parse(json['total'].toString()),
+      debt: double.parse(json['debt'].toString()),
       tax: double.parse(json['tax'].toString()),
       totalPaymentAmount: double.parse(json['totalPaymentAmount'].toString()),
       deliveryFee: double.tryParse(json['deliveryFee']?.toString() ?? '0') ?? 0,

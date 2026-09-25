@@ -224,12 +224,19 @@ class AppLocalNotification {
       '@mipmap/ic_launcher',
     );
 
-    // for iOS
-    const initSettingsIos = DarwinInitializationSettings();
-    // for both platforms
+    const initSettingsWindows = WindowsInitializationSettings(
+      appName: 'POS Master Myanmar',
+      appUserModelId: 'com.oakarkyaw.posmaster',
+      guid: '829876F3-8699-4679-BFBC-ECD051F53093',
+    );
+
+    const initSettingsDarwin = DarwinInitializationSettings();
+
     const initSettings = InitializationSettings(
       android: initSettingsAndroid,
-      iOS: initSettingsIos,
+      iOS: initSettingsDarwin,
+      macOS: initSettingsDarwin,
+      windows: initSettingsWindows,
     );
     // initialize the plugin with the settings
     await notificationPlugin.initialize(settings: initSettings);
@@ -427,6 +434,21 @@ class AppLocalNotification {
     await notificationPlugin.cancel(id: notiId);
   }
 
+  // static Future<void> requestNotification() async {
+  //   await notificationPlugin
+  //       .resolvePlatformSpecificImplementation<
+  //         AndroidFlutterLocalNotificationsPlugin
+  //       >()
+  //       ?.requestNotificationsPermission();
+
+  //   // for iOS
+  //   await notificationPlugin
+  //       .resolvePlatformSpecificImplementation<
+  //         IOSFlutterLocalNotificationsPlugin
+  //       >()
+  //       ?.requestPermissions(alert: true, badge: true, sound: true);
+  // }
+
   static Future<void> requestNotification() async {
     await notificationPlugin
         .resolvePlatformSpecificImplementation<
@@ -434,10 +456,15 @@ class AppLocalNotification {
         >()
         ?.requestNotificationsPermission();
 
-    // for iOS
     await notificationPlugin
         .resolvePlatformSpecificImplementation<
           IOSFlutterLocalNotificationsPlugin
+        >()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
+
+    await notificationPlugin
+        .resolvePlatformSpecificImplementation<
+          MacOSFlutterLocalNotificationsPlugin
         >()
         ?.requestPermissions(alert: true, badge: true, sound: true);
   }
@@ -448,6 +475,11 @@ class AppLocalNotification {
     bool isAndroidImage = false,
     bool isIOSImage = false,
   }) async {
+    const darwin = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
     // Android: large icon (round)
     ByteArrayAndroidBitmap? largeIcon;
     final androidImageUrl = isAndroidImage ? imageUrl : null;
@@ -497,6 +529,8 @@ class AppLocalNotification {
         presentSound: true,
         attachments: iosAttachments,
       ),
+      macOS: darwin,
+      windows: const WindowsNotificationDetails(),
     );
   }
 }

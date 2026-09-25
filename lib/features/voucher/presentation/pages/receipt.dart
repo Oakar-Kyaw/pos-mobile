@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pos/api/voucher.api.dart';
+import 'package:pos/component/app-bar.dart';
 import 'package:pos/core/database/printer-table-schema.dart';
+import 'package:pos/core/utils/voucher/logo-cache.dart';
+import 'package:pos/core/utils/voucher/os-printer-voucher.dart';
 import 'package:pos/features/printer/data/datasource/printer-local-datasource.dart';
 import 'package:pos/features/printer/domain/entites/printer-device.dart';
 import 'package:pos/features/printer/domain/enums/printer-type.dart';
@@ -15,6 +19,7 @@ import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/features/voucher/presentation/widgets/receipt-generator.dart';
 import 'package:pos/features/voucher/presentation/widgets/show-recept-dialog.dart';
 import 'package:pos/localization/company-local.dart';
+import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/localization/payment-local.dart';
 import 'package:pos/utils/font-size.dart';
@@ -46,6 +51,7 @@ class _ReceiptPageState extends ConsumerState<ReceiptPage> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _getSavedPrinters();
     });
@@ -116,11 +122,20 @@ class _ReceiptPageState extends ConsumerState<ReceiptPage> {
 
     return SafeArea(
       child: Scaffold(
+        appBar: CustomAppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.pop(),
+          ),
+          title: DrawerScreenLocale.drawerReceiptVoucher.getString(context),
+        ),
         body: voucherAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (err, _) => Center(child: Text("Error: $err")),
           data: (voucher) {
-            //print("receipt voucher is ${voucher.discountPercent}");
+            //logo cache
+            LogoCache.load(voucher.company?.photoUrl);
+            // print("receipt voucher is ${voucher.user}");
             return LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
@@ -339,6 +354,22 @@ class _ReceiptPageState extends ConsumerState<ReceiptPage> {
                                 VoucherScreenLocale.printReceipt.getString(
                                   context,
                                 ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            ShadButton(
+                              onPressed: () async {
+                                // Page
+                                await OSVoucherService().printOSVoucher(
+                                  context,
+                                  voucher,
+                                );
+                              },
+                              child: Text(
+                                VoucherScreenLocale.printOfficePrinter
+                                    .getString(context),
                               ),
                             ),
 

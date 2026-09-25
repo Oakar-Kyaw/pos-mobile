@@ -17,6 +17,7 @@ mixin VoucherScreenLocale {
   static const somethingWentWrong = 'voucher_something_went_wrong';
   static const receipt = 'voucher_receipt';
   static const printReceipt = 'voucher_print_receipt';
+  static const printOfficePrinter = 'voucher_print_office_printer';
   static const thankYouMessage = 'voucher_thank_you_message';
   static const item = 'voucher_item';
   static const amount = 'voucher_amount';
@@ -39,6 +40,7 @@ mixin VoucherScreenLocale {
   static const createdBy = 'voucher_created_by';
   static const receiptNo = 'voucher_receipt_no';
   static const receiptDate = 'voucher_receipt_date';
+  static const salesperson = 'voucher_salesperson';
 
   // Customer Keys
   static const customerOptional = 'voucher_customer_optional';
@@ -49,6 +51,7 @@ mixin VoucherScreenLocale {
   static const phoneOptional = 'voucher_phone_optional';
   static const createAndSelect = 'voucher_create_and_select';
 
+  // 🇺🇸 English
   static const EN = {
     title: 'Create Voucher',
     voucher: 'Voucher',
@@ -69,6 +72,7 @@ mixin VoucherScreenLocale {
     somethingWentWrong: 'Something went wrong',
     receipt: 'Receipt',
     printReceipt: 'Print Receipt',
+    printOfficePrinter: 'Print with Office Printer',
     item: 'Item',
     amount: 'Amount',
     viewAllVouchers:
@@ -91,6 +95,7 @@ mixin VoucherScreenLocale {
     createdBy: 'Created by',
     receiptNo: 'Receipt No.',
     receiptDate: 'Receipt Date',
+    salesperson: 'Salesperson',
 
     // Customer EN
     customerOptional: 'Customer (optional)',
@@ -101,6 +106,7 @@ mixin VoucherScreenLocale {
     createAndSelect: 'Create & Select',
   };
 
+  // 🇲🇲 Burmese
   static const MM = {
     title: 'ဘောက်ချာ ဖန်တီးခြင်း',
     voucher: 'ဘောက်ချာ',
@@ -121,6 +127,7 @@ mixin VoucherScreenLocale {
     somethingWentWrong: 'တစ်စုံတစ်ခု မှားယွင်းနေပါသည်',
     receipt: 'ပြေစာ',
     printReceipt: 'ပြေစာ ထုတ်မည်',
+    printOfficePrinter: 'ရုံးသုံးပရင်တာဖြင့် ထုတ်မည်',
     item: 'ပစ္စည်း',
     amount: 'ငွေပမာဏ',
     viewAllVouchers:
@@ -143,13 +150,14 @@ mixin VoucherScreenLocale {
     createdBy: 'ရေးသွင်းသူ',
     receiptNo: 'ပြေစာ အမှတ်',
     receiptDate: 'ပြေစာ ရက်စွဲ',
+    salesperson: 'အရောင်းဝန်ထမ်း',
 
     // Customer MM
     customerOptional: 'ဖောက်သည် (မထည့်လည်းရ)',
     searchCustomerPlaceholder: 'အမည် သို့မဟုတ် ဖုန်းနံပါတ်ဖြင့် ရှာပါ...',
     noCustomerFound: 'ဖောက်သည် မတွေ့ပါ။ အသစ်ဖန်တီးပါ:',
     customerName: 'ဖောက်သည် အမည်',
-    phoneOptional: 'ဖုန်းနံပါတ် (စိတ်ကြိုက်)',
+    phoneOptional: 'ဖုန်းနံပါတ်',
     createAndSelect: 'ဖန်တီးပြီး ရွေးချယ်မည်',
   };
 }

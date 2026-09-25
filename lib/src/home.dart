@@ -1,5 +1,9 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pos/core/utils/voucher/os-printer-voucher.dart';
+import 'package:printing/printing.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -638,10 +642,14 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                           ),
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: Responsive.isTablet(context)
+                                crossAxisCount: Responsive.isDesktop(context)
+                                    ? 7
+                                    : Responsive.isTablet(context)
                                     ? 5
                                     : 3,
-                                mainAxisExtent: Responsive.isTablet(context)
+                                mainAxisExtent: Responsive.isDesktop(context)
+                                    ? 200
+                                    : Responsive.isTablet(context)
                                     ? 180
                                     : 160,
                                 crossAxisSpacing: 8,

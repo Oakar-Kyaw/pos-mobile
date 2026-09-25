@@ -88,8 +88,6 @@ PODS:
     - nanopb/encode (= 3.30910.0)
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
-  - open_folder (0.0.1):
-    - FlutterMacOS
   - print_bluetooth_thermal (0.0.1):
     - FlutterMacOS
   - printing (1.0.0):
@@ -121,7 +119,6 @@ DEPENDENCIES:
   - flutter_timezone (from `Flutter/ephemeral/.symlinks/plugins/flutter_timezone/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - mobile_scanner (from `Flutter/ephemeral/.symlinks/plugins/mobile_scanner/darwin`)
-  - open_folder (from `Flutter/ephemeral/.symlinks/plugins/open_folder/macos`)
   - print_bluetooth_thermal (from `Flutter/ephemeral/.symlinks/plugins/print_bluetooth_thermal/macos`)
   - printing (from `Flutter/ephemeral/.symlinks/plugins/printing/macos`)
   - shared_preferences_foundation (from `Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -168,8 +165,6 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral
   mobile_scanner:
     :path: Flutter/ephemeral/.symlinks/plugins/mobile_scanner/darwin
-  open_folder:
-    :path: Flutter/ephemeral/.symlinks/plugins/open_folder/macos
   print_bluetooth_thermal:
     :path: Flutter/ephemeral/.symlinks/plugins/print_bluetooth_thermal/macos
   printing:
@@ -205,7 +200,6 @@ SPEC CHECKSUMS:
   GoogleUtilities: 4e0c2ad9fa0d0d18b5c4df8bf57b461cba35b0bb
   mobile_scanner: 9157936403f5a0644ca3779a38ff8404c5434a93
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
-  open_folder: 412fe4b7b2f53d32e4b16a310f7cf8ce7f0c2d99
   print_bluetooth_thermal: 4681888b4aa9db6ef0b9c2e4228b56258fe09dc8
   printing: 7916ffaaede65713863e621de9a4742d9fa723b9
   PromisesObjC: 752c3227f599e3467650e47ea36f433eeb10c273

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -23,8 +25,9 @@ void main() async {
   ]);
   initLocalization();
   //Pre-load font so it's ready before any theme build
-
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  if (Platform.isAndroid || Platform.isIOS) {
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  }
 
   // await GoogleFonts.pendingFonts([
   //   GoogleFonts.merriweather(),
@@ -134,6 +137,8 @@ class _MyAppState extends ConsumerState<MyApp> {
   }
 
   void _setupFirebaseNotification() async {
+    //if window and linux , doesn't provider id
+    if (Platform.isWindows || Platform.isLinux) return;
     await FirebaseService.instance.init();
     FirebaseMessaging instance = FirebaseMessaging.instance;
     print("setup firbase notification is: 😘 $instance");
