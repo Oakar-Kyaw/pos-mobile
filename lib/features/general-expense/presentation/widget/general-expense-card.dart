@@ -43,6 +43,7 @@ class GeneralExpenseCard extends ConsumerStatefulWidget {
 class _GeneralExpenseCardState extends ConsumerState<GeneralExpenseCard> {
   void _delete(int id) async {
     if (!mounted) return;
+
     final confirmed = await showConfirmDialog(
       context,
       title: GeneralExpenseLocale.deleteExpense.getString(context),
@@ -50,9 +51,11 @@ class _GeneralExpenseCardState extends ConsumerState<GeneralExpenseCard> {
       confirmLabel: GeneralExpenseLocale.confirmDelete.getString(context),
       cancelLabel: GeneralExpenseLocale.cancelDelete.getString(context),
     );
+
     if (confirmed != true) return;
 
     debugPrint("Deleting purchase: $id");
+
     ref
         .read(generalExpenseProvider.notifier)
         .deleteExpense(id)
@@ -64,6 +67,7 @@ class _GeneralExpenseCardState extends ConsumerState<GeneralExpenseCard> {
                 GeneralExpenseLocale.deleteSuccess.getString(context),
               ),
             );
+
             widget._pagingController.refresh();
           }
         })
@@ -107,67 +111,73 @@ class _GeneralExpenseCardState extends ConsumerState<GeneralExpenseCard> {
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.all(16),
       decoration: generalExpenseBoxDecoration,
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GeneralExpenseTitle(
-                isDark: widget.isDark,
-                textColor: widget.textColor,
-                expense: expense,
-              ),
-              const SizedBox(height: 10),
-              GeneralExpenseDate(
-                subColor: widget.subColor,
-                expense: expense,
-                textColor: widget.textColor,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                GeneralExpenseLocale.expenseReason.getString(context),
-                style: TextStyle(fontSize: 12, color: widget.subColor),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                expense.reason ?? '-',
-                style: TextStyle(
-                  fontSize: FontSizeConfig.body(context),
-                  color: widget.textColor,
-                ),
-              ),
-              const Divider(),
-
-              ...expense.generalExpensePayment.map(
-                (e) => GeneralExpensePaymentRow(
-                  subColor: widget.subColor,
-                  textColor: widget.textColor,
-                  expensePayment: e,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-              if (user != null && (isAdmin(user.role) || isManager(user.role)))
-                Row(
-                  children: [
-                    GradientSubmitButton(
-                      onPressed: () => _edit(expense),
-                      text: GeneralExpenseLocale.editExpense.getString(context),
-                      width: 150,
-                    ),
-                    const Spacer(),
-                    GradientSubmitButton(
-                      onPressed: () => _delete(expense.id),
-                      decoration: BoxDecoration(color: kRed),
-                      text: GeneralExpenseLocale.deleteExpense.getString(
-                        context,
-                      ),
-                      width: 150,
-                    ),
-                  ],
-                ),
-            ],
+          GeneralExpenseTitle(
+            isDark: widget.isDark,
+            textColor: widget.textColor,
+            expense: expense,
           ),
+
+          const SizedBox(height: 10),
+
+          GeneralExpenseDate(
+            subColor: widget.subColor,
+            expense: expense,
+            textColor: widget.textColor,
+          ),
+
+          const SizedBox(height: 8),
+
+          Text(
+            GeneralExpenseLocale.expenseReason.getString(context),
+            style: TextStyle(fontSize: 12, color: widget.subColor),
+          ),
+
+          const SizedBox(height: 4),
+
+          Text(
+            expense.reason ?? '-',
+            style: TextStyle(
+              fontSize: FontSizeConfig.body(context),
+              color: widget.textColor,
+            ),
+          ),
+
+          const Divider(),
+
+          ...expense.generalExpensePayment.map(
+            (e) => GeneralExpensePaymentRow(
+              subColor: widget.subColor,
+              textColor: widget.textColor,
+              expensePayment: e,
+            ),
+          ),
+
+          if (user != null && (isAdmin(user.role) || isManager(user.role))) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: GradientSubmitButton(
+                    onPressed: () => _edit(expense),
+                    text: GeneralExpenseLocale.editExpense.getString(context),
+                    width: 150,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GradientSubmitButton(
+                    onPressed: () => _delete(expense.id),
+                    decoration: BoxDecoration(color: kRed),
+                    text: GeneralExpenseLocale.deleteExpense.getString(context),
+                    width: 150,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -182,35 +192,45 @@ class _GeneralExpenseCardState extends ConsumerState<GeneralExpenseCard> {
         : 1;
 
     final builderDelegate = PagedChildBuilderDelegate<GeneralExpense>(
-      itemBuilder: (context, expense, index) => _buildCard(context, expense),
-      firstPageProgressIndicatorBuilder: (_) =>
-          const Center(child: LoadingWidget()),
-      newPageProgressIndicatorBuilder: (_) => const LoadingWidget(),
-      noItemsFoundIndicatorBuilder: (_) =>
-          NoItemGeneralExpense(subColor: widget.subColor),
+      itemBuilder: (context, expense, index) {
+        return _buildCard(context, expense);
+      },
+      firstPageProgressIndicatorBuilder: (_) {
+        return const Center(child: LoadingWidget());
+      },
+      newPageProgressIndicatorBuilder: (_) {
+        return const LoadingWidget();
+      },
+      noItemsFoundIndicatorBuilder: (_) {
+        return NoItemGeneralExpense(subColor: widget.subColor);
+      },
     );
 
-    return Expanded(
-      child: PagingListener(
-        controller: widget._pagingController,
-        builder: (context, state, fetchNextPage) => crossAxisCount > 1
-            ? PagedGridView<int, GeneralExpense>(
-                state: state,
-                fetchNextPage: fetchNextPage,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 6,
-                  childAspectRatio: 0.8,
-                ),
-                builderDelegate: builderDelegate,
-              )
-            : PagedListView<int, GeneralExpense>(
-                state: state,
-                fetchNextPage: fetchNextPage,
-                builderDelegate: builderDelegate,
-              ),
-      ),
+    return PagingListener(
+      controller: widget._pagingController,
+      builder: (context, state, fetchNextPage) {
+        if (crossAxisCount > 1) {
+          return PagedGridView<int, GeneralExpense>(
+            state: state,
+            fetchNextPage: fetchNextPage,
+            padding: const EdgeInsets.only(bottom: 16),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 6,
+              childAspectRatio: 0.8,
+            ),
+            builderDelegate: builderDelegate,
+          );
+        }
+
+        return PagedListView<int, GeneralExpense>(
+          state: state,
+          fetchNextPage: fetchNextPage,
+          padding: const EdgeInsets.only(bottom: 16),
+          builderDelegate: builderDelegate,
+        );
+      },
     );
   }
 }
@@ -233,14 +253,16 @@ class GeneralExpenseDate extends StatelessWidget {
       children: [
         Icon(LucideIcons.calendar, size: 12, color: subColor),
         const SizedBox(width: 6),
-        Text(
-          DateFormat('yyyy-MM-dd').format(expense.date),
-          style: TextStyle(
-            fontSize: FontSizeConfig.body(context),
-            color: subColor,
+        Expanded(
+          child: Text(
+            DateFormat('yyyy-MM-dd').format(expense.date),
+            style: TextStyle(
+              fontSize: FontSizeConfig.body(context),
+              color: subColor,
+            ),
           ),
         ),
-        Spacer(),
+        const SizedBox(width: 8),
         Text(
           formatAmount(expense.amount),
           style: TextStyle(
@@ -269,6 +291,7 @@ class GeneralExpenseTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           padding: const EdgeInsets.all(8),
@@ -283,10 +306,11 @@ class GeneralExpenseTitle extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        SizedBox(
+        Expanded(
           child: Text(
             expense.title,
             maxLines: 10,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: FontSizeConfig.title(context),
               fontWeight: FontWeight.w700,
@@ -347,14 +371,17 @@ class GeneralExpensePaymentRow extends StatelessWidget {
       children: [
         Icon(LucideIcons.wallet, size: 12, color: subColor),
         const SizedBox(width: 6),
-        Text(
-          expensePayment.paymentData!.accountName,
-          style: TextStyle(
-            fontSize: FontSizeConfig.body(context),
-            color: subColor,
+        Expanded(
+          child: Text(
+            expensePayment.paymentData?.accountName ?? '-',
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: FontSizeConfig.body(context),
+              color: subColor,
+            ),
           ),
         ),
-        Spacer(),
+        const SizedBox(width: 8),
         Text(
           formatAmount(expensePayment.amount),
           style: TextStyle(

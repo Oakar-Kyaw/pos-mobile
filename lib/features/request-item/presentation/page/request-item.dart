@@ -13,6 +13,7 @@ import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/check-role.dart';
 import 'package:pos/utils/inventory-configuration.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -32,11 +33,14 @@ class _RequestItemPageState extends ConsumerState<RequestItemPage> {
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
-    final textColor = isDark ? kTextDark : kTextLight;
     final user = ref.watch(userStateProvider);
     final selectedData = ref.watch(selectedDataStateProvider);
     final config = InventoryActionConfig('Request', context);
-    //print("expire item is ${InventoryActionType.damaged}");
+    final isWide =
+        Responsive.isTablet(context) || Responsive.isDesktop(context);
+    final isAdminOrManager =
+        user != null && (isAdmin(user.role) || isManager(user.role));
+
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) => _clearSelectedData(),
@@ -54,39 +58,42 @@ class _RequestItemPageState extends ConsumerState<RequestItemPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Description Banner ──────────────────
-              // DescriptionWidget(
-              //   isDark: isDark,
-              //   description: config.description,
-              //   icon: config.icon,
-              //   subColor: subColor,
-              // ),
-
-              // const SizedBox(height: 20),
               GradientSubmitButton(
                 onPressed: () => context.pushNamed(
                   AppRoute.inventoryItem,
                   extra: {'type': 'Request'},
                 ),
                 text: DrawerScreenLocale.drawerCreate.getString(context),
-                width: 120,
+                width: 150,
               ),
 
               const SizedBox(height: 20),
-              if (user != null && (isAdmin(user.role) || isManager(user.role)))
-                SizedBox(
-                  width: double.infinity,
-                  child: RequestLabel(textColor: textColor),
-                ),
-              if (user != null && (isAdmin(user.role) || isManager(user.role)))
-                SizedBox(
-                  width: double.infinity,
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: DateRangeSelect(),
-                  ),
-                ),
 
+              if (isAdminOrManager)
+                isWide
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Expanded(child: UserSelect()),
+                          const SizedBox(width: 16),
+                          const Expanded(child: DateRangeSelect()),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            width: double.infinity,
+                            child: UserSelect(),
+                          ),
+                          const SizedBox(height: 10),
+                          const SizedBox(
+                            width: double.infinity,
+                            child: DateRangeSelect(),
+                          ),
+                        ],
+                      ),
+              const SizedBox(height: 10),
               Expanded(
                 child: RequestItemLists(
                   userId: selectedData?.userId,
@@ -99,16 +106,5 @@ class _RequestItemPageState extends ConsumerState<RequestItemPage> {
         ),
       ),
     );
-  }
-}
-
-class RequestLabel extends ConsumerWidget {
-  const RequestLabel({super.key, required this.textColor});
-
-  final Color textColor;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return const UserSelect();
   }
 }

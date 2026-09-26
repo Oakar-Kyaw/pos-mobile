@@ -14,7 +14,7 @@ import 'package:pos/models/repayment.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/check-role.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/shad-toaster.dart';
 
 class RepaymentList extends ConsumerStatefulWidget {
@@ -54,25 +54,6 @@ class _RepaymentListState extends ConsumerState<RepaymentList> {
   void dispose() {
     super.dispose();
     _pagingController.dispose();
-  }
-
-  BoxDecoration getContainerBoxDecorationByEven(Color dividerColor) {
-    return BoxDecoration(
-      color: Colors.transparent,
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
-    );
-  }
-
-  BoxDecoration getContainerBoxDecorationByOdd(
-    bool isDark,
-    Color dividerColor,
-  ) {
-    return BoxDecoration(
-      color: (isDark
-          ? Colors.white.withOpacity(0.02)
-          : Colors.black.withOpacity(0.01)),
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
-    );
   }
 
   void _delete(Repay repayment, bool isDark) {
@@ -120,32 +101,45 @@ class _RepaymentListState extends ConsumerState<RepaymentList> {
       _pagingController.refresh();
     });
 
+    final crossAxisCount = Responsive.isDesktop(context)
+        ? 3
+        : Responsive.isTablet(context)
+        ? 2
+        : 1;
+
+    final mainAxisExtent = Responsive.isDesktop(context)
+        ? 400.0
+        : Responsive.isTablet(context)
+        ? 380.0
+        : 380.0;
+
     return RefreshIndicator(
       onRefresh: () async {
         _pagingController.refresh();
       },
       child: PagingListener(
         controller: _pagingController,
-        builder: (context, state, fetchNextPage) => PagedListView<int, Repay>(
+        builder: (context, state, fetchNextPage) => PagedGridView<int, Repay>(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           state: state,
           fetchNextPage: fetchNextPage,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            mainAxisExtent: mainAxisExtent,
+          ),
           builderDelegate: PagedChildBuilderDelegate<Repay>(
             itemBuilder: (context, repayment, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                child: RepaymentCard(
-                  repayment: repayment,
-                  textColor: textColor,
-                  subColor: subColor,
-                  // onDelete:
-                  //     (user != null &&
-                  //         (isAdmin(user.role) || isManager(user.role)))
-                  //     ? () => _delete(repayment, isDark)
-                  //     : null,
-                ),
+              return RepaymentCard(
+                repayment: repayment,
+                textColor: textColor,
+                subColor: subColor,
+                // onDelete:
+                //     (user != null &&
+                //         (isAdmin(user.role) || isManager(user.role)))
+                //     ? () => _delete(repayment, isDark)
+                //     : null,
               );
             },
 

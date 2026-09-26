@@ -83,7 +83,7 @@ class _ProductListPageState extends ConsumerState<ProductLists> {
     final mainAxisExtent = Responsive.isDesktop(context)
         ? 750.0
         : Responsive.isTablet(context)
-        ? 600.0
+        ? 680.0
         : 550.0;
 
     return RefreshIndicator(

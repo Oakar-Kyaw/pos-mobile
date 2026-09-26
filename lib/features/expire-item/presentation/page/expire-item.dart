@@ -16,6 +16,7 @@ import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/check-role.dart';
 import 'package:pos/utils/inventory-configuration.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -77,10 +78,13 @@ class _ExpireItemsPageState extends ConsumerState<ExpireItemsPage> {
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
-    final textColor = isDark ? kTextDark : kTextLight;
     final user = ref.watch(userStateProvider);
     final selectedData = ref.watch(selectedDataStateProvider);
     final config = InventoryActionConfig('Damage', context);
+    final isWide =
+        Responsive.isTablet(context) || Responsive.isDesktop(context);
+    final isAdminOrManager =
+        user != null && (isAdmin(user.role) || isManager(user.role));
 
     return PopScope(
       canPop: true,
@@ -104,24 +108,36 @@ class _ExpireItemsPageState extends ConsumerState<ExpireItemsPage> {
               GradientSubmitButton(
                 onPressed: _onCreate,
                 text: DrawerScreenLocale.drawerCreate.getString(context),
-                width: 120,
+                width: 150,
               ),
 
               const SizedBox(height: 20),
-              if (user != null && (isAdmin(user.role) || isManager(user.role)))
-                SizedBox(
-                  width: double.infinity,
-                  child: ExpireLabel(textColor: textColor),
-                ),
-              if (user != null && (isAdmin(user.role) || isManager(user.role)))
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: DateRangeSelect(),
-                  ),
-                ),
 
+              if (isAdminOrManager)
+                isWide
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Expanded(child: UserSelect()),
+                          const SizedBox(width: 16),
+                          const Expanded(child: DateRangeSelect()),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            width: double.infinity,
+                            child: UserSelect(),
+                          ),
+                          const SizedBox(height: 10),
+                          const SizedBox(
+                            width: double.infinity,
+                            child: DateRangeSelect(),
+                          ),
+                        ],
+                      ),
+              const SizedBox(height: 10),
               Expanded(
                 child: ExpireDamageLists(
                   pagingController: _pagingController,
@@ -133,17 +149,5 @@ class _ExpireItemsPageState extends ConsumerState<ExpireItemsPage> {
         ),
       ),
     );
-  }
-}
-
-class ExpireLabel extends ConsumerWidget {
-  const ExpireLabel({super.key, required this.textColor});
-
-  final Color textColor;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userStateProvider);
-    return const UserSelect();
   }
 }

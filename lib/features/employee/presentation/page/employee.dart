@@ -48,7 +48,7 @@ class EmployeePage extends ConsumerWidget {
             GradientSubmitButton(
               onPressed: () => context.pushNamed(AppRoute.employeeCreate),
               text: DrawerScreenLocale.drawerCreate.getString(context),
-              width: 120,
+              width: 150,
             ),
             const SizedBox(height: 20),
 

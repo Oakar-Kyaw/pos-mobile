@@ -104,7 +104,7 @@ mixin IncomeScreenLocale {
 
     incomeNetIncome: 'Net Income',
 
-    incomeTotalPaymentAmount: 'Total Payment Amount',
+    incomeTotalPaymentAmount: 'Total Pay Amount',
 
     incomeOpeningAmount: 'Opening Amount',
 

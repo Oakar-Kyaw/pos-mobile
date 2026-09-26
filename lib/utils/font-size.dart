@@ -6,9 +6,9 @@ class FontSizeConfig {
     if (Responsive.isMobile(context)) {
       return 14.0;
     } else if (Responsive.isTablet(context)) {
-      return 18.0;
+      return 15.0;
     } else {
-      return 20.0;
+      return 18.0;
     }
   }
 
@@ -16,9 +16,9 @@ class FontSizeConfig {
     if (Responsive.isMobile(context)) {
       return 12.5;
     } else if (Responsive.isTablet(context)) {
-      return 17;
+      return 13.5;
     } else {
-      return 21;
+      return 16.5;
     }
   }
 
@@ -26,9 +26,9 @@ class FontSizeConfig {
     if (Responsive.isMobile(context)) {
       return 20;
     } else if (Responsive.isTablet(context)) {
-      return 24;
+      return 22;
     } else {
-      return 28;
+      return 24;
     }
   }
 }

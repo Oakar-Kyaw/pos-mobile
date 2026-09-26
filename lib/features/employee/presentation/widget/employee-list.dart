@@ -7,6 +7,7 @@ import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/no-item-found-widget.dart';
 import 'package:pos/features/profile/data/model/user.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/responsive.dart';
 
 class EmployeeList extends ConsumerStatefulWidget {
   const EmployeeList({super.key});
@@ -37,25 +38,6 @@ class _EmployeeListState extends ConsumerState<EmployeeList> {
     _pagingController.dispose();
   }
 
-  BoxDecoration getContainerBoxDecorationByEven(Color dividerColor) {
-    return BoxDecoration(
-      color: Colors.transparent,
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
-    );
-  }
-
-  BoxDecoration getContainerBoxDecorationByOdd(
-    bool isDark,
-    Color dividerColor,
-  ) {
-    return BoxDecoration(
-      color: (isDark
-          ? Colors.white.withOpacity(0.02)
-          : Colors.black.withOpacity(0.01)),
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
@@ -65,19 +47,30 @@ class _EmployeeListState extends ConsumerState<EmployeeList> {
         ? kPrimary.withOpacity(0.06)
         : kPrimary.withOpacity(0.04);
 
+    final crossAxisCount =
+        (Responsive.isDesktop(context) || Responsive.isTablet(context)) ? 2 : 1;
+
+    final mainAxisExtent = crossAxisCount == 2 ? 350.0 : 300.0;
+
     return RefreshIndicator(
       onRefresh: () async {
         _pagingController.refresh();
       },
       child: PagingListener(
         controller: _pagingController,
-        builder: (context, state, fetchNextPage) => PagedListView<int, User>(
+        builder: (context, state, fetchNextPage) => PagedGridView<int, User>(
           state: state,
           fetchNextPage: fetchNextPage,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            mainAxisExtent: mainAxisExtent,
+          ),
           builderDelegate: PagedChildBuilderDelegate<User>(
             itemBuilder: (context, user, index) {
-              // print("user is 😇 ${user.email}");
               return InkWell(
+                borderRadius: BorderRadius.circular(12),
                 splashColor: kPrimary.withOpacity(0.08),
                 highlightColor: rowHoverColor,
                 child: EmployeeCard(

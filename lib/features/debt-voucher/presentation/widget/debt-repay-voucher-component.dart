@@ -48,7 +48,7 @@ class DebtAndRepayVoucherListComponent extends StatelessWidget {
               AccentBar(hasDebt: hasDebt),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -78,7 +78,7 @@ class DebtAndRepayVoucherListComponent extends StatelessWidget {
           ),
         ),
         if (onDelete != null)
-          Positioned(right: 0, top: 10, child: DeleteIcon(onDelete: onDelete)),
+          Positioned(right: 2, top: 5, child: DeleteIcon(onDelete: onDelete)),
       ],
     );
   }

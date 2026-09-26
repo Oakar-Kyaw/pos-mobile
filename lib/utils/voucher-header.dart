@@ -116,7 +116,7 @@ class VoucherHeader extends StatelessWidget {
                             const SizedBox(width: 4),
                             Text(
                               DateFormat(
-                                'dd MMM yyyy EEEE',
+                                'dd MMM yyyy EE',
                               ).format(inventory.createdAt!),
                               style: TextStyle(
                                 fontSize: FontSizeConfig.body(context),

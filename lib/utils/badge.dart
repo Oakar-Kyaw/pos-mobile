@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 
 class BadgeWidget extends StatelessWidget {
-  const BadgeWidget({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
+  const BadgeWidget({this.icon, required this.label, required this.color});
 
-  final IconData icon;
+  final IconData? icon;
   final String label;
   final Color color;
 
@@ -22,15 +18,15 @@ class BadgeWidget extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 10, color: color),
+          if (icon != null) Icon(icon, size: 10, color: color),
           const SizedBox(width: 4),
           Text(
             label,
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 8,
               fontWeight: FontWeight.w700,
               color: color,
-              letterSpacing: 1.1,
+              letterSpacing: 0.2,
             ),
           ),
         ],

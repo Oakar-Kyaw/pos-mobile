@@ -13,6 +13,7 @@ import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/check-role.dart';
 import 'package:pos/utils/inventory-configuration.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -46,12 +47,13 @@ class _PurchaseItemPageState extends ConsumerState<PurchaseItemPage> {
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final bgColor = isDark ? kBgDark : kBgLight;
-    // final textColor = isDark ? kTextDark : kTextLight;
-    // final subColor = isDark ? kTextSubDark : kTextSubLight;
     final user = ref.watch(userStateProvider);
     final config = InventoryActionConfig('Purchase', context);
     final selectedData = ref.watch(selectedDataStateProvider);
-    print("selected data is: 💽 ${selectedData?.supplierId}");
+    final isWide =
+        Responsive.isTablet(context) || Responsive.isDesktop(context);
+    final isAdminOrManager =
+        user != null && (isAdmin(user.role) || isManager(user.role));
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -75,40 +77,58 @@ class _PurchaseItemPageState extends ConsumerState<PurchaseItemPage> {
 
             const SizedBox(height: 20),
 
-            if (user != null && (isAdmin(user.role) || isManager(user.role)))
+            if (isAdminOrManager)
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: SupplierSelect(
-                    onChanged: (value) {
-                      print("value of supplier is: ❤️ ${value}");
-                      // setState(() {
-                      //   selectedValue = value;
-                      // });
-                      // //print("user select value ${value == ''}");
-                      if (value == '' || value == null) {
-                        // All selected
-                        ref
-                            .read(selectedDataStateProvider.notifier)
-                            .clearSupplier();
-                      } else {
-                        // Specific user selected
-                        ref
-                            .read(selectedDataStateProvider.notifier)
-                            .setSupplierUser(int.tryParse(value)!);
-                      }
-                    },
-                  ),
-                ),
-              ),
-            if (user != null && (isAdmin(user.role) || isManager(user.role)))
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: DateRangeSelect(),
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: isWide
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: SupplierSelect(
+                              onChanged: (value) {
+                                if (value == '' || value == null) {
+                                  ref
+                                      .read(selectedDataStateProvider.notifier)
+                                      .clearSupplier();
+                                } else {
+                                  ref
+                                      .read(selectedDataStateProvider.notifier)
+                                      .setSupplierUser(int.tryParse(value)!);
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          const Expanded(child: DateRangeSelect()),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: SupplierSelect(
+                              onChanged: (value) {
+                                if (value == '' || value == null) {
+                                  ref
+                                      .read(selectedDataStateProvider.notifier)
+                                      .clearSupplier();
+                                } else {
+                                  ref
+                                      .read(selectedDataStateProvider.notifier)
+                                      .setSupplierUser(int.tryParse(value)!);
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const SizedBox(
+                            width: double.infinity,
+                            child: DateRangeSelect(),
+                          ),
+                        ],
+                      ),
               ),
 
             Expanded(child: PurchaseItemLists(selectedData: selectedData)),

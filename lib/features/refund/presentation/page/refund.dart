@@ -12,6 +12,7 @@ import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
 import 'package:pos/utils/check-role.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -30,6 +31,9 @@ class _RefundPageState extends ConsumerState<RefundPage> {
     final bgColor = isDark ? kBgDark : kBgLight;
     final user = ref.watch(userStateProvider);
     final selectedData = ref.watch(selectedDataStateProvider);
+    final isWide =
+        Responsive.isTablet(context) || Responsive.isDesktop(context);
+    final isAdminOrManager = isAdmin(user!.role) || isManager(user.role);
 
     return PopScope(
       canPop: true,
@@ -49,17 +53,40 @@ class _RefundPageState extends ConsumerState<RefundPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (isAdmin(user!.role) || isManager(user.role)) ...[
+              if (isAdminOrManager) ...[
                 GradientSubmitButton(
                   onPressed: () => context.pushNamed(AppRoute.refundCreate),
                   text: RefundLocale.refundButton.getString(context),
                   width: 200,
                 ),
                 SizedBox(height: 20),
-                SizedBox(width: double.infinity, child: UserSelect()),
-                SizedBox(height: 20),
               ],
-              SizedBox(width: double.infinity, child: DateRangeSelect()),
+
+              isWide
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (isAdminOrManager) ...[
+                          Expanded(child: UserSelect()),
+                          const SizedBox(width: 16),
+                        ],
+                        Expanded(child: DateRangeSelect()),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (isAdminOrManager) ...[
+                          SizedBox(width: double.infinity, child: UserSelect()),
+                          const SizedBox(height: 20),
+                        ],
+                        SizedBox(
+                          width: double.infinity,
+                          child: DateRangeSelect(),
+                        ),
+                      ],
+                    ),
+
               const SizedBox(height: 20),
               Expanded(child: RefundCard(selectedData: selectedData)),
             ],

@@ -148,9 +148,9 @@ class _VoucherListState extends ConsumerState<VoucherList> {
         : 1;
 
     final mainAxisExtent = Responsive.isDesktop(context)
-        ? 650.0
+        ? 850.0
         : Responsive.isTablet(context)
-        ? 650.0
+        ? 750.0
         : 620.0;
 
     return PagingListener(

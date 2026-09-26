@@ -149,10 +149,16 @@ class VoucherComponent extends StatelessWidget {
               ],
             ),
           ),
+          //check with debt and discount
           if (onDelete != null)
             Positioned(
-              right: 0,
-              top: 10,
+              right: 2,
+              top:
+                  ((voucher.existDebt != null && voucher.existDebt!) ||
+                      (voucher.discountAmount > 0) ||
+                      (voucher.discountPercent > 0))
+                  ? 9
+                  : 20,
               child: DeleteIcon(onDelete: onDelete),
             ),
         ],

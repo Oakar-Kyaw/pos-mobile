@@ -8,8 +8,8 @@ import 'package:pos/features/profit-loss/data/model/profit-loss.dart';
 import 'package:pos/features/profit-loss/presentation/provider/profit-loss.provider.dart';
 import 'package:pos/localization/profit-loss-local.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/date-ui.dart';
 import 'package:pos/utils/formatAmount.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class ProfitAndLossPage extends ConsumerStatefulWidget {
@@ -80,6 +80,8 @@ class _ProfitAndLossPageState extends ConsumerState<ProfitAndLossPage> {
     bool isDark,
   ) {
     final textColor = isDark ? kTextDark : kTextLight;
+    final isWide =
+        Responsive.isTablet(context) || Responsive.isDesktop(context);
 
     return RefreshIndicator(
       color: kPrimary,
@@ -111,39 +113,78 @@ class _ProfitAndLossPageState extends ConsumerState<ProfitAndLossPage> {
 
             const SizedBox(height: 14),
 
-            _ProfitSummaryCard(
-              title: ProfitAndLossScreenLocale.profitAndLossToday.getString(
-                context,
+            // ── Today / This Month / This Year ──────────────
+            if (isWide) ...[
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: _ProfitSummaryCard(
+                        title: ProfitAndLossScreenLocale.profitAndLossToday
+                            .getString(context),
+                        data: data.todayProfitAndLoss,
+                        dark: true,
+                        isDark: isDark,
+                        icon: Icons.today_rounded,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _ProfitSummaryCard(
+                        title: ProfitAndLossScreenLocale.profitAndLossThisMonth
+                            .getString(context),
+                        data: data.monthlyProfitAndLoss,
+                        dark: false,
+                        isDark: isDark,
+                        icon: Icons.calendar_month_rounded,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              data: data.todayProfitAndLoss,
-              dark: true,
-              isDark: isDark,
-              icon: Icons.today_rounded,
-            ),
-
-            const SizedBox(height: 12),
-
-            _ProfitSummaryCard(
-              title: ProfitAndLossScreenLocale.profitAndLossThisMonth.getString(
-                context,
+              const SizedBox(height: 12),
+              _ProfitSummaryCard(
+                title: ProfitAndLossScreenLocale.profitAndLossThisYear
+                    .getString(context),
+                data: data.yearlyProfitAndLoss,
+                dark: true,
+                isDark: isDark,
+                icon: Icons.trending_up_rounded,
               ),
-              data: data.monthlyProfitAndLoss,
-              dark: false,
-              isDark: isDark,
-              icon: Icons.calendar_month_rounded,
-            ),
-
-            const SizedBox(height: 12),
-
-            _ProfitSummaryCard(
-              title: ProfitAndLossScreenLocale.profitAndLossThisYear.getString(
-                context,
+            ] else ...[
+              _ProfitSummaryCard(
+                title: ProfitAndLossScreenLocale.profitAndLossToday.getString(
+                  context,
+                ),
+                data: data.todayProfitAndLoss,
+                dark: true,
+                isDark: isDark,
+                icon: Icons.today_rounded,
               ),
-              data: data.yearlyProfitAndLoss,
-              dark: true,
-              isDark: isDark,
-              icon: Icons.trending_up_rounded,
-            ),
+
+              const SizedBox(height: 12),
+
+              _ProfitSummaryCard(
+                title: ProfitAndLossScreenLocale.profitAndLossThisMonth
+                    .getString(context),
+                data: data.monthlyProfitAndLoss,
+                dark: false,
+                isDark: isDark,
+                icon: Icons.calendar_month_rounded,
+              ),
+
+              const SizedBox(height: 12),
+
+              _ProfitSummaryCard(
+                title: ProfitAndLossScreenLocale.profitAndLossThisYear
+                    .getString(context),
+                data: data.yearlyProfitAndLoss,
+                dark: true,
+                isDark: isDark,
+                icon: Icons.trending_up_rounded,
+              ),
+            ],
 
             const SizedBox(height: 28),
 
@@ -309,14 +350,9 @@ class _ProfitSummaryCard extends StatelessWidget {
     return double.tryParse(value) ?? 0;
   }
 
-  // Percent fields come back from the backend as raw strings with many
-  // decimal places (e.g. "98.762204190605320237"). Parse then clamp to
-  // 2 decimals for display — never show the raw string.
   String _percent(dynamic value) {
     final parsed = double.tryParse(value.toString()) ?? 0;
 
-    // Whole number → no decimals ("45" not "45.00")
-    // Has a fractional part → 2 decimals ("98.76")
     if (parsed == parsed.truncateToDouble()) {
       return parsed.toStringAsFixed(0);
     }
@@ -339,6 +375,7 @@ class _ProfitSummaryCard extends StatelessWidget {
         : (isDark ? kTextSubDark : kTextSubLight);
 
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: dark
@@ -365,6 +402,7 @@ class _ProfitSummaryCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -929,8 +967,6 @@ class _ItemProfitCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  // margin already comes in as a parsed double from
-                  // _ItemProfitList, so this stays as-is (already 2 dp).
                   '${margin.toStringAsFixed(2)}%',
                   style: TextStyle(
                     color: isNegative ? kRed : kGreen,

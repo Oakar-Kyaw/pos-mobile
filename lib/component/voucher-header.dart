@@ -25,11 +25,6 @@ class HeaderSection extends StatelessWidget {
 
   Widget _buildBadges(BuildContext context) {
     final badges = <Widget>[
-      BadgeWidget(
-        label: VoucherScreenLocale.voucher.getString(context),
-        color: kPrimary,
-        icon: LucideIcons.ticket,
-      ),
       if (hasDebt)
         BadgeWidget(
           label: VoucherScreenLocale.hasDebt.getString(context),
@@ -184,14 +179,14 @@ class _TotalAmount extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(
-          VoucherScreenLocale.total.getString(context),
-          style: TextStyle(
-            fontSize: isSmallScreen ? 10 : 11,
-            color: Colors.grey,
-          ),
-        ),
-        const SizedBox(height: 4),
+        // Text(
+        //   VoucherScreenLocale.total.getString(context),
+        //   style: TextStyle(
+        //     fontSize: isSmallScreen ? 10 : 11,
+        //     color: Colors.grey,
+        //   ),
+        // ),
+        const SizedBox(height: 32.5),
         Text(
           formatAmount(voucher.total),
           maxLines: 1,

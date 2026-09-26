@@ -11,6 +11,7 @@ import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/check-role.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class RepaymentHistoryPage extends ConsumerStatefulWidget {
@@ -33,6 +34,10 @@ class _RepaymentHistoryPageState extends ConsumerState<RepaymentHistoryPage> {
     final textColor = isDark ? kTextDark : kTextLight;
     final user = ref.watch(userStateProvider);
     final selectedData = ref.watch(selectedDataStateProvider);
+    final isWide =
+        Responsive.isTablet(context) || Responsive.isDesktop(context);
+    final isAdminOrManager =
+        user != null && (isAdmin(user.role) || isManager(user.role));
 
     return PopScope(
       canPop: true,
@@ -50,16 +55,34 @@ class _RepaymentHistoryPageState extends ConsumerState<RepaymentHistoryPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            if (user != null && (isAdmin(user.role) || isManager(user.role)))
-              SizedBox(
-                width: double.infinity,
-                child: RepayLabel(textColor: textColor),
-              ),
-            const SizedBox(height: 12),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: SizedBox(width: double.infinity, child: DateRangeSelect()),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: isWide
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (isAdminOrManager) ...[
+                          Expanded(child: UserSelect()),
+                          const SizedBox(width: 16),
+                        ],
+                        Expanded(child: DateRangeSelect()),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (isAdminOrManager) ...[
+                          SizedBox(width: double.infinity, child: UserSelect()),
+                          const SizedBox(height: 12),
+                        ],
+                        SizedBox(
+                          width: double.infinity,
+                          child: DateRangeSelect(),
+                        ),
+                      ],
+                    ),
             ),
+            const SizedBox(height: 12),
             Expanded(
               child: RepaymentList(
                 userId: selectedData?.userId,
@@ -71,20 +94,6 @@ class _RepaymentHistoryPageState extends ConsumerState<RepaymentHistoryPage> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class RepayLabel extends ConsumerWidget {
-  const RepayLabel({super.key, required this.textColor});
-
-  final Color textColor;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: const UserSelect(),
     );
   }
 }

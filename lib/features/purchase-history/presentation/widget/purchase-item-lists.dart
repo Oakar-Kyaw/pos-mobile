@@ -12,6 +12,7 @@ import 'package:pos/features/purchase-history/presentation/widget/purchase-card.
 import 'package:pos/localization/purchase-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/shad-toaster.dart';
 
@@ -81,7 +82,6 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
         return;
       }
       if ((startDateChanged || endDateChanged) && _endDate != null) {
-        print("start $_startDate, $_endDate");
         _pagingController.refresh();
       }
     });
@@ -191,22 +191,11 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
     super.dispose();
   }
 
-  BoxDecoration getContainerBoxDecorationByEven(Color dividerColor) {
+  BoxDecoration getContainerBoxDecoration(bool isDark, Color dividerColor) {
     return BoxDecoration(
-      color: Colors.transparent,
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
-    );
-  }
-
-  BoxDecoration getContainerBoxDecorationByOdd(
-    bool isDark,
-    Color dividerColor,
-  ) {
-    return BoxDecoration(
-      color: (isDark
-          ? Colors.white.withOpacity(0.02)
-          : Colors.black.withOpacity(0.01)),
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
+      color: isDark ? kSurfaceDark : kSurfaceLight,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: dividerColor, width: 0.5),
     );
   }
 
@@ -221,25 +210,34 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
     final rowHoverColor = isDark
         ? kPrimary.withOpacity(0.06)
         : kPrimary.withOpacity(0.04);
-    print("date is $_startDate $_endDate");
+
+    final crossAxisCount =
+        (Responsive.isDesktop(context) || Responsive.isTablet(context)) ? 2 : 1;
+
+    final mainAxisExtent = crossAxisCount == 2 ? 350.0 : 350.0;
 
     return PagingListener(
       controller: _pagingController,
-      builder: (context, state, fetchNextPage) => PagedListView<int, Purchase>(
+      builder: (context, state, fetchNextPage) => PagedGridView<int, Purchase>(
         state: state,
         fetchNextPage: fetchNextPage,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          mainAxisExtent: mainAxisExtent,
+        ),
         builderDelegate: PagedChildBuilderDelegate<Purchase>(
           itemBuilder: (context, purchaseItem, index) {
-            // print("Expire item 🥸 ${expireItem.totalAmount}");
-            final isEven = index % 2 == 0;
-            BoxDecoration containerDecoration = isEven
-                ? getContainerBoxDecorationByEven(dividerColor)
-                : getContainerBoxDecorationByOdd(isDark, dividerColor);
+            final containerDecoration = getContainerBoxDecoration(
+              isDark,
+              dividerColor,
+            );
             return InkWell(
+              borderRadius: BorderRadius.circular(12),
               splashColor: kPrimary.withOpacity(0.08),
               highlightColor: rowHoverColor,
               child: Container(
-                // padding: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: containerDecoration,
                 child: PurchaseCard(
                   onDelete: () => _onDelete(purchaseItem.id),

@@ -29,6 +29,7 @@ class GeneralExpensePage extends ConsumerStatefulWidget {
 
 class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
   final int limit = 20;
+
   SelectedData? selectedData;
 
   late final PagingController<int, GeneralExpense> _pagingController;
@@ -36,6 +37,7 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
   @override
   void initState() {
     super.initState();
+
     _pagingController = PagingController<int, GeneralExpense>(
       getNextPageKey: (state) =>
           state.lastPageIsEmpty ? null : state.nextIntPageKey,
@@ -64,21 +66,27 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+
     final bgColor = isDark ? kBgDark : kBgLight;
     final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
     final surfaceColor = isDark ? kSurfaceDark : kSurfaceLight;
+
     final user = ref.watch(userStateProvider);
+
     final isWide =
         Responsive.isTablet(context) || Responsive.isDesktop(context);
 
-    ref.listen<SelectedData?>(selectedDataStateProvider, (prev, next) {
+    ref.listen<SelectedData?>(selectedDataStateProvider, (previous, next) {
       selectedData = next;
       _pagingController.refresh();
     });
+
     return PopScope(
       canPop: true,
-      onPopInvokedWithResult: (didPop, result) => _clearSelectedData(),
+      onPopInvokedWithResult: (didPop, result) {
+        _clearSelectedData();
+      },
       child: Scaffold(
         backgroundColor: bgColor,
         appBar: CustomAppBar(
@@ -90,56 +98,60 @@ class _GeneralExpensePageState extends ConsumerState<GeneralExpensePage> {
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: RefreshIndicator(
-            onRefresh: () async => _pagingController.refresh(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GradientSubmitButton(
-                  onPressed: () async {
-                    await context.pushNamed(AppRoute.generalExpenseCreate);
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GradientSubmitButton(
+                onPressed: () async {
+                  await context.pushNamed(AppRoute.generalExpenseCreate);
+
+                  if (mounted) {
                     _pagingController.refresh();
-                  },
-                  text: GeneralExpenseLocale.expenseButton.getString(context),
-                  width: 150,
-                ),
-                const SizedBox(height: 16),
-                if (isAdmin(user!.role) || isManager(user.role)) ...[
-                  isWide
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: UserSelect()),
-                            const SizedBox(width: 12),
-                            Expanded(child: DateRangeSelect()),
-                          ],
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: double.infinity,
-                              child: UserSelect(),
-                            ),
-                            const SizedBox(height: 10),
-                            SizedBox(
-                              width: double.infinity,
-                              child: DateRangeSelect(),
-                            ),
-                          ],
-                        ),
-                  const SizedBox(height: 10),
-                ],
-                GeneralExpenseCard(
+                  }
+                },
+                text: GeneralExpenseLocale.expenseButton.getString(context),
+                width: 150,
+              ),
+
+              const SizedBox(height: 16),
+
+              if (user != null &&
+                  (isAdmin(user.role) || isManager(user.role))) ...[
+                if (isWide)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: UserSelect()),
+                      const SizedBox(width: 12),
+                      Expanded(child: DateRangeSelect()),
+                    ],
+                  )
+                else
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(width: double.infinity, child: UserSelect()),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: DateRangeSelect(),
+                      ),
+                    ],
+                  ),
+
+                const SizedBox(height: 10),
+              ],
+
+              Expanded(
+                child: GeneralExpenseCard(
                   pagingController: _pagingController,
                   surfaceColor: surfaceColor,
                   isDark: isDark,
                   textColor: textColor,
                   subColor: subColor,
                 ),
-                const SizedBox(height: 16),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

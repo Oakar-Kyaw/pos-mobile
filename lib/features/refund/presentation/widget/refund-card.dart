@@ -15,6 +15,7 @@ import 'package:pos/utils/button.dart';
 import 'package:pos/utils/check-role.dart';
 import 'package:pos/utils/formatAmount.dart';
 import 'package:pos/utils/font-size.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -95,26 +96,41 @@ class _RefundCardState extends ConsumerState<RefundCard> {
       _pagingController.refresh();
     });
 
+    final crossAxisCount = Responsive.isDesktop(context)
+        ? 3
+        : Responsive.isTablet(context)
+        ? 2
+        : 1;
+
+    final mainAxisExtent = Responsive.isDesktop(context)
+        ? 490.0
+        : Responsive.isTablet(context)
+        ? 490.0
+        : 460.0;
+
     return RefreshIndicator(
       onRefresh: () async {
         _pagingController.refresh();
       },
       child: PagingListener(
         controller: _pagingController,
-        builder: (context, state, fetchNextPage) => PagedListView<int, Refund>(
+        builder: (context, state, fetchNextPage) => PagedGridView<int, Refund>(
           state: state,
           fetchNextPage: fetchNextPage,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            mainAxisExtent: mainAxisExtent,
+          ),
           builderDelegate: PagedChildBuilderDelegate<Refund>(
             itemBuilder: (context, refund, index) {
-              return RefreshIndicator(
-                onRefresh: () async => _pagingController.refresh(),
-                child: _RefundCard(
-                  refund: refund,
-                  textColor: textColor,
-                  subColor: subColor,
-                  isDark: isDark,
-                  onDelete: () => _delete(refund, isDark),
-                ),
+              return _RefundCard(
+                refund: refund,
+                textColor: textColor,
+                subColor: subColor,
+                isDark: isDark,
+                onDelete: () => _delete(refund, isDark),
               );
             },
             firstPageProgressIndicatorBuilder: (_) =>
@@ -124,12 +140,9 @@ class _RefundCardState extends ConsumerState<RefundCard> {
               child: Center(child: CircularProgressIndicator(color: kPrimary)),
             ),
             noItemsFoundIndicatorBuilder: (_) => Center(
-              child: RefreshIndicator(
-                onRefresh: () async => _pagingController.refresh(),
-                child: Text(
-                  RefundLocale.refundNoItems.getString(context),
-                  style: TextStyle(color: subColor, fontSize: 14),
-                ),
+              child: Text(
+                RefundLocale.refundNoItems.getString(context),
+                style: TextStyle(color: subColor, fontSize: 14),
               ),
             ),
           ),
@@ -158,7 +171,6 @@ class _RefundCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userStateProvider);
     return Container(
-      margin: EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? kSurfaceDark : kSurfaceLight,
@@ -245,50 +257,64 @@ class RefundData extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        ...refund.refundItems.map(
-          (item) => Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Text(
-                    item.product?.name ?? '-',
-                    style: TextStyle(
-                      fontSize: FontSizeConfig.body(context),
-                      color: textColor,
+        ...refund.refundItems
+            .take(3)
+            .map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        item.product?.name ?? '-',
+                        style: TextStyle(
+                          fontSize: FontSizeConfig.body(context),
+                          color: textColor,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    'x ${item.quantity}',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: FontSizeConfig.body(context),
-                      color: subColor,
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                        'x ${item.quantity}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: FontSizeConfig.body(context),
+                          color: subColor,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    (item.price * item.quantity).toStringAsFixed(0),
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      fontSize: FontSizeConfig.body(context),
-                      color: textColor,
-                      fontWeight: FontWeight.w600,
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        (item.price * item.quantity).toStringAsFixed(0),
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: FontSizeConfig.body(context),
+                          color: textColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
+            ),
+        //if items are more than 3,
+        if (refund.refundItems.length > 3)
+          Padding(
+            padding: const EdgeInsets.only(top: 2, bottom: 4),
+            child: Text(
+              '+${refund.refundItems.length - 3} more',
+              style: TextStyle(
+                fontSize: FontSizeConfig.body(context),
+                color: subColor,
+                fontStyle: FontStyle.italic,
+              ),
             ),
           ),
-        ),
-
         const Divider(),
 
         /// ---- Payments ----
@@ -327,12 +353,12 @@ class RefundData extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 6),
+        const Spacer(),
         GradientSubmitButton(
           onPressed: () =>
               context.pushNamed(AppRoute.refundUpdate, extra: refund),
           text: RefundLocale.edit.getString(context),
-          width: 130,
+          width: 150,
         ),
       ],
     );

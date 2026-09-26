@@ -14,6 +14,7 @@ import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/check-role.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/shad-toaster.dart';
 
@@ -32,22 +33,11 @@ class ExpireDamageLists extends ConsumerStatefulWidget {
 }
 
 class _ExpireDamageListsState extends ConsumerState<ExpireDamageLists> {
-  BoxDecoration getContainerBoxDecorationByEven(Color dividerColor) {
+  BoxDecoration getContainerBoxDecoration(bool isDark, Color dividerColor) {
     return BoxDecoration(
-      color: Colors.transparent,
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
-    );
-  }
-
-  BoxDecoration getContainerBoxDecorationByOdd(
-    bool isDark,
-    Color dividerColor,
-  ) {
-    return BoxDecoration(
-      color: (isDark
-          ? Colors.white.withOpacity(0.02)
-          : Colors.black.withOpacity(0.01)),
-      border: Border(bottom: BorderSide(color: dividerColor, width: 0.5)),
+      color: isDark ? kSurfaceDark : kSurfaceLight,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: dividerColor, width: 0.5),
     );
   }
 
@@ -137,26 +127,36 @@ class _ExpireDamageListsState extends ConsumerState<ExpireDamageLists> {
       widget.pagingController.refresh();
     });
 
+    final crossAxisCount =
+        (Responsive.isDesktop(context) || Responsive.isTablet(context)) ? 2 : 1;
+
+    final mainAxisExtent = crossAxisCount == 2 ? 350.0 : 320.0;
+
     return RefreshIndicator(
       onRefresh: () async => widget.pagingController.refresh(),
       child: PagingListener(
         controller: widget.pagingController,
         builder: (context, state, fetchNextPage) =>
-            PagedListView<int, InventoryManagement>(
+            PagedGridView<int, InventoryManagement>(
               state: state,
               fetchNextPage: fetchNextPage,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                mainAxisExtent: mainAxisExtent,
+              ),
               builderDelegate: PagedChildBuilderDelegate<InventoryManagement>(
                 itemBuilder: (context, expireItem, index) {
-                  // print("Expire item 🥸 ${expireItem.totalAmount}");
-                  final isEven = index % 2 == 0;
-                  BoxDecoration containerDecoration = isEven
-                      ? getContainerBoxDecorationByEven(dividerColor)
-                      : getContainerBoxDecorationByOdd(isDark, dividerColor);
+                  final containerDecoration = getContainerBoxDecoration(
+                    isDark,
+                    dividerColor,
+                  );
                   return InkWell(
+                    borderRadius: BorderRadius.circular(12),
                     splashColor: kPrimary.withOpacity(0.08),
                     highlightColor: rowHoverColor,
                     child: Container(
-                      // padding: const EdgeInsets.symmetric(horizontal: 20),
                       decoration: containerDecoration,
                       child: ExpireDamageCard(
                         pagingController: widget.pagingController,

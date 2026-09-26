@@ -178,32 +178,36 @@ class _IncomePageState extends ConsumerState<IncomePage> {
                           icon: Icons.calendar_today_rounded,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _StatCard(
-                          label: IncomeScreenLocale.incomeThisYear.getString(
-                            context,
+
+                      ///only the size is desktop
+                      if (Responsive.isDesktop(context)) ...[
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _StatCard(
+                            label: IncomeScreenLocale.incomeThisYear.getString(
+                              context,
+                            ),
+                            netIncome: data.yearlySale.netIncome,
+                            taxValue: data.yearlySale.tax,
+                            deliveryFeeValue: data.yearlySale.deliveryFee,
+                            packagingFeeValue: data.yearlySale.packagingFee,
+                            discountAmount: data.yearlySale.discountAmount,
+                            discountPercent: data.yearlySale.discountPercent,
+                            refundAmount: data.yearlySale.refundAmount,
+                            debtAmount: data.yearlySale.debtAmount,
+                            repayAmount: data.yearlySale.repayAmount,
+                            expenseAmount: data.yearlySale.expenseAmount,
+                            purchaseAmount: data.yearlySale.purchaseAmount,
+                            totalPaymentAmount:
+                                data.yearlySale.totalPaymentAmount,
+                            total: data.yearlySale.total,
+                            sub:
+                                '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.deliveryFee) ?? 0)}',
+                            dark: true,
+                            icon: Icons.trending_up_rounded,
                           ),
-                          netIncome: data.yearlySale.netIncome,
-                          taxValue: data.yearlySale.tax,
-                          deliveryFeeValue: data.yearlySale.deliveryFee,
-                          packagingFeeValue: data.yearlySale.packagingFee,
-                          discountAmount: data.yearlySale.discountAmount,
-                          discountPercent: data.yearlySale.discountPercent,
-                          refundAmount: data.yearlySale.refundAmount,
-                          debtAmount: data.yearlySale.debtAmount,
-                          repayAmount: data.yearlySale.repayAmount,
-                          expenseAmount: data.yearlySale.expenseAmount,
-                          purchaseAmount: data.yearlySale.purchaseAmount,
-                          totalPaymentAmount:
-                              data.yearlySale.totalPaymentAmount,
-                          total: data.yearlySale.total,
-                          sub:
-                              '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.deliveryFee) ?? 0)}',
-                          dark: true,
-                          icon: Icons.trending_up_rounded,
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 )
@@ -273,6 +277,30 @@ class _IncomePageState extends ConsumerState<IncomePage> {
                   icon: Icons.trending_up_rounded,
                 ),
               ],
+              //if tablet then show one card
+              if (Responsive.isTablet(context)) ...[
+                const SizedBox(height: 12),
+                _StatCard(
+                  label: IncomeScreenLocale.incomeThisYear.getString(context),
+                  netIncome: data.yearlySale.netIncome,
+                  taxValue: data.yearlySale.tax,
+                  deliveryFeeValue: data.yearlySale.deliveryFee,
+                  packagingFeeValue: data.yearlySale.packagingFee,
+                  discountAmount: data.yearlySale.discountAmount,
+                  discountPercent: data.yearlySale.discountPercent,
+                  refundAmount: data.yearlySale.refundAmount,
+                  debtAmount: data.yearlySale.debtAmount,
+                  repayAmount: data.yearlySale.repayAmount,
+                  expenseAmount: data.yearlySale.expenseAmount,
+                  purchaseAmount: data.yearlySale.purchaseAmount,
+                  totalPaymentAmount: data.yearlySale.totalPaymentAmount,
+                  total: data.yearlySale.total,
+                  sub:
+                      '${IncomeScreenLocale.incomeTax.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.tax) ?? 0)}  •  ${IncomeScreenLocale.incomeFee.getString(context)} ${formatAmount(double.tryParse(data.yearlySale.deliveryFee) ?? 0)}',
+                  dark: true,
+                  icon: Icons.trending_up_rounded,
+                ),
+              ],
 
               const SizedBox(height: 20),
 
@@ -318,10 +346,14 @@ class _IncomePageState extends ConsumerState<IncomePage> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: data.getMonthlyTopSaleUser.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: Responsive.isDesktop(context) ? 3 : 2,
+                    crossAxisCount: Responsive.isDesktop(context)
+                        ? 3
+                        : Responsive.isTablet(context)
+                        ? 2
+                        : 1,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
-                    mainAxisExtent: 110,
+                    mainAxisExtent: 140,
                   ),
                   itemBuilder: (context, index) => _TopUserCard(
                     user: data.getMonthlyTopSaleUser[index],
@@ -526,7 +558,7 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 6),
           StatCardRow(
             label:
-                "${IncomeScreenLocale.incomeTotalOtherExpense.getString(context)} :",
+                "${IncomeScreenLocale.incomeTotalOtherExpense.getString(context)}:",
             labelColor: kRed,
             valueColor: kRed,
             value: formatAmount(otherExpenseTotal),

@@ -11,6 +11,7 @@ import 'package:pos/models/product.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/formatAmount.dart';
+import 'package:pos/utils/responsive.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class LowStockList extends ConsumerStatefulWidget {
@@ -58,15 +59,26 @@ class _LowStockListState extends ConsumerState<LowStockList> {
       _pagingController.refresh();
     });
 
+    final crossAxisCount =
+        (Responsive.isDesktop(context) || Responsive.isTablet(context)) ? 2 : 1;
+
+    final mainAxisExtent = crossAxisCount == 2 ? 190.0 : 150.0;
+
     return RefreshIndicator(
       onRefresh: () async {
         _pagingController.refresh();
       },
       child: PagingListener(
         controller: _pagingController,
-        builder: (context, state, fetchNextPage) => PagedListView<int, Product>(
+        builder: (context, state, fetchNextPage) => PagedGridView<int, Product>(
           state: state,
           fetchNextPage: fetchNextPage,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            mainAxisExtent: mainAxisExtent,
+          ),
           builderDelegate: PagedChildBuilderDelegate<Product>(
             itemBuilder: (context, product, index) {
               return _LowStockCard(
@@ -125,7 +137,6 @@ class _LowStockCard extends StatelessWidget {
     final hasPhoto = product.photoUrl != null && product.photoUrl!.isNotEmpty;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: surfaceColor,
@@ -219,13 +230,14 @@ class _LowStockCard extends StatelessWidget {
                   style: TextStyle(color: subColor, fontSize: 11),
                 ),
                 const SizedBox(height: 8),
-                Row(
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 8,
                   children: [
                     _StockPill(
                       label: '$stockLabel: ${product.stock}',
                       color: isOutOfStock ? kRed : kAmber,
                     ),
-                    const SizedBox(width: 6),
                     if (product.minStock != null)
                       _StockPill(
                         label: '$minStockLabel: ${product.minStock}',
@@ -260,7 +272,7 @@ class _StockPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       decoration: BoxDecoration(
         color: color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(20),
