@@ -5,6 +5,7 @@ import 'package:pos/core/utils/inventory/inventory-detail-page.dart';
 import 'package:pos/core/utils/inventory/inventory-edit.dart';
 import 'package:pos/core/utils/inventory/inventory-items-create.dart';
 import 'package:pos/features/account-upgrade/presentation/pages/account-upgrade.dart';
+import 'package:pos/features/barcode-generate/presentation/page/barcode-generate.dart';
 import 'package:pos/features/brand/presentation/page/brand.dart';
 import 'package:pos/features/category/presentation/page/category.dart';
 import 'package:pos/features/company/presentation/page/company-profile.dart';
@@ -195,6 +196,11 @@ final routeProvider = Provider<GoRouter>((ref) {
         path: AppRoute.notification,
         name: AppRoute.notification,
         builder: (context, state) => NotificationPage(),
+      ),
+      GoRoute(
+        path: AppRoute.barcode,
+        name: AppRoute.barcode,
+        builder: (context, state) => NoBarcodeProductsPage(),
       ),
       GoRoute(
         path: AppRoute.profitAndLoss,

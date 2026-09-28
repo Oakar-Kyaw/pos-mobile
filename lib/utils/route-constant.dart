@@ -1,5 +1,6 @@
 class AppRoute {
   static const String home = '/home';
+  static const String barcode = '/bar-code';
   static const String splash = '/splash';
   static const String settings = '/settings';
   static const String profile = '/profile';

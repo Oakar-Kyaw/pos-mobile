@@ -75,6 +75,11 @@ List<MenuSection> menuListByAdmin(BuildContext context) => [
         label: DrawerScreenLocale.drawerAddProduct.getString(context),
         route: AppRoute.product,
       ),
+      MenuItem(
+        icon: LucideIcons.barcode,
+        label: DrawerScreenLocale.drawerBarcodeGenerator.getString(context),
+        route: AppRoute.barcode,
+      ),
     ],
   ),
 

@@ -6,47 +6,61 @@ mixin PrinterScreenLocale {
   static const printerTypePlaceholder = 'printer_type_placeholder';
   static const printerSearchButton = 'printer_search';
 
-  // Device Info
-  static const deviceName = 'device_name';
-  static const deviceAddress = 'device_address';
+  static const printerDeviceName = 'printer_device_name';
+  static const printerDeviceAddress = 'printer_device_address';
 
-  // Paper Size
-  static const paperSize = 'paper_size';
-  static const paperSizePlaceholder = 'paper_size_placeholder';
-  static const paper58mm = 'paper_58mm';
-  static const paper80mm = 'paper_80mm';
+  static const printerPaperSize = 'printer_paper_size';
+  static const printerPaperSizePlaceholder = 'printer_paper_size_placeholder';
+  static const printerPaper58mm = 'printer_paper_58mm';
+  static const printerPaper80mm = 'printer_paper_80mm';
 
-  // Default
-  static const setAsDefault = 'set_as_default';
+  static const printerSetAsDefault = 'printer_set_as_default';
 
-  // Actions
-  static const savePrinter = 'save_printer';
+  static const printerSave = 'printer_save';
   static const printerTest = 'printer_test';
 
-  // Connection Status
-  static const connectedPrinter = 'connected_printer';
-  static const connect = 'connect';
-  static const connected = 'connected';
-  static const disconnected = 'disconnected';
-  static const connectionFailed = 'connection_failed';
+  static const printerConnectedPrinter = 'printer_connected_printer';
+  static const printerConnect = 'printer_connect';
+  static const printerConnected = 'printer_connected';
+  static const printerDisconnected = 'printer_disconnected';
+  static const printerConnectionFailed = 'printer_connection_failed';
 
-  // Messages
   static const printerSaveSuccess = 'printer_save_success';
   static const printerSaveFailed = 'printer_save_failed';
-  static const noPrinterFound = 'no_printer_found';
+  static const printerNoPrinterFound = 'printer_no_printer_found';
   static const printerDeletedSuccess = 'printer_deleted_success';
   static const printerDeleteFailed = 'printer_delete_failed';
-  static const savedPrinters = 'saved_printers';
-  static const disconnectedSuccess = 'disconnected_success';
-  static const disconnectedFailed = 'disconnected_failed';
+  static const printerSavedPrinters = 'printer_saved_printers';
+  static const printerDisconnectedSuccess = 'printer_disconnected_success';
+  static const printerDisconnectedFailed = 'printer_disconnected_failed';
+  static const printerSomethingWentWrong = 'printer_something_went_wrong';
 
-  // Validation
   static const printerNameRequired = 'printer_name_required';
   static const printerTypeRequired = 'printer_type_required';
-  static const paperSizeRequired = 'paper_size_required';
+  static const printerPaperSizeRequired = 'printer_paper_size_required';
   static const printerConnectRequired = 'printer_connect_required';
 
-  /// English translations
+  static const printerBluetooth = 'printer_bluetooth';
+  static const printerWifi = 'printer_wifi';
+  static const printerUsb = 'printer_usb';
+  static const printerNotSelected = 'printer_not_selected';
+  static const printerNotConnected = 'printer_not_connected';
+  static const printerBluetoothPermissionRequired =
+      'printer_bluetooth_permission_required';
+  static const printerBluetoothTurnedOff = 'printer_bluetooth_turned_off';
+  static const printerScanning = 'printer_scanning';
+  static const printerConnecting = 'printer_connecting';
+  static const printerTesting = 'printer_testing';
+  static const printerTestPrintSuccess = 'printer_test_print_success';
+  static const printerTestPrintFailed = 'printer_test_print_failed';
+  static const printerConfirmDelete = 'printer_confirm_delete';
+  static const printerDeleteMessage = 'printer_delete_message';
+  static const printerCancel = 'printer_cancel';
+  static const printerDelete = 'printer_delete';
+  static const printerClose = 'printer_close';
+  static const printerRetry = 'printer_retry';
+  static const printerRefresh = 'printer_refresh';
+
   static const EN = {
     printerTitle: 'Printer Page',
     printerName: 'Printer Name',
@@ -55,94 +69,125 @@ mixin PrinterScreenLocale {
     printerTypePlaceholder: 'Select Printer Type',
     printerSearchButton: 'Search',
 
-    // Device Info
-    deviceName: 'Device Name',
-    deviceAddress: 'Device Address',
+    printerDeviceName: 'Printer Device Name',
+    printerDeviceAddress: 'Printer Device Address',
 
-    // Paper Size
-    paperSize: 'Paper Size',
-    paperSizePlaceholder: 'Select Paper Size',
-    paper58mm: '58 mm',
-    paper80mm: '80 mm',
+    printerPaperSize: 'Printer Paper Size',
+    printerPaperSizePlaceholder: 'Select Printer Paper Size',
+    printerPaper58mm: 'Printer 58 mm',
+    printerPaper80mm: 'Printer 80 mm',
 
-    // Default
-    setAsDefault: 'Set as Default',
+    printerSetAsDefault: 'Set Printer as Default',
 
-    // Actions
-    savePrinter: 'Save Printer',
-    printerTest: 'Printer Test',
+    printerSave: 'Save Printer',
+    printerTest: 'Test Printer',
 
-    // Connection Status
-    connectedPrinter: 'Connected Printer',
-    connect: 'Connect',
-    connected: 'Connected',
-    disconnected: 'Disconnect',
-    connectionFailed: 'Connection failed.',
+    printerConnectedPrinter: 'Connected Printer',
+    printerConnect: 'Connect Printer',
+    printerConnected: 'Printer Connected',
+    printerDisconnected: 'Disconnect Printer',
+    printerConnectionFailed: 'Printer connection failed.',
 
-    // Messages
     printerSaveSuccess: 'Printer saved successfully.',
     printerSaveFailed: 'Failed to save printer.',
-    noPrinterFound: 'No printers found.',
+    printerNoPrinterFound: 'No printer found.',
     printerDeletedSuccess: 'Printer deleted successfully.',
     printerDeleteFailed: 'Failed to delete printer.',
-    savedPrinters: 'Saved Printers',
-    disconnectedSuccess: 'Printer disconnected successfully.',
-    disconnectedFailed: 'Failed to disconnect printer.',
+    printerSavedPrinters: 'Saved Printers',
+    printerDisconnectedSuccess: 'Printer disconnected successfully.',
+    printerDisconnectedFailed: 'Failed to disconnect printer.',
+    printerSomethingWentWrong: 'Something went wrong.',
 
-    // Validation
     printerNameRequired: 'Please enter your printer name.',
     printerTypeRequired: 'Please choose your printer type.',
-    paperSizeRequired: 'Please choose a paper size.',
+    printerPaperSizeRequired: 'Please choose a printer paper size.',
     printerConnectRequired: 'Please search for and connect to a printer.',
+
+    printerBluetooth: 'Printer Bluetooth',
+    printerWifi: 'Printer Wi-Fi',
+    printerUsb: 'Printer USB',
+    printerNotSelected: 'Please select a printer.',
+    printerNotConnected: 'Printer is not connected.',
+    printerBluetoothPermissionRequired:
+        'Printer Bluetooth permission is required to search for printers.',
+    printerBluetoothTurnedOff: 'Please turn on Printer Bluetooth.',
+    printerScanning: 'Searching for printers...',
+    printerConnecting: 'Connecting to printer...',
+    printerTesting: 'Testing printer...',
+    printerTestPrintSuccess: 'Printer test print completed successfully.',
+    printerTestPrintFailed: 'Printer test print failed.',
+    printerConfirmDelete: 'Delete Printer',
+    printerDeleteMessage: 'Are you sure you want to delete this printer?',
+    printerCancel: 'Cancel',
+    printerDelete: 'Delete Printer',
+    printerClose: 'Close',
+    printerRetry: 'Retry Printer',
+    printerRefresh: 'Refresh Printers',
   };
 
-  /// Burmese translations
   static const MM = {
     printerTitle: 'ပရင်တာ',
     printerName: 'ပရင်တာ အမည်',
     printerNamePlaceholder: 'ပရင်တာ အမည်ထည့်ပါ',
     printerType: 'ပရင်တာ အမျိုးအစား',
     printerTypePlaceholder: 'ပရင်တာ အမျိုးအစား ရွေးချယ်ပါ',
-    printerSearchButton: 'ရှာဖွေပါ',
+    printerSearchButton: 'ပရင်တာ ရှာဖွေပါ',
 
-    // Device Info
-    deviceName: 'စက်အမည်',
-    deviceAddress: 'စက်လိပ်စာ',
+    printerDeviceName: 'ပရင်တာ စက်အမည်',
+    printerDeviceAddress: 'ပရင်တာ စက်လိပ်စာ',
 
-    // Paper Size
-    paperSize: 'စက္ကူအရွယ်အစား',
-    paperSizePlaceholder: 'စက္ကူအရွယ်အစား ရွေးချယ်ပါ',
-    paper58mm: '၅၈ မီလီမီတာ',
-    paper80mm: '၈၀ မီလီမီတာ',
+    printerPaperSize: 'ပရင်တာ စက္ကူအရွယ်အစား',
+    printerPaperSizePlaceholder: 'ပရင်တာ စက္ကူအရွယ်အစား ရွေးချယ်ပါ',
+    printerPaper58mm: 'ပရင်တာ ၅၈ မီလီမီတာ',
+    printerPaper80mm: 'ပရင်တာ ၈၀ မီလီမီတာ',
 
-    // Default
-    setAsDefault: 'မူလပရင်တာအဖြစ် သတ်မှတ်မည်',
+    printerSetAsDefault: 'ပရင်တာကို မူလပရင်တာအဖြစ် သတ်မှတ်မည်',
 
-    // Actions
-    savePrinter: 'ပရင်တာ သိမ်းဆည်းမည်',
-    printerTest: 'ပရင်တာ စမ်းသပ်ပုံနှိပ်မည်',
+    printerSave: 'ပရင်တာ သိမ်းဆည်းမည်',
+    printerTest: 'ပရင်တာ စမ်းသပ်မည်',
 
-    // Connection Status
-    connectedPrinter: 'ချိတ်ဆက်ထားသော ပရင်တာ',
-    connect: 'ချိတ်ဆက်ပါ',
-    connected: 'ချိတ်ဆက်ပြီး',
-    disconnected: 'ချိတ်ဆက်မှု ဖြုတ်ပါ',
-    connectionFailed: 'ချိတ်ဆက်မှု မအောင်မြင်ပါ။',
+    printerConnectedPrinter: 'ချိတ်ဆက်ထားသော ပရင်တာ',
+    printerConnect: 'ပရင်တာ ချိတ်ဆက်ပါ',
+    printerConnected: 'ပရင်တာ ချိတ်ဆက်ပြီးပါပြီ',
+    printerDisconnected: 'ပရင်တာ ချိတ်ဆက်မှု ဖြုတ်ပါ',
+    printerConnectionFailed: 'ပရင်တာ ချိတ်ဆက်မှု မအောင်မြင်ပါ။',
 
-    // Messages
     printerSaveSuccess: 'ပရင်တာကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။',
     printerSaveFailed: 'ပရင်တာကို သိမ်းဆည်း၍ မရပါ။',
-    noPrinterFound: 'ပရင်တာ မတွေ့ပါ။',
+    printerNoPrinterFound: 'ပရင်တာ မတွေ့ပါ။',
     printerDeletedSuccess: 'ပရင်တာကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ။',
     printerDeleteFailed: 'ပရင်တာကို ဖျက်၍ မရပါ။',
-    savedPrinters: 'သိမ်းဆည်းထားသော ပရင်တာများ',
-    disconnectedSuccess: 'ပရင်တာ ချိတ်ဆက်မှုကို အောင်မြင်စွာ ဖြုတ်ပြီးပါပြီ။',
-    disconnectedFailed: 'ပရင်တာ ချိတ်ဆက်မှုကို ဖြုတ်၍ မရပါ။',
+    printerSavedPrinters: 'သိမ်းဆည်းထားသော ပရင်တာများ',
+    printerDisconnectedSuccess:
+        'ပရင်တာ ချိတ်ဆက်မှုကို အောင်မြင်စွာ ဖြုတ်ပြီးပါပြီ။',
+    printerDisconnectedFailed: 'ပရင်တာ ချိတ်ဆက်မှုကို ဖြုတ်၍ မရပါ။',
+    printerSomethingWentWrong: 'တစ်ခုခု မှားယွင်းသွားပါသည်။',
 
-    // Validation
     printerNameRequired: 'ပရင်တာအမည်ကို ထည့်သွင်းပါ။',
     printerTypeRequired: 'ပရင်တာအမျိုးအစားကို ရွေးချယ်ပါ။',
-    paperSizeRequired: 'စက္ကူအရွယ်အစားကို ရွေးချယ်ပါ။',
+    printerPaperSizeRequired: 'ပရင်တာ စက္ကူအရွယ်အစားကို ရွေးချယ်ပါ။',
     printerConnectRequired: 'ပရင်တာကို ရှာဖွေပြီး ချိတ်ဆက်ပါ။',
+
+    printerBluetooth: 'ပရင်တာ Bluetooth',
+    printerWifi: 'ပရင်တာ Wi-Fi',
+    printerUsb: 'ပရင်တာ USB',
+    printerNotSelected: 'ပရင်တာကို ရွေးချယ်ပါ။',
+    printerNotConnected: 'ပရင်တာ ချိတ်ဆက်ထားခြင်း မရှိပါ။',
+    printerBluetoothPermissionRequired:
+        'ပရင်တာများကို ရှာဖွေရန် Bluetooth ခွင့်ပြုချက် လိုအပ်ပါသည်။',
+    printerBluetoothTurnedOff: 'ပရင်တာ Bluetooth ကို ဖွင့်ပေးပါ။',
+    printerScanning: 'ပရင်တာများကို ရှာဖွေနေပါသည်...',
+    printerConnecting: 'ပရင်တာသို့ ချိတ်ဆက်နေပါသည်...',
+    printerTesting: 'ပရင်တာကို စမ်းသပ်နေပါသည်...',
+    printerTestPrintSuccess:
+        'ပရင်တာ စမ်းသပ်ပုံနှိပ်ခြင်း အောင်မြင်စွာ ပြီးဆုံးပါပြီ။',
+    printerTestPrintFailed: 'ပရင်တာ စမ်းသပ်ပုံနှိပ်ခြင်း မအောင်မြင်ပါ။',
+    printerConfirmDelete: 'ပရင်တာ ဖျက်ရန်',
+    printerDeleteMessage: 'ဤပရင်တာကို ဖျက်ရန် သေချာပါသလား။',
+    printerCancel: 'မလုပ်တော့ပါ',
+    printerDelete: 'ပရင်တာ ဖျက်မည်',
+    printerClose: 'ပရင်တာ ပိတ်မည်',
+    printerRetry: 'ပရင်တာ ထပ်မံကြိုးစားမည်',
+    printerRefresh: 'ပရင်တာများ ပြန်လည်ရှာဖွေမည်',
   };
 }

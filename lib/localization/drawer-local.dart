@@ -35,6 +35,8 @@ mixin DrawerScreenLocale {
   static const drawerPurchaseItems = 'drawer_purchase_items';
   static const drawerEmployeeSalary = 'drawer_employee_salary';
   static const drawerLowStock = 'drawer_low_stock';
+  static const drawerBarcodeGenerator =
+      'drawer_barcode_generator'; // 👈 Added key
 
   static const drawerUpgrade = 'drawer_upgrade';
   static const drawerUpgradeSuggestion = 'drawer_upgrade_suggestion';
@@ -92,6 +94,7 @@ mixin DrawerScreenLocale {
     drawerPurchaseItems: 'Purchase Items',
     drawerEmployeeSalary: 'Employee Salary',
     drawerLowStock: 'Low Stock',
+    drawerBarcodeGenerator: 'Barcode Generator', // 👈 Added English translation
 
     drawerBankAccount: 'Payment Account',
     drawerRepay: 'Repayment',
@@ -145,6 +148,8 @@ mixin DrawerScreenLocale {
     drawerPurchaseItems: 'ဝယ်ယူထားသောပစ္စည်းများ',
     drawerEmployeeSalary: 'ဝန်ထမ်းလစာ',
     drawerLowStock: 'ကုန်ပစ္စည်း နည်းနေမှု',
+    drawerBarcodeGenerator:
+        'ဘာကုဒ် ထုတ်လုပ်ရန်', // 👈 Added Burmese translation
 
     drawerUpgrade: 'ပလန် အဆင့်မြှင့်ရန်',
     drawerUpgradeSuggestion: 'စီးပွားရေး အဆင့်မြှင့် အကြံပြုချက်',

@@ -21,6 +21,8 @@ mixin ProductScreenLocale {
 
   static const barcode = 'product_barcode';
   static const barcodePlaceholder = 'product_barcode_placeholder';
+  static const barcodeAlreadyExist =
+      'product_barcode_already_exist'; // 👈 Added key
 
   static const barcodeScan = 'product_barcode_scan';
   static const barcodeScanning = 'product_barcode_scanning';
@@ -120,6 +122,8 @@ mixin ProductScreenLocale {
 
     barcode: 'Barcode',
     barcodePlaceholder: 'Enter barcode',
+    barcodeAlreadyExist:
+        'Barcode already exists', // 👈 Added English translation
 
     barcodeScan: 'Scan Barcode',
     barcodeScanning: 'Scanning barcode...',
@@ -222,6 +226,8 @@ mixin ProductScreenLocale {
 
     barcode: 'ဘားကုဒ်',
     barcodePlaceholder: 'ဘားကုဒ် ထည့်ပါ',
+    barcodeAlreadyExist:
+        'ဘားကုဒ် ရှိပြီးသားဖြစ်ပါသည်', // 👈 Added Burmese translation
 
     barcodeScan: 'ဘားကုဒ် စကင်ဖတ်မည်',
     barcodeScanning: 'ဘားကုဒ် စကင်ဖတ်နေသည်...',

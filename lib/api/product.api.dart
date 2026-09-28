@@ -40,7 +40,7 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
         },
       );
       final Map<String, dynamic> data = response.data;
-      // print("data 👨‍🏭 $data");
+      //print("data 👨‍🏭 $data");
       if (data["success"] == true) {
         final items = data["data"] as List;
         List<Product> products = items
@@ -58,6 +58,61 @@ class ProductAsyncNotifier extends AsyncNotifier<List<Product>> {
       state = AsyncError(e, st);
       throw Exception("Failed to fetch");
     }
+  }
+
+  /// Products that have no barcode assigned yet — used by the
+  /// "Generate Barcode" screen so the user only sees items that
+  /// still need one.
+  ///
+  /// NOTE: adjust the query param name/value below ("hasBarcode": false)
+  /// to whatever your backend actually expects. Common alternatives:
+  ///   "noBarcode": true
+  ///   "barcode": "null"
+  Future<List<Product>> getProductsWithoutBarcode({
+    required String page,
+    required String limit,
+    String? search,
+  }) async {
+    try {
+      final url = "v1/products/no-barcode/get";
+      final response = await _dio.get(
+        url,
+        query: {
+          "page": page,
+          "limit": limit,
+          if (search != null && search.isNotEmpty) "search": search,
+        },
+      );
+      final Map<String, dynamic> data = response.data;
+      if (data["success"] == true) {
+        final items = data["data"] as List;
+        return items
+            .map((e) => Product.fromJson(Map<String, dynamic>.from(e)))
+            .toList();
+      }
+      throw Exception(data["message"] ?? "Failed to fetch products");
+    } catch (e) {
+      throw Exception("Failed to fetch products without barcode: $e");
+    }
+  }
+
+  /// Saves a generated barcode value back onto a product.
+  /// Adjust the endpoint/body shape to match your backend's
+  /// product-update route.
+  Future<bool> assignBarcodeToProduct({
+    required int productId,
+    required String barcode,
+  }) async {
+    final url = "v1/products/$productId/bar-code/update";
+    _dio.setContentType("application/json");
+    final response = await _dio.patch(url, data: {"barCode": barcode});
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      ref.invalidateSelf();
+      return true;
+    }
+    throw Exception(data["message"] ?? "Failed to save barcode");
   }
 
   //Low Stock Products

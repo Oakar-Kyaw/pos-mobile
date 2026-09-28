@@ -31,7 +31,7 @@ class PrinterUiHelper {
       ShowToast(
         context,
         description: Text(
-          PrinterScreenLocale.connected.getString(context),
+          PrinterScreenLocale.printerConnected.getString(context),
           style: TextStyle(color: kGreen),
         ),
       );
@@ -39,7 +39,7 @@ class PrinterUiHelper {
       ShowToast(
         context,
         description: Text(
-          PrinterScreenLocale.connectionFailed.getString(context),
+          PrinterScreenLocale.printerConnectionFailed.getString(context),
           style: TextStyle(color: kRed),
         ),
       );
@@ -61,7 +61,7 @@ class PrinterUiHelper {
       ShowToast(
         context,
         description: Text(
-          PrinterScreenLocale.disconnectedSuccess.getString(context),
+          PrinterScreenLocale.printerDisconnectedSuccess.getString(context),
           style: TextStyle(color: kGreen),
         ),
       );
@@ -69,7 +69,7 @@ class PrinterUiHelper {
       ShowToast(
         context,
         description: Text(
-          PrinterScreenLocale.disconnectedFailed.getString(context),
+          PrinterScreenLocale.printerDisconnectedFailed.getString(context),
           style: TextStyle(color: kRed),
         ),
       );
