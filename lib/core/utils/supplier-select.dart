@@ -8,17 +8,20 @@ import 'package:pos/localization/purchase-local.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class SupplierSelect extends ConsumerStatefulWidget {
-  SupplierSelect({
+  const SupplierSelect({
     super.key,
     required this.onChanged,
     this.allSupplier = true,
     this.initialValue,
   });
+
   final ValueChanged<String?> onChanged;
 
-  ///check all supplier or not
-  bool allSupplier;
-  //initial value
+  /// true  => "All" option ပါမယ် (filter အတွက်)
+  /// false => supplier တစ်ယောက်ကို ရွေးရမယ် (form အတွက်)
+  final bool allSupplier;
+
+  /// initial value
   final String? initialValue;
 
   @override
@@ -31,7 +34,6 @@ class _SupplierSelectState extends ConsumerState<SupplierSelect> {
   @override
   void initState() {
     super.initState();
-
     selectedValue = widget.initialValue;
   }
 
@@ -73,8 +75,30 @@ class _SupplierSelectState extends ConsumerState<SupplierSelect> {
           ),
         ];
 
+        /// Supplier မရှိသေးရင် (All option လည်း မပါရင်) crash မဖြစ်အောင်
+        /// select အစား placeholder text ပဲ ပြမယ်
+        if (shadOptions.isEmpty) {
+          return Text(
+            PurchaseLocale.purchaseSelectSupplier.getString(context),
+            style: TextStyle(color: Colors.grey.shade600),
+          );
+        }
+
         /// default selection
-        selectedValue ??= shadOptions.first.value;
+        if (selectedValue == null) {
+          final first = shadOptions.first.value;
+          selectedValue = first;
+
+          /// Form မှာ (allSupplier=false) UI က ပထမ supplier ကို ပြထားပေမဲ့
+          /// parent ကို မသိရင် supplierId က null ကျန်နေမယ်။
+          /// ဒါကြောင့် frame ပြီးမှ parent ကို အကြောင်းကြားမယ်။
+          if (!widget.allSupplier && first.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) widget.onChanged.call(first);
+            });
+          }
+        }
+
         return ShadSelect<String>(
           initialValue: selectedValue,
           options: shadOptions,

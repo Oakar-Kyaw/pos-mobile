@@ -3,6 +3,8 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
 import 'package:intl/intl.dart';
+import 'package:pos/core/database/printer-table-schema.dart';
+import 'package:pos/features/printer/data/datasource/printer-local-datasource.dart';
 import 'package:pos/features/printer/presentation/provider/printer-provider.dart';
 import 'package:pos/features/printer/domain/enums/printer-type.dart';
 import 'package:pos/features/voucher/data/model/voucher-detail.dart';
@@ -56,6 +58,11 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
   );
 
   Future<void> _printReceipt() async {
+    final datasource = PrinterLocalDatabaseSource();
+    final printers = await datasource.getAll();
+    final initial = printers.firstWhere((e) => e.setDefault);
+    print("printers are: ${initial} $printers ");
+    final type = initial.type.toDomain();
     setState(() {
       _isPrinting = true;
     });
@@ -64,12 +71,15 @@ class _ReceiptVoucherWidgetState extends ConsumerState<ReceiptVoucherWidget> {
       final bytes = await generateReceiptBytes(
         context,
         widget.voucher,
-        PaperSize.mm58,
+        initial.paperSize == '58mm'
+            ? PaperSize.mm58
+            : initial.paperSize == '72mm'
+            ? PaperSize.mm72
+            : PaperSize.mm80,
       );
-
-      await ref
-          .read(printerProvider.notifier)
-          .printTest(PrinterType.bluetooth, bytes);
+      // await _sendToPrinter(type, bytes);
+      await ref.read(printerProvider.notifier).printTest(type, bytes);
+      await Future.delayed(const Duration(seconds: 1));
     } catch (e) {
       debugPrint('Printing error: $e');
     } finally {

@@ -274,7 +274,7 @@ class _ProductPageState extends ConsumerState<ProductPage> {
 
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['xlsx'],
+      allowedExtensions: ['xlsx', 'xls'],
     );
 
     if (result == null || result.files.single.path == null) {

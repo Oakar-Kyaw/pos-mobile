@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
+import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/voucher.api.dart';
 import 'package:pos/component/app-bar.dart';
@@ -47,6 +48,7 @@ class ReceiptPage extends ConsumerStatefulWidget {
 class _ReceiptPageState extends ConsumerState<ReceiptPage> {
   final datasource = PrinterLocalDatabaseSource();
   List<PrinterTableItem> listOfPrinters = [];
+  PrinterType? printerType;
 
   @override
   void initState() {
@@ -60,38 +62,40 @@ class _ReceiptPageState extends ConsumerState<ReceiptPage> {
   Future<void> _getSavedPrinters() async {
     try {
       final printers = await datasource.getAll();
-      final initialPrinter = printers.firstWhereOrNull((e) => e.setDefault);
+      final initial = printers.firstWhereOrNull((e) => e.setDefault);
 
-      print("printers are: ${initialPrinter} $printers ");
+      print("printers are: ${initial} $printers ");
+
+      if (initial == null) return;
       setState(() {
         listOfPrinters = printers;
+        printerType = initial.type.toDomain();
       });
-      if (initialPrinter == null) return;
       ref
           .read(printerProvider.notifier)
           .connect(
-            initialPrinter.type.toDomain(),
-            PrinterDevice(
-              id: initialPrinter.id.toString(),
-              name: initialPrinter.name,
-              type: initialPrinter.type.toDomain(),
-              paperSize: initialPrinter.paperSize,
-              address: initialPrinter.address,
-              setDefault: initialPrinter.setDefault,
-              isConnected: initialPrinter.isConnected,
+            initial.type.toDomain(),
+            Printer(
+              name: initial.name,
+              address: initial.address,
+              vendorId: initial.vendorId,
+              productId: initial.productId,
+              isConnected: initial.isConnected,
+              connectionType: initial.type == PrinterTypeByTable.usb
+                  ? ConnectionType.USB
+                  : ConnectionType.BLE,
             ),
+            // PrinterDevice(
+            //   id: initialPrinter.id.toString(),
+            //   name: initialPrinter.name,
+            //   type: initialPrinter.type.toDomain(),
+            //   paperSize: initialPrinter.paperSize,
+            //   address: initialPrinter.address,
+            //   setDefault: initialPrinter.setDefault,
+            //   isConnected: initialPrinter.isConnected,
+            // ),
           );
     } catch (e) {}
-  }
-
-  Future<void> printReceipt(
-    VoucherDetailModel voucher, {
-    Duration scanTimeout = const Duration(seconds: 5),
-  }) async {
-    final bytes = await generateReceiptBytes(context, voucher, PaperSize.mm58);
-    await ref
-        .read(printerProvider.notifier)
-        .printTest(PrinterType.bluetooth, bytes);
   }
 
   Future<void> showReceiptvoucher() async {

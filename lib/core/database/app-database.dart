@@ -62,7 +62,16 @@ class AppDatabase {
     // Version 3
     // ===========================
     if (oldVersion < 3) {
-      // Future migrations
+      final t = PrinterTableSchema.printerTableName;
+      await db.execute(
+        'ALTER TABLE $t ADD COLUMN ${PrinterTableSchema.brandType} TEXT',
+      );
+      await db.execute(
+        'ALTER TABLE $t ADD COLUMN ${PrinterTableSchema.vendorId} TEXT',
+      );
+      await db.execute(
+        'ALTER TABLE $t ADD COLUMN ${PrinterTableSchema.productId} TEXT',
+      );
     }
 
     // ===========================

@@ -7,7 +7,7 @@ abstract class PrinterRepository {
   Future<bool> checkBluetoothConnection(String deviceAddress);
   Future<bool> disconnectBluetoothConnection();
   Future<List<PrinterDevice>> searchUsbPrinter();
-  Future<bool> connectUsbPrinter(String deviceAddress);
+  Future<bool> connectUsbPrinter(Printer device);
   Future<bool> testPrintByBluetoothPrinter(Printer printer, List<int> bytes);
   Future<bool> testPrintByUsbPrinter(Printer printer, List<int> bytes);
 }

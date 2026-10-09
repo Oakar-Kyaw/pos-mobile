@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:pos/component/loading-component.dart';
 import 'package:pos/features/printer/domain/enums/printer-type.dart';
 import 'package:pos/features/printer/presentation/printer-helper.dart';
@@ -63,7 +64,14 @@ class _PrinterListDialogState extends ConsumerState<PrinterListDialog> {
                       onTap: () => PrinterUiHelper.connectPrinter(
                         context: context,
                         ref: ref,
-                        printer: printer,
+                        printer: Printer(
+                          address: printer.address,
+                          isConnected: true,
+                          connectionType: ConnectionType.BLE,
+                          name: printer.name,
+                          productId: printer.productId,
+                          vendorId: printer.vendorId,
+                        ),
                         printerType: PrinterType.bluetooth,
                         showDeviceNameAndAddress: true,
                       ),

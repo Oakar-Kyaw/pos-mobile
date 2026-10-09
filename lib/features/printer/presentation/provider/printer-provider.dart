@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:pos/features/printer/data/datasource/bluetooth-data-source.dart';
+import 'package:pos/features/printer/data/datasource/usb-data-source.dart';
 import 'package:pos/features/printer/domain/entites/printer-device.dart';
 import 'package:pos/features/printer/domain/entites/printer-state.dart';
 import 'package:pos/features/printer/domain/enums/printer-type.dart';
@@ -11,15 +12,22 @@ import 'package:pos/features/printer/domain/repository/printer-repository.dart';
 import 'package:pos/features/printer/domain/usecases/connect-printer.dart';
 import 'package:pos/features/printer/domain/usecases/printer-usecase.dart';
 import 'package:pos/features/printer/domain/usecases/search-printer.dart';
+import 'package:uuid/uuid.dart';
 
-// 2. BluetoothDataSource Provider
+// 1. BluetoothDataSource Provider
 final bluetoothDataSourceProvider = Provider<BluetoothDataSource>((ref) {
   return BluetoothDataSource();
+});
+
+//2. UsbDataSource Provider
+final usbDataSourceProvider = Provider<UsbDataSource>((ref) {
+  return UsbDataSource();
 });
 
 final printerRepositoryProvider = Provider<PrinterRepository>((ref) {
   return PrinterRepositoryImpl(
     bluetooth: ref.watch(bluetoothDataSourceProvider),
+    usb: ref.watch(usbDataSourceProvider),
   );
 });
 
@@ -49,7 +57,8 @@ class PrinterNotifier extends Notifier<PrinterState> {
     try {
       final printers = await ref
           .read(searchPrinterUsecaseProvider)
-          .call(type); // await ထည့်ပြီးပြီ
+          .searchDevice(type);
+      debugPrint("😁 Search Device is: $printers");
       state = state.copyWith(isLoading: false, printers: printers);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -58,36 +67,42 @@ class PrinterNotifier extends Notifier<PrinterState> {
 
   Future<bool> connect(
     PrinterType type,
-    PrinterDevice device, {
+    Printer device, {
     bool showDeviceNameAndAddress = false,
   }) async {
-    state = state.copyWith(
-      isConnecting: true,
-      address: device.address,
-      error: null,
-    );
+    state = state.copyWith(isConnecting: true, error: null);
     try {
-      debugPrint("Usb are connecting ${device}");
+      debugPrint("Connecting $device ${device.vendorId}");
       final success = await ref
           .read(connectPrinterUsecaseProvider)
-          .connect(type, device.address!);
-      print("success connection is $success");
+          .connect(type, device.address!, device: device);
+
+      final domainDevice = PrinterDevice(
+        id: device.address ?? '',
+        name: device.name ?? '',
+        address: device.address,
+        vendorId: device.vendorId,
+        productId: device.productId,
+        type: type,
+        isConnected: success,
+      );
 
       state = state.copyWith(
         isConnecting: false,
-        isConnected: true,
-        connectedPrinterType: type,
-        connectedPrinter: success ? device : state.connectedPrinter,
-        showDeviceNameAndAddress: showDeviceNameAndAddress,
+        isConnected: success,
+        connectedPrinterType: success ? type : null,
+        connectedPrinter: success ? domainDevice : null,
+        address: success ? device.address : null,
+        showDeviceNameAndAddress: success && showDeviceNameAndAddress,
       );
       return success;
     } catch (e) {
       state = state.copyWith(
         isConnecting: false,
         isConnected: false,
-        address: null,
         connectedPrinter: null,
         connectedPrinterType: null,
+        address: null,
         showDeviceNameAndAddress: false,
         error: e.toString(),
       );
@@ -144,21 +159,23 @@ class PrinterNotifier extends Notifier<PrinterState> {
   Future<bool> printTest(PrinterType type, List<int> bytes) async {
     final existPrinter = state.connectedPrinter;
     if (existPrinter == null) return false;
-    Printer printerDevice = Printer(
+    debugPrint("printer type for print test 📈 $type");
+    final printerDevice = Printer(
       address: existPrinter.address,
       name: existPrinter.name,
+      vendorId: existPrinter.vendorId,
+      productId: existPrinter.productId,
       connectionType: switch (type) {
-        "bluetooth" => ConnectionType.BLE,
-        "usb" => ConnectionType.USB,
-        "network" => ConnectionType.NETWORK,
+        PrinterType.usb => ConnectionType.USB,
+        PrinterType.ethernet => ConnectionType.NETWORK,
         _ => ConnectionType.BLE,
       },
       isConnected: existPrinter.isConnected,
     );
-    final writeData = await ref
+
+    return ref
         .read(printerUsecaseProvider)
-        .testPrint(type, printerDevice, bytes);
-    return writeData;
+        .testPrint(type, printerDevice, bytes, device: existPrinter);
   }
 
   void clearPrinters() {

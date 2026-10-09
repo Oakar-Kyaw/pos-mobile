@@ -1,0 +1,1 @@
+enum PrinterBrandType { ecs, labelPrinter }

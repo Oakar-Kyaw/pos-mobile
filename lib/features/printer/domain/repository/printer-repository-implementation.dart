@@ -1,12 +1,14 @@
 import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:pos/features/printer/data/datasource/bluetooth-data-source.dart';
+import 'package:pos/features/printer/data/datasource/usb-data-source.dart';
 import 'package:pos/features/printer/domain/entites/printer-device.dart';
 import 'package:pos/features/printer/domain/repository/printer-repository.dart';
 
 class PrinterRepositoryImpl implements PrinterRepository {
   final BluetoothDataSource bluetooth;
+  final UsbDataSource usb;
 
-  PrinterRepositoryImpl({required this.bluetooth});
+  PrinterRepositoryImpl({required this.bluetooth, required this.usb});
 
   @override
   Future<List<PrinterDevice>> checkAndScanBluetooth() =>
@@ -25,11 +27,11 @@ class PrinterRepositoryImpl implements PrinterRepository {
       bluetooth.disconnectBluetoothPrinter();
 
   @override
-  Future<List<PrinterDevice>> searchUsbPrinter() async => [];
+  Future<List<PrinterDevice>> searchUsbPrinter() async => usb.scanUsbPrinters();
 
   @override
-  Future<bool> connectUsbPrinter(String deviceAddress) =>
-      bluetooth.connectBluetoothPrinter(deviceAddress);
+  Future<bool> connectUsbPrinter(Printer device) =>
+      usb.connectUsbPrinter(device);
 
   @override
   Future<bool> testPrintByBluetoothPrinter(
@@ -39,5 +41,5 @@ class PrinterRepositoryImpl implements PrinterRepository {
 
   @override
   Future<bool> testPrintByUsbPrinter(Printer printerDevice, List<int> bytes) =>
-      bluetooth.printData(bytes);
+      usb.printData(bytes);
 }

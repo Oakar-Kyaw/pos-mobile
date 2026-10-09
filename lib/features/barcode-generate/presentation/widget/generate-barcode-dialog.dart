@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'dart:typed_data';
-
-import 'package:dio/dio.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart' as esc;
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/features/printer/domain/entites/printer-state.dart';
 import 'package:pos/features/printer/presentation/provider/printer-provider.dart';

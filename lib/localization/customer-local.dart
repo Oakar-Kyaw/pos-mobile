@@ -16,34 +16,31 @@ mixin CustomerLocale {
   static const customerAddress = 'customer_local_address';
 
   static const customerCreateSuccess = 'customer_local_create_success';
-
   static const customerEditSuccess = 'customer_local_edit_success';
-
   static const customerEditFail = 'customer_local_edit_fail';
-
   static const customerDeleteSuccess = 'customer_local_delete_success';
-
   static const customerDeleteFail = 'customer_local_delete_fail';
-
   static const customerCreateFail = 'customer_local_create_fail';
-
   static const customerUpdateSuccess = 'customer_local_update_success';
-
   static const customerUpdateFail = 'customer_local_update_fail';
-
   static const customerUpdateConfirm = 'customer_local_update_confirm';
-
   static const customerDeleteConfirm = 'customer_local_delete_confirm';
-
   static const customerError = 'customer_local_error';
-
   static const customerEmpty = 'customer_local_empty';
+
+  // Excel Keys
+  static const customerUploadExcel = 'customer_local_upload_excel';
+  static const customerUploading = 'customer_local_uploading';
+  static const customerUploadComplete = 'customer_local_upload_complete';
+  static const customerUploaded = 'customer_local_uploaded';
+  static const customerUploadFailed = 'customer_local_upload_failed';
+  static const customerDownloadTemplate = 'customer_local_download_template';
+  static const customerSelectFile = 'customer_local_select_file';
+  static const customerInvalidFile = 'customer_local_invalid_file';
 
   // Validation
   static const customerNameRequired = 'customer_local_name_required';
-
   static const customerEmailInvalid = 'customer_local_email_invalid';
-
   static const customerPhoneRequired = 'customer_local_phone_required';
 
   // 🇺🇸 English
@@ -64,33 +61,32 @@ mixin CustomerLocale {
     customerAddress: 'Address',
 
     customerCreateSuccess: 'Customer created successfully',
-
     customerCreateFail: 'Failed to create customer',
-
     customerEditSuccess: 'Customer edited successfully',
-
     customerEditFail: 'Failed to edit customer',
-
     customerUpdateSuccess: 'Customer updated successfully',
-
     customerUpdateFail: 'Failed to update customer',
-
     customerDeleteSuccess: 'Customer deleted successfully',
-
     customerDeleteFail: 'Failed to delete customer',
 
     customerUpdateConfirm: 'Do you want to update this customer?',
-
     customerDeleteConfirm: 'Do you want to delete this customer?',
 
     customerError: 'Something went wrong',
-
     customerEmpty: 'No customers found',
 
+    // Excel Translations
+    customerUploadExcel: 'Upload Excel',
+    customerUploading: 'Uploading...',
+    customerUploadComplete: 'Upload Complete',
+    customerUploaded: 'Uploaded',
+    customerUploadFailed: 'Upload Failed',
+    customerDownloadTemplate: 'Download Template',
+    customerSelectFile: 'Select Excel File',
+    customerInvalidFile: 'Please select a valid .xlsx or .xls file',
+
     customerNameRequired: 'Please enter customer name',
-
     customerEmailInvalid: 'Please enter a valid email address',
-
     customerPhoneRequired: 'Please enter customer phone number',
   };
 
@@ -99,55 +95,46 @@ mixin CustomerLocale {
     customerManagementTitle: 'ဖောက်သည် စီမံခန့်ခွဲမှု',
 
     customerList: 'ဖောက်သည်များ',
-
     customerCreate: 'အသစ်ထည့်ရန်',
-
     customerEdit: 'ပြင်ဆင်ရန်',
-
     customerUpdate: 'ပြင်ဆင်ရန်',
-
     customerCancel: 'ပယ်ဖျက်ရန်',
-
     customerDelete: 'ဖျက်ရန်',
-
     customerDetail: 'အသေးစိတ်',
 
     customerName: 'ဖောက်သည်အမည်',
-
     customerEmail: 'အီးမေးလ်',
-
     customerPhone: 'ဖုန်းနံပါတ်',
-
     customerAddress: 'လိပ်စာ',
 
     customerCreateSuccess: 'ဖောက်သည်ကို အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ',
-
     customerCreateFail: 'ဖောက်သည် ထည့်သွင်းရန် မအောင်မြင်ပါ',
-
     customerEditSuccess: 'ဖောက်သည်အချက်အလက်ကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ',
-
     customerEditFail: 'ဖောက်သည်အချက်အလက်ကို ပြင်ဆင်ရန် မအောင်မြင်ပါ',
-
     customerUpdateSuccess: 'ဖောက်သည်အချက်အလက်ကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ',
-
     customerUpdateFail: 'ဖောက်သည် ပြင်ဆင်ရန် မအောင်မြင်ပါ',
-
     customerDeleteSuccess: 'ဖောက်သည်ကို အောင်မြင်စွာ ဖျက်ပြီးပါပြီ',
-
     customerDeleteFail: 'ဖောက်သည်ကို ဖျက်ရန် မအောင်မြင်ပါ',
 
     customerUpdateConfirm: 'ဤဖောက်သည်အချက်အလက်ကို ပြင်ဆင်လိုပါသလား?',
-
     customerDeleteConfirm: 'ဤဖောက်သည်ကို ဖျက်လိုပါသလား?',
 
     customerError: 'အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်',
-
     customerEmpty: 'ဖောက်သည် မတွေ့ရှိပါ',
 
+    // Excel Translations
+    customerUploadExcel: 'Excelဖိုင်တင်ရန်',
+    customerUploading: 'တင်နေသည်...',
+    customerUploadComplete: 'ဖိုင်တင်ခြင်း ပြီးဆုံးပါပြီ',
+    customerUploaded: 'တင်ပြီးပါပြီ',
+    customerUploadFailed: 'ဖိုင်တင်ရန် မအောင်မြင်ပါ',
+    customerDownloadTemplate: 'ပုံစံဖိုင် (Template) ရယူရန်',
+    customerSelectFile: 'Excel ဖိုင် ရွေးချယ်ပါ',
+    customerInvalidFile:
+        'ကျေးဇူးပြု၍ မှန်ကန်သော .xlsx သို့မဟုတ် .xls ဖိုင်ကို ရွေးချယ်ပါ',
+
     customerNameRequired: 'ကျေးဇူးပြု၍ ဖောက်သည်အမည် ထည့်ပါ',
-
     customerEmailInvalid: 'ကျေးဇူးပြု၍ မှန်ကန်သော အီးမေးလ်လိပ်စာ ထည့်ပါ',
-
     customerPhoneRequired: 'ကျေးဇူးပြု၍ ဖောက်သည်ဖုန်းနံပါတ် ထည့်ပါ',
   };
 }

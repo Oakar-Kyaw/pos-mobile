@@ -138,20 +138,8 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
 
   void createPurchase() async {
     try {
-      debugPrint("Creating purchase...");
+      debugPrint("Creating purchase... ${supplierId == null}");
       if (!mounted) return;
-
-      if (purchasePayment.isEmpty) throw AddPurchasePaymentError();
-
-      final purchasePayments = List.generate(
-        purchasePayment.length,
-        (index) => {
-          "paymentDataId": purchasePayment[index].paymentData!.id,
-          "amount": double.tryParse(paymentAmountController[index].text) ?? 0,
-          "type": purchasePayment[index].type,
-        },
-      );
-
       if (supplierId == null) {
         debugPrint("Supplier is required");
         ShowToast(
@@ -165,6 +153,16 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
         );
         return;
       }
+      if (purchasePayment.isEmpty) throw AddPurchasePaymentError();
+
+      final purchasePayments = List.generate(
+        purchasePayment.length,
+        (index) => {
+          "paymentDataId": purchasePayment[index].paymentData!.id,
+          "amount": double.tryParse(paymentAmountController[index].text) ?? 0,
+          "type": purchasePayment[index].type,
+        },
+      );
 
       if (status == null) {
         debugPrint("status is required");
@@ -262,7 +260,7 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
         context,
         isError: true,
         description: Text(
-          PurchaseLocale.purchaseSuccess.getString(context),
+          PurchaseLocale.purchasePaymentRequired.getString(context),
           style: TextStyle(color: kRed),
         ),
         borderColor: kRed,

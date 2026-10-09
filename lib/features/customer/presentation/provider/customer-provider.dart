@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/dio.dart';
 import 'package:pos/core/provider.dart';
@@ -167,6 +170,40 @@ class CustomerAsyncNotifier extends AsyncNotifier<List<Customer>> {
     } catch (e, st) {
       state = AsyncError(e, st);
     }
+  }
+
+  ///upload excel customer
+  Future<Map<String, dynamic>> uploadProductExcel(
+    File file, {
+    void Function(int sent, int total)? onSendProgress,
+  }) async {
+    final formData = FormData.fromMap({
+      "file": await MultipartFile.fromFile(
+        file.path,
+        filename: file.path.split('/').last,
+      ),
+    });
+
+    final url = "v1/customers/excel";
+    _dio.setContentType("multipart/form-data");
+
+    final response = await _dio.post(
+      url,
+      data: formData,
+      onSendProgress: onSendProgress,
+    );
+    final Map<String, dynamic> data = response.data;
+
+    if (data["success"] == true) {
+      ref.invalidateSelf(); // customer list refresh
+      return {
+        "success": true,
+        "message": data["message"] ?? "Excel uploaded successfully",
+        "importedCount": data["data"]?["importedCount"],
+      };
+    }
+
+    throw Exception(data["message"] ?? "Failed to upload Excel");
   }
 }
 

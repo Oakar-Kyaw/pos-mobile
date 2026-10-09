@@ -60,6 +60,7 @@ mixin PrinterScreenLocale {
   static const printerClose = 'printer_close';
   static const printerRetry = 'printer_retry';
   static const printerRefresh = 'printer_refresh';
+  static const printerFoundUsbPrinters = 'printer_found_usb_printers';
 
   static const EN = {
     printerTitle: 'Printer Page',
@@ -84,8 +85,8 @@ mixin PrinterScreenLocale {
 
     printerConnectedPrinter: 'Connected Printer',
     printerConnect: 'Connect Printer',
-    printerConnected: 'Printer Connected',
-    printerDisconnected: 'Disconnect Printer',
+    printerConnected: 'Connected',
+    printerDisconnected: 'Disconnect',
     printerConnectionFailed: 'Printer connection failed.',
 
     printerSaveSuccess: 'Printer saved successfully.',
@@ -123,6 +124,7 @@ mixin PrinterScreenLocale {
     printerClose: 'Close',
     printerRetry: 'Retry Printer',
     printerRefresh: 'Refresh Printers',
+    printerFoundUsbPrinters: 'Found USB Printers',
   };
 
   static const MM = {
@@ -131,7 +133,7 @@ mixin PrinterScreenLocale {
     printerNamePlaceholder: 'ပရင်တာ အမည်ထည့်ပါ',
     printerType: 'ပရင်တာ အမျိုးအစား',
     printerTypePlaceholder: 'ပရင်တာ အမျိုးအစား ရွေးချယ်ပါ',
-    printerSearchButton: 'ပရင်တာ ရှာဖွေပါ',
+    printerSearchButton: 'ရှာဖွေပါ',
 
     printerDeviceName: 'ပရင်တာ စက်အမည်',
     printerDeviceAddress: 'ပရင်တာ စက်လိပ်စာ',
@@ -147,9 +149,9 @@ mixin PrinterScreenLocale {
     printerTest: 'ပရင်တာ စမ်းသပ်မည်',
 
     printerConnectedPrinter: 'ချိတ်ဆက်ထားသော ပရင်တာ',
-    printerConnect: 'ပရင်တာ ချိတ်ဆက်ပါ',
-    printerConnected: 'ပရင်တာ ချိတ်ဆက်ပြီးပါပြီ',
-    printerDisconnected: 'ပရင်တာ ချိတ်ဆက်မှု ဖြုတ်ပါ',
+    printerConnect: 'ချိတ်ဆက်ပါ',
+    printerConnected: 'ချိတ်ဆက်ပြီးပါပြီ',
+    printerDisconnected: 'ဖြုတ်ပါ',
     printerConnectionFailed: 'ပရင်တာ ချိတ်ဆက်မှု မအောင်မြင်ပါ။',
 
     printerSaveSuccess: 'ပရင်တာကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။',
@@ -189,5 +191,6 @@ mixin PrinterScreenLocale {
     printerClose: 'ပရင်တာ ပိတ်မည်',
     printerRetry: 'ပရင်တာ ထပ်မံကြိုးစားမည်',
     printerRefresh: 'ပရင်တာများ ပြန်လည်ရှာဖွေမည်',
+    printerFoundUsbPrinters: 'တွေ့ရှိထားသော USB ပရင်တာများ',
   };
 }

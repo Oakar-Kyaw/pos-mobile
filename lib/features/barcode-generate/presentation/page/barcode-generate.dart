@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/core/database/printer-table-schema.dart';
@@ -43,25 +44,32 @@ class _NoBarcodeProductsPageState extends ConsumerState<NoBarcodeProductsPage> {
       final datasource = PrinterLocalDatabaseSource();
       final printers = await datasource.getAll();
       if (printers.isEmpty) return;
-      final initialPrinter = printers.firstWhere((e) => e.setDefault);
+      final initial = printers.firstWhere((e) => e.setDefault);
 
-      print("printers are: ${initialPrinter} ");
+      print("printers are: ${initial} ");
       setState(() {
         listOfPrinters = printers;
       });
       ref
           .read(printerProvider.notifier)
           .connect(
-            initialPrinter.type.toDomain(),
-            PrinterDevice(
-              id: initialPrinter.id.toString(),
-              name: initialPrinter.name,
-              type: initialPrinter.type.toDomain(),
-              paperSize: initialPrinter.paperSize,
-              address: initialPrinter.address,
-              setDefault: initialPrinter.setDefault,
-              isConnected: initialPrinter.isConnected,
+            initial.type.toDomain(),
+            Printer(
+              name: initial.name,
+              address: initial.address,
+              vendorId: initial.vendorId,
+              productId: initial.productId,
+              isConnected: initial.isConnected,
             ),
+            // PrinterDevice(
+            //   id: initialPrinter.id.toString(),
+            //   name: initialPrinter.name,
+            //   type: initialPrinter.type.toDomain(),
+            //   paperSize: initialPrinter.paperSize,
+            //   address: initialPrinter.address,
+            //   setDefault: initialPrinter.setDefault,
+            //   isConnected: initialPrinter.isConnected,
+            // ),
           );
     } catch (e) {}
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pos/features/printer/domain/entites/printer-device.dart';
+import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:pos/features/printer/domain/enums/printer-type.dart';
 import 'package:pos/features/printer/presentation/provider/printer-provider.dart';
 import 'package:pos/localization/printer-local.dart';
@@ -13,9 +13,10 @@ class PrinterUiHelper {
     required BuildContext context,
     required PrinterType printerType,
     required WidgetRef ref,
-    required PrinterDevice printer,
+    required Printer printer,
     bool? showDeviceNameAndAddress,
   }) async {
+    debugPrint("Printer Ui Helper 📊 ${printer.vendorId}");
     final connected = await ref
         .read(printerProvider.notifier)
         .connect(
@@ -23,7 +24,7 @@ class PrinterUiHelper {
           printer,
           showDeviceNameAndAddress: showDeviceNameAndAddress ?? false,
         );
-
+    debugPrint("printer ui heloper success 📆 $connected");
     if (!context.mounted) return;
 
     if (connected) {
@@ -38,6 +39,7 @@ class PrinterUiHelper {
     } else {
       ShowToast(
         context,
+        isError: true,
         description: Text(
           PrinterScreenLocale.printerConnectionFailed.getString(context),
           style: TextStyle(color: kRed),
