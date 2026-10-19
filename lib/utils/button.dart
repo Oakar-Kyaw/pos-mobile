@@ -38,13 +38,9 @@ class GradientSubmitButton extends StatelessWidget {
         decoration: decoration,
         child: ShadButton(
           backgroundColor: Colors.transparent,
-          onPressed: onPressed,
+          onPressed: isSubmitting ? null : onPressed,
           child: isSubmitting
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: LoadingWidget(color: kBgLight),
-                )
+              ? const LoadingWidget(color: kBgLight)
               : Text(text, style: const TextStyle(color: kBgLight)),
         ),
       ),

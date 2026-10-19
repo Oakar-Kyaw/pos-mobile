@@ -3,14 +3,18 @@ import 'package:pos/utils/app-theme.dart';
 
 class LoadingWidget extends StatelessWidget {
   final Color color;
-  const LoadingWidget({super.key, this.color = kPrimary});
+  final double size;
+
+  const LoadingWidget({super.key, this.color = kPrimary, this.size = 15});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
-      width: 80,
-      child: Center(child: CircularProgressIndicator(color: color)),
+    return Center(
+      child: SizedBox(
+        height: size,
+        width: size,
+        child: CircularProgressIndicator(color: color, strokeWidth: 2.5),
+      ),
     );
   }
 }

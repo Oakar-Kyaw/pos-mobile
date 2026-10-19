@@ -3,6 +3,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:pos/api/account.api.dart';
 import 'package:pos/api/voucher.api.dart';
 import 'package:pos/component/delete-dialog.dart';
 import 'package:pos/component/loading-component.dart';
@@ -48,6 +49,10 @@ class _VoucherListState extends ConsumerState<VoucherList> {
             endDate: widget.endDate,
           ),
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(paymentDataProvider);
+    });
   }
 
   @override
@@ -100,6 +105,7 @@ class _VoucherListState extends ConsumerState<VoucherList> {
   }
 
   Widget getVoucherComponentByRole(
+    int index,
     String role,
     Color textColor,
     Color subColor,
@@ -108,6 +114,7 @@ class _VoucherListState extends ConsumerState<VoucherList> {
   ) {
     return (isAdmin(role))
         ? VoucherComponent(
+            index: index,
             textColor: textColor,
             subColor: subColor,
             voucher: voucher,
@@ -115,6 +122,7 @@ class _VoucherListState extends ConsumerState<VoucherList> {
             onDelete: () => _delete(voucher, isDark),
           )
         : VoucherComponent(
+            index: index,
             textColor: textColor,
             subColor: subColor,
             voucher: voucher,
@@ -127,9 +135,6 @@ class _VoucherListState extends ConsumerState<VoucherList> {
     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
     final textColor = isDark ? kTextDark : kTextLight;
     final subColor = isDark ? kTextSubDark : kTextSubLight;
-    final dividerColor = isDark
-        ? Colors.white.withOpacity(0.08)
-        : const Color(0xFFE5E7EB);
     final rowHoverColor = isDark
         ? kPrimary.withOpacity(0.06)
         : kPrimary.withOpacity(0.04);
@@ -148,56 +153,51 @@ class _VoucherListState extends ConsumerState<VoucherList> {
         : 1;
 
     final mainAxisExtent = Responsive.isDesktop(context)
-        ? 850.0
+        ? 250.0
         : Responsive.isTablet(context)
-        ? 750.0
-        : 620.0;
+        ? 200.0
+        : 160.0;
 
     return PagingListener(
       controller: _pagingController,
-      builder: (context, state, fetchNextPage) =>
-          PagedGridView<int, VoucherDetailModel>(
-            state: state,
-            fetchNextPage: fetchNextPage,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              mainAxisExtent: mainAxisExtent,
-            ),
-            builderDelegate: PagedChildBuilderDelegate<VoucherDetailModel>(
-              itemBuilder: (context, voucher, index) {
-                final containerDecoration = getContainerBoxDecoration(
-                  isDark,
-                  dividerColor,
-                );
-                return InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  splashColor: kPrimary.withOpacity(0.08),
-                  highlightColor: rowHoverColor,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: containerDecoration,
-                    child: getVoucherComponentByRole(
-                      user!.role,
-                      textColor,
-                      subColor,
-                      isDark,
-                      voucher,
-                    ),
-                  ),
-                );
-              },
-
-              firstPageProgressIndicatorBuilder: (_) => LoadingWidget(),
-              newPageProgressIndicatorBuilder: (_) => LoadingWidget(),
-              noItemsFoundIndicatorBuilder: (_) =>
-                  NoItemFoundWidget(subColor: subColor),
-            ),
+      builder: (context, state, fetchNextPage) => RefreshIndicator(
+        onRefresh: () => Future.sync(() => _pagingController.refresh()),
+        child: PagedGridView<int, VoucherDetailModel>(
+          state: state,
+          fetchNextPage: fetchNextPage,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 2,
+            mainAxisExtent: mainAxisExtent,
           ),
+          builderDelegate: PagedChildBuilderDelegate<VoucherDetailModel>(
+            itemBuilder: (context, voucher, index) {
+              return InkWell(
+                borderRadius: BorderRadius.circular(12),
+                splashColor: kPrimary.withOpacity(0.08),
+                highlightColor: rowHoverColor,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: getVoucherComponentByRole(
+                    index,
+                    user!.role,
+                    textColor,
+                    subColor,
+                    isDark,
+                    voucher,
+                  ),
+                ),
+              );
+            },
+
+            firstPageProgressIndicatorBuilder: (_) => LoadingWidget(),
+            newPageProgressIndicatorBuilder: (_) => LoadingWidget(),
+            noItemsFoundIndicatorBuilder: (_) =>
+                NoItemFoundWidget(subColor: subColor),
+          ),
+        ),
+      ),
     );
   }
 }

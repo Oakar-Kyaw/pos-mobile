@@ -117,7 +117,7 @@ mixin DrawerScreenLocale {
     drawerCategory: 'အမျိုးအစားများ',
     drawerBrand: 'တံဆိပ်များ',
     drawerCompany: 'ကုမ္ပဏီမှတ်ပုံတင်ခြင်း',
-    drawerProduct: 'ကုန်ပစ္စည်းများ',
+    drawerProduct: 'ကုန်ပစ္စည်း',
     drawerAddProduct: 'ကုန်ပစ္စည်း ထည့်ရန်',
     drawerViewProducts: 'ကုန်ပစ္စည်း ကြည့်ရန်',
     drawerIncome: 'ဝင်ငွေ',

@@ -1,7 +1,12 @@
 mixin VoucherScreenLocale {
   static const title = 'voucher_title';
   static const noItems = 'voucher_no_items';
+  static const unPaidStatus = 'voucher_unpaid_status';
+  static const updatePaidStatus = 'voucher_update_paid_status';
   static const subtotal = 'voucher_subtotal';
+  static const paidStatus = 'voucher_paid_status';
+  static const updatePaidStatusSuccess = 'voucher_update_paid_status_success';
+  static const updatePaidStatusFailed = 'voucher_update_paid_status_failed';
   static const tax = 'voucher_tax';
   static const total = 'voucher_total';
   static const packagingFee = 'voucher_packaging_fee';
@@ -55,6 +60,11 @@ mixin VoucherScreenLocale {
   static const EN = {
     title: 'Create Voucher',
     voucher: 'Voucher',
+    paidStatus: 'Paid Status',
+    updatePaidStatus: 'Paid',
+    unPaidStatus: 'Unpaid',
+    updatePaidStatusSuccess: 'Paid status updated successfully',
+    updatePaidStatusFailed: 'Failed to update paid status',
     noItems: 'No Data',
     subtotal: 'Subtotal',
     tax: 'Tax',
@@ -111,6 +121,13 @@ mixin VoucherScreenLocale {
     title: 'ဘောက်ချာ ဖန်တီးခြင်း',
     voucher: 'ဘောက်ချာ',
     noItems: 'ဒေတာ မရှိပါ',
+    updatePaidStatus: 'ပေးပြီး',
+    unPaidStatus: 'မပေးသေး',
+    paidStatus: 'ပိုက်ဆံပေးခြင်း အခြေအနေ',
+    updatePaidStatusSuccess:
+        'ပိုက်ဆံပေးခြင်း အခြေအနေကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ',
+    updatePaidStatusFailed:
+        'ပိုက်ဆံပေးခြင်း အခြေအနေကို ပြင်ဆင်ရန် မအောင်မြင်ပါ',
     subtotal: 'ပစ္စည်းစုစုပေါင်း ဈေးနှုန်း',
     tax: 'အခွန်',
     total: 'စုစုပေါင်း',

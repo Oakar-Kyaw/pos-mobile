@@ -62,11 +62,11 @@ class PurchaseCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final accent = _accentColor;
 
-    final totalAmount = purchase.purchaseItems.fold<double>(
-      0,
-      (sum, item) => sum + item.price * item.quantity,
-    );
-    print("on success $onSuccess");
+    // final totalAmount = purchase.purchaseItems.fold<double>(
+    //   0,
+    //   (sum, item) => sum + item.price * item.quantity,
+    // );
+    // print("on success $onSuccess");
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
@@ -219,7 +219,7 @@ class PurchaseCard extends ConsumerWidget {
                 PurchasePriceRow(
                   title: PurchaseLocale.purchaseTotalAmount.getString(context),
                   subColor: subColor,
-                  totalAmount: formatAmount(totalAmount),
+                  totalAmount: formatAmount(purchase.totalAmount),
                   accent: accent,
                 ),
 
@@ -233,6 +233,21 @@ class PurchaseCard extends ConsumerWidget {
                   ).format(purchase.orderDate.toLocal()),
                   accent: accent,
                 ),
+
+                if (purchase.receivedDate != null) ...[
+                  const SizedBox(height: 5),
+
+                  PurchasePriceRow(
+                    title: PurchaseLocale.purchaseReceivedDate.getString(
+                      context,
+                    ),
+                    subColor: subColor,
+                    totalAmount: DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(purchase.receivedDate!.toLocal()),
+                    accent: accent,
+                  ),
+                ],
 
                 const SizedBox(height: 10),
 
@@ -253,19 +268,20 @@ class PurchaseCard extends ConsumerWidget {
                   const SizedBox(height: 5),
                 ],
 
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     purchase.status.toUpperCase() == "SUCCESS"
                         ? const SizedBox()
                         : GradientSubmitButton(
-                            width: MediaQuery.of(context).size.width * 0.2,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             onPressed: onEdit ?? () {},
                             text: PurchaseLocale.purchaseEdit.getString(
                               context,
                             ),
                           ),
 
-                    const SizedBox(width: 10),
+                    const SizedBox(height: 10),
                     purchase.status.toUpperCase() == "SUCCESS"
                         ? const SizedBox()
                         : GradientSubmitButton(
@@ -273,7 +289,7 @@ class PurchaseCard extends ConsumerWidget {
                             text: PurchaseLocale.purchaseSuccess.getString(
                               context,
                             ),
-                            width: MediaQuery.of(context).size.width * 0.4,
+                            width: MediaQuery.of(context).size.width * 0.5,
                           ),
                   ],
                 ),

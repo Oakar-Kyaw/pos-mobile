@@ -108,10 +108,10 @@ class _RepaymentListState extends ConsumerState<RepaymentList> {
         : 1;
 
     final mainAxisExtent = Responsive.isDesktop(context)
-        ? 400.0
+        ? 250.0
         : Responsive.isTablet(context)
-        ? 380.0
-        : 380.0;
+        ? 200.0
+        : 160.0;
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -120,13 +120,13 @@ class _RepaymentListState extends ConsumerState<RepaymentList> {
       child: PagingListener(
         controller: _pagingController,
         builder: (context, state, fetchNextPage) => PagedGridView<int, Repay>(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
           state: state,
           fetchNextPage: fetchNextPage,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
             crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
+            mainAxisSpacing: 5,
             mainAxisExtent: mainAxisExtent,
           ),
           builderDelegate: PagedChildBuilderDelegate<Repay>(

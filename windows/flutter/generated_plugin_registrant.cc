@@ -16,6 +16,7 @@
 #include <permission_handler_windows/permission_handler_windows_plugin.h>
 #include <print_bluetooth_thermal/print_bluetooth_thermal_plugin_c_api.h>
 #include <printing/printing_plugin.h>
+#include <restart_app/restart_app_plugin_c_api.h>
 #include <universal_ble/universal_ble_plugin_c_api.h>
 #include <url_launcher_windows/url_launcher_windows.h>
 
@@ -40,6 +41,8 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("PrintBluetoothThermalPluginCApi"));
   PrintingPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("PrintingPlugin"));
+  RestartAppPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("RestartAppPluginCApi"));
   UniversalBlePluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("UniversalBlePluginCApi"));
   UrlLauncherWindowsRegisterWithRegistrar(

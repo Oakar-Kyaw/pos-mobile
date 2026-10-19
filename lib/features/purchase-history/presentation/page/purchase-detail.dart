@@ -30,6 +30,7 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
 
   late List<TextEditingController> qtyControllers;
   late List<TextEditingController> priceControllers;
+  late List<TextEditingController> sellingPriceControllers;
 
   late TextEditingController discountController;
   late TextEditingController discountPercentController;
@@ -52,6 +53,10 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
 
     priceControllers = purchaseItems
         .map((e) => TextEditingController(text: e.price.toString()))
+        .toList();
+
+    sellingPriceControllers = purchaseItems
+        .map((e) => TextEditingController(text: e.sellingPrice.toString()))
         .toList();
 
     discountController = TextEditingController(
@@ -98,6 +103,11 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
     }
 
     for (final controller in priceControllers) {
+      controller.dispose();
+    }
+
+    //selling price
+    for (final controller in sellingPriceControllers) {
       controller.dispose();
     }
 
@@ -242,6 +252,7 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
                         Row(
                           children: [
                             Expanded(
+                              flex: 2,
                               child: ShadInputFormField(
                                 id: 'qty_$index',
                                 readOnly: true,
@@ -262,13 +273,35 @@ class _PurchaseDetailPageState extends ConsumerState<PurchaseDetailPage> {
                             const SizedBox(width: 12),
 
                             Expanded(
+                              flex: 5,
                               child: ShadInputFormField(
-                                id: 'price_$index',
+                                id: 'buy_price_$index',
                                 readOnly: true,
                                 controller: priceControllers[index],
                                 keyboardType: TextInputType.number,
                                 label: Text(
-                                  PurchaseLocale.purchasePrice.getString(
+                                  PurchaseLocale.purchaseBuyPrice.getString(
+                                    context,
+                                  ),
+                                  style: TextStyle(color: subColor),
+                                ),
+                                onChanged: (_) {
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            Expanded(
+                              flex: 5,
+                              child: ShadInputFormField(
+                                id: 'selling_price_$index',
+                                readOnly: true,
+                                controller: sellingPriceControllers[index],
+                                keyboardType: TextInputType.number,
+                                label: Text(
+                                  PurchaseLocale.purchaseSellingPrice.getString(
                                     context,
                                   ),
                                   style: TextStyle(color: subColor),

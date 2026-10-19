@@ -1,9 +1,5 @@
 import 'dart:async';
 import 'dart:ui';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:pos/core/utils/voucher/os-printer-voucher.dart';
-import 'package:printing/printing.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -15,29 +11,30 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pos/api/category.api.dart';
 import 'package:pos/api/product.api.dart';
 import 'package:pos/component/app-bar.dart';
+import 'package:pos/component/loading-component.dart';
 import 'package:pos/core/network/socket/socket-provider.dart';
-import 'package:pos/core/utils/brand-select.dart';
-import 'package:pos/core/utils/categories-select.dart';
+import 'package:pos/core/utils/bottom-navigation.dart';
 import 'package:pos/core/widgets/app-local-notification.dart';
 import 'package:pos/features/brand/presentation/provider/brand-provider.dart';
 import 'package:pos/features/company/presentation/provider/company.riverpod.dart';
 import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/localization/brand-local.dart';
 import 'package:pos/localization/category-local.dart';
+import 'package:pos/localization/drawer-local.dart';
 import 'package:pos/localization/home-local.dart';
-import 'package:pos/localization/product-local.dart';
+import 'package:pos/localization/voucher-local.dart';
 import 'package:pos/models/product.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/riverpod/voucher-detail.dart';
 import 'package:pos/riverpod/login-check.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/button.dart';
 import 'package:pos/utils/drawer.dart';
 import 'package:pos/utils/font-size.dart';
 import 'package:pos/utils/responsive.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/secure-storage.dart';
 import 'package:pos/utils/shad-toaster.dart';
+import 'package:print_bluetooth_thermal/post_code.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
@@ -111,6 +108,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       payments: [],
       total: 0,
       type: "draft",
+      paidStatus: PaidStatus.paid,
     );
     ref.read(voucherDetailProvider.notifier).setVoucher(voucherDetailModel);
   }
@@ -181,21 +179,21 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   }
 
   //categories on change
-  void _onChangedCate(v) {
-    debugPrint("val is $v");
+  void _onChangedCate(int? v) {
+    debugPrint("category is $v");
     setState(() {
-      categoryId = v is String ? int.tryParse(v) : v as int?;
-      _pagingController.refresh();
+      categoryId = v;
     });
+    _pagingController.refresh();
   }
 
   //brand on change
-  void _onChangedBrand(v) {
-    debugPrint("val is $v");
+  void _onChangedBrand(int? v) {
+    debugPrint("brand is $v");
     setState(() {
-      brandId = v is String ? int.tryParse(v) : v as int?;
-      _pagingController.refresh();
+      brandId = v;
     });
+    _pagingController.refresh();
   }
 
   //Product On Tap
@@ -270,54 +268,35 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     final company = ref.watch(companyStateProvider);
     final voucher = ref.watch(voucherDetailProvider);
 
+    // Brand / Category list for the horizontal chips
+    // (assumes AsyncValue<List<...>> with `id` and `name` on each item)
+    final List<dynamic> brands = ref
+        .watch(brandProvider)
+        .maybeWhen(data: (d) => d as List<dynamic>, orElse: () => <dynamic>[]);
+    final List<dynamic> categories = ref
+        .watch(categoryProvider)
+        .maybeWhen(data: (d) => d as List<dynamic>, orElse: () => <dynamic>[]);
+
     return Scaffold(
       backgroundColor: bgColor,
       drawer: CustomerDrawer(
         isLoggedIn: ref.watch(checkLoginProvider),
       ).buildDrawer(context),
-      appBar: _isSearching
-          ? AppBar(
-              backgroundColor: bgColor,
-              leading: IconButton(
-                onPressed: _toggleSearch,
-                icon: const Icon(LucideIcons.arrowLeft),
-              ),
-              title: TextField(
-                controller: _searchController,
-                autofocus: true,
-                onChanged: _onSearchChanged,
-                style: TextStyle(color: isDark ? kTextDark : Colors.black),
-                decoration: InputDecoration(
-                  hintText: 'Search products...',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(
-                    color: isDark ? Colors.white54 : Colors.black45,
-                  ),
-                ),
-              ),
-            )
-          : CustomAppBar(
-              title:
-                  company?.name ??
-                  HomeScreenLocale.homeTitle.getString(context),
-              actions: [
-                IconButton(
-                  onPressed: _toggleSearch,
-                  icon: const Icon(LucideIcons.search),
-                ),
-                IconButton(
-                  onPressed: () =>
-                      context.pushNamed(AppRoute.productBarcodeScan),
-                  icon: const Icon(LucideIcons.scanBarcode),
-                ),
-                IconButton(
-                  onPressed: () {
-                    context.pushNamed(AppRoute.printer);
-                  },
-                  icon: const Icon(LucideIcons.printer),
-                ),
-              ],
-            ),
+      appBar: CustomAppBar(
+        title: company?.name ?? HomeScreenLocale.homeTitle.getString(context),
+        actions: [
+          IconButton(
+            onPressed: () => context.pushNamed(AppRoute.productBarcodeScan),
+            icon: const Icon(LucideIcons.scanBarcode),
+          ),
+          IconButton(
+            onPressed: () {
+              context.pushNamed(AppRoute.printer);
+            },
+            icon: const Icon(LucideIcons.printer),
+          ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(brandProvider);
@@ -326,6 +305,74 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         },
         child: Column(
           children: [
+            // ── Search bar ─────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
+              child: TextField(
+                controller: _searchController,
+                autofocus: false,
+                onChanged: _onSearchChanged,
+                textInputAction: TextInputAction.search,
+                cursorColor: kPrimary,
+                style: TextStyle(
+                  fontSize: FontSizeConfig.body1(context),
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? kTextDark : Colors.black87,
+                ),
+                onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                decoration: InputDecoration(
+                  hintText: HomeScreenLocale.searchProduct.getString(context),
+                  hintStyle: TextStyle(
+                    fontSize: FontSizeConfig.body1(context),
+                    color: isDark ? Colors.white : Colors.black45,
+                  ),
+                  filled: true,
+                  fillColor: isDark
+                      ? Colors.white.withOpacity(0.08)
+                      : Colors.black.withOpacity(0.05),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  prefixIcon: Icon(
+                    LucideIcons.search,
+                    size: 20,
+                    color: isDark ? Colors.white60 : Colors.black54,
+                  ),
+                  prefixIconConstraints: const BoxConstraints(minWidth: 48),
+                  suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _searchController,
+                    builder: (context, value, _) {
+                      if (value.text.isEmpty) return const SizedBox.shrink();
+                      return IconButton(
+                        icon: Icon(
+                          LucideIcons.x,
+                          size: 18,
+                          color: isDark ? Colors.white : Colors.black54,
+                        ),
+                        onPressed: () {
+                          _searchController.clear();
+                          _onSearchChanged('');
+                        },
+                      );
+                    },
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: BorderSide(color: kPrimary, width: 1.5),
+                  ),
+                ),
+              ),
+            ),
+
             // ── Product Grid ─────────────────────────────
             Expanded(
               child: PagingListener(
@@ -392,9 +439,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                               ),
                                               child: Text(
                                                 'x${selectedItem.quantity}',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 9,
+                                                  fontSize:
+                                                      FontSizeConfig.body2(
+                                                        context,
+                                                      ),
                                                 ),
                                               ),
                                             ),
@@ -448,10 +498,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                               ),
                                               child: Text(
                                                 selectedItem.name,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w600,
-                                                  fontSize: 11,
+                                                  fontSize:
+                                                      FontSizeConfig.body3(
+                                                        context,
+                                                      ),
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 maxLines: 2,
@@ -467,171 +520,57 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               ),
                               const SizedBox(height: 10),
                               const Divider(),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 6),
                             ]
                           : <Widget>[],
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 10,
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 4,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        BrandScreenLocale.brandTitle.getString(
-                                          context,
-                                        ),
-                                        style: TextStyle(
-                                          fontSize: FontSizeConfig.body(
-                                            context,
-                                          ),
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: BrandSelect(
-                                          noSelect: false,
-                                          onChanged: (v) => _onChangedBrand(v),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        CategoryScreenLocale.categoryTitle
-                                            .getString(context),
-                                        style: TextStyle(
-                                          fontSize: FontSizeConfig.body(
-                                            context,
-                                          ),
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: CategoriesSelect(
-                                          onChanged: (v) => _onChangedCate(v),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+
+                      // ── Brand chips (horizontal scroll) ──
+                      const SizedBox(height: 4),
+                      HorizontalFilterChips(
+                        title: BrandScreenLocale.brandTitle.getString(context),
+                        icon: LucideIcons.tag,
+                        isDark: isDark,
+                        selectedId: brandId,
+                        items: [
+                          FilterChipItem(
+                            id: null,
+                            label: HomeScreenLocale.all.getString(context),
+                          ),
+                          ...brands.map(
+                            (b) => FilterChipItem(
+                              id: b.id as int?,
+                              label: '${b.name}',
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                        onSelected: _onChangedBrand,
                       ),
+                      const SizedBox(height: 12),
 
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(
-                      //     horizontal: 10,
-                      //     vertical: 10,
-                      //   ),
-                      //   child: Row(
-                      //     mainAxisAlignment: MainAxisAlignment.start,
-                      //     crossAxisAlignment: CrossAxisAlignment.center,
-                      //     children: [
-                      //       Expanded(
-                      //         flex: 3,
-                      //         child: Text(
-                      //           ProductScreenLocale.productTitle.getString(
-                      //             context,
-                      //           ),
-                      //           style: TextStyle(fontWeight: FontWeight.bold),
-                      //         ),
-                      //       ),
-                      //       const SizedBox(width: 5),
-                      //       Expanded(
-                      //         flex: 10,
-                      //         child: Row(
-                      //           crossAxisAlignment: CrossAxisAlignment.center,
-                      //           children: [
-                      //             Expanded(
-                      //               flex: 4,
-                      //               child: Column(
-                      //                 crossAxisAlignment:
-                      //                     CrossAxisAlignment.center,
-                      //                 mainAxisAlignment: MainAxisAlignment.center,
-                      //                 children: [
-                      //                   Text(
-                      //                     BrandScreenLocale.brandTitle.getString(
-                      //                       context,
-                      //                     ),
-                      //                     style: TextStyle(
-                      //                       fontSize: FontSizeConfig.body(
-                      //                         context,
-                      //                       ),
-                      //                       fontWeight: FontWeight.w600,
-                      //                     ),
-                      //                   ),
-                      //                   const SizedBox(height: 6),
-                      //                   SizedBox(
-                      //                     width: double.infinity,
-                      //                     child: BrandSelect(
-                      //                       noSelect: false,
-                      //                       onChanged: (v) => _onChangedBrand(v),
-                      //                     ),
-                      //                   ),
-                      //                 ],
-                      //               ),
-                      //             ),
-                      //             const SizedBox(width: 4),
-                      //             Expanded(
-                      //               flex: 3,
-                      //               child: Column(
-                      //                 crossAxisAlignment:
-                      //                     CrossAxisAlignment.center,
-                      //                 mainAxisAlignment: MainAxisAlignment.center,
-                      //                 children: [
-                      //                   Text(
-                      //                     CategoryScreenLocale.categoryTitle
-                      //                         .getString(context),
-                      //                     style: TextStyle(
-                      //                       fontSize: FontSizeConfig.body(
-                      //                         context,
-                      //                       ),
-                      //                       fontWeight: FontWeight.w600,
-                      //                     ),
-                      //                   ),
-                      //                   const SizedBox(height: 6),
-
-                      //                   SizedBox(
-                      //                     width: double.infinity,
-                      //                     child: CategoriesSelect(
-                      //                       onChanged: (v) => _onChangedCate(v),
-                      //                     ),
-                      //                   ),
-                      //                 ],
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
+                      // ── Category chips (horizontal scroll) ──
+                      HorizontalFilterChips(
+                        title: CategoryScreenLocale.categoryTitle.getString(
+                          context,
+                        ),
+                        icon: LucideIcons.layoutGrid,
+                        isDark: isDark,
+                        selectedId: categoryId,
+                        items: [
+                          FilterChipItem(
+                            id: null,
+                            label: HomeScreenLocale.all.getString(context),
+                          ),
+                          ...categories.map(
+                            (c) => FilterChipItem(
+                              id: c.id as int?,
+                              label: '${c.title}',
+                            ),
+                          ),
+                        ],
+                        onSelected: _onChangedCate,
+                      ),
                       const SizedBox(height: 10),
+
                       Expanded(
                         child: PagedGridView<int, Product>(
                           padding: const EdgeInsets.only(
@@ -674,12 +613,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                                 ),
                               );
                             },
-                            firstPageProgressIndicatorBuilder: (_) => Center(
-                              child: CircularProgressIndicator(color: kPrimary),
-                            ),
-                            newPageProgressIndicatorBuilder: (_) => Center(
-                              child: CircularProgressIndicator(color: kPrimary),
-                            ),
+                            firstPageProgressIndicatorBuilder: (_) =>
+                                Center(child: LoadingWidget()),
+                            newPageProgressIndicatorBuilder: (_) =>
+                                Center(child: LoadingWidget()),
                             noItemsFoundIndicatorBuilder: (_) => Center(
                               child: Text(
                                 HomeScreenLocale.noItemFound.getString(context),
@@ -693,55 +630,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 },
               ),
             ),
-
-            // ── Bottom Action Bar ─────────────────────────
-            // voucher != null && voucher.items.isNotEmpty
-            //     ? Positioned(
-            //         bottom: 20,
-            //         left: 0,
-            //         right: 0,
-            //         child: Center(
-            //           child: ClipRRect(
-            //             borderRadius: BorderRadius.circular(30),
-            //             child: BackdropFilter(
-            //               filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            //               child: Container(
-            //                 padding: const EdgeInsets.symmetric(
-            //                   vertical: 8,
-            //                   horizontal: 10,
-            //                 ),
-            //                 decoration: BoxDecoration(
-            //                   color: isDark
-            //                       ? Colors.white.withOpacity(0.08)
-            //                       : Colors.black.withOpacity(0.06),
-            //                   borderRadius: BorderRadius.circular(30),
-            //                   border: Border.all(
-            //                     color: isDark
-            //                         ? Colors.white.withOpacity(0.12)
-            //                         : Colors.black.withOpacity(0.08),
-            //                     width: 1,
-            //                   ),
-            //                 ),
-            //                 child: Row(
-            //                   mainAxisSize: MainAxisSize.min,
-            //                   children: [
-            //                     GradientSubmitButton(
-            //                       onPressed: () =>
-            //                           context.pushNamed(AppRoute.createVoucher),
-            //                       text: HomeScreenLocale.createVoucher.getString(
-            //                         context,
-            //                       ),
-            //                       width: 200,
-            //                       circularNo: 20,
-            //                     ),
-            //                   ],
-            //                 ),
-            //               ),
-            //             ),
-            //           ),
-            //         ),
-            //       )
-            //     : const SizedBox(),
           ],
         ),
       ),
@@ -753,6 +641,158 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           child: const Icon(Icons.add, color: Colors.white),
         ),
       ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: isDark ? kBgDark : kBgLight,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isDark ? 0.4 : 0.10),
+              blurRadius: 16,
+              spreadRadius: 0,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: [
+                BottomNavItem(
+                  icon: LucideIcons.packageOpen,
+                  label: DrawerScreenLocale.drawerProduct.getString(context),
+                  onTap: () => context.pushNamed(AppRoute.product),
+                ),
+                BottomNavItem(
+                  icon: LucideIcons.ticket,
+                  label: VoucherScreenLocale.voucher.getString(context),
+                  onTap: () => context.pushNamed(AppRoute.vouchers),
+                ),
+                BottomNavItem(
+                  icon: LucideIcons.trendingUp,
+                  label: DrawerScreenLocale.drawerIncome.getString(context),
+                  onTap: () => context.pushNamed(AppRoute.income),
+                ),
+                BottomNavItem(
+                  icon: LucideIcons.chartNoAxesCombined,
+                  label: DrawerScreenLocale.drawerProfit.getString(context),
+                  onTap: () => context.pushNamed(AppRoute.profitAndLoss),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+// Horizontal Filter Chips (Brand / Category)
+// ─────────────────────────────────────────
+class FilterChipItem {
+  final int? id; // null = "အားလုံး"
+  final String label;
+  const FilterChipItem({required this.id, required this.label});
+}
+
+class HorizontalFilterChips extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final List<FilterChipItem> items;
+  final int? selectedId;
+  final ValueChanged<int?> onSelected;
+  final bool isDark;
+
+  const HorizontalFilterChips({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.items,
+    required this.selectedId,
+    required this.onSelected,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: [
+              Icon(icon, size: 15, color: kPrimary),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: FontSizeConfig.body2(context),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 38,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: items.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final item = items[index];
+              final selected = item.id == selectedId;
+
+              return GestureDetector(
+                onTap: () => onSelected(item.id),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOut,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    gradient: selected
+                        ? LinearGradient(colors: [kPrimary, kSecondary])
+                        : null,
+                    color: selected
+                        ? null
+                        : (isDark
+                              ? Colors.white.withOpacity(0.08)
+                              : Colors.black.withOpacity(0.05)),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: selected
+                        ? [
+                            BoxShadow(
+                              color: kPrimary.withOpacity(0.35),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ]
+                        : [],
+                  ),
+                  child: Text(
+                    item.label,
+                    style: TextStyle(
+                      fontSize: FontSizeConfig.body2(context),
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                      color: selected
+                          ? Colors.white
+                          : (isDark ? Colors.white70 : Colors.black87),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -851,10 +891,10 @@ class _ProductCard extends StatelessWidget {
                 ),
                 child: Text(
                   item.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
-                    fontSize: 11,
+                    fontSize: FontSizeConfig.body3(context),
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,

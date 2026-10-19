@@ -124,10 +124,10 @@ class _DebtListTileState extends ConsumerState<DebtListTile> {
         : 1;
 
     final mainAxisExtent = Responsive.isDesktop(context)
-        ? 350.0
+        ? 300.0
         : Responsive.isTablet(context)
-        ? 320.0
-        : 320.0;
+        ? 250.0
+        : 160.0;
 
     return RefreshIndicator(
       onRefresh: () async {

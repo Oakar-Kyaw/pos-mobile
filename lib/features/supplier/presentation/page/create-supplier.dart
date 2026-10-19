@@ -26,6 +26,8 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
   final phoneController = TextEditingController();
   final addressController = TextEditingController();
 
+  bool _isLoading = false;
+
   @override
   void dispose() {
     nameController.dispose();
@@ -36,6 +38,8 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
   }
 
   Future<void> createSupplier() async {
+    if (_isLoading) return;
+
     if (nameController.text.trim().isEmpty) {
       ShowToast(
         context,
@@ -61,6 +65,8 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
           ? null
           : addressController.text.trim(),
     };
+
+    setState(() => _isLoading = true);
 
     try {
       final success = await ref
@@ -95,6 +101,8 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
         borderColor: Colors.red,
         isError: true,
       );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -117,86 +125,104 @@ class _CreateSupplierPageState extends ConsumerState<CreateSupplierPage> {
           style: TextStyle(color: textColor),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: ShadForm(
-          key: _formKey,
-          child: Column(
-            children: [
-              ShadCard(
-                backgroundColor: surfaceColor,
+      body: Stack(
+        children: [
+          AbsorbPointer(
+            absorbing: _isLoading,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: ShadForm(
+                key: _formKey,
                 child: Column(
                   children: [
-                    ShadInputFormField(
-                      id: 'name',
-                      controller: nameController,
-                      label: Text(
-                        SupplierLocale.supplierName.getString(context),
-                        style: TextStyle(color: subColor),
-                      ),
-                      placeholder: Text(
-                        SupplierLocale.supplierName.getString(context),
+                    ShadCard(
+                      backgroundColor: surfaceColor,
+                      child: Column(
+                        children: [
+                          ShadInputFormField(
+                            id: 'name',
+                            controller: nameController,
+                            enabled: !_isLoading,
+                            label: Text(
+                              SupplierLocale.supplierName.getString(context),
+                              style: TextStyle(color: subColor),
+                            ),
+                            placeholder: Text(
+                              SupplierLocale.supplierName.getString(context),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          ShadInputFormField(
+                            id: 'email',
+                            controller: emailController,
+                            enabled: !_isLoading,
+                            keyboardType: TextInputType.emailAddress,
+                            label: Text(
+                              SupplierLocale.supplierEmail.getString(context),
+                              style: TextStyle(color: subColor),
+                            ),
+                            placeholder: Text(
+                              SupplierLocale.supplierEmail.getString(context),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          ShadInputFormField(
+                            id: 'phone',
+                            controller: phoneController,
+                            enabled: !_isLoading,
+                            keyboardType: TextInputType.phone,
+                            label: Text(
+                              SupplierLocale.supplierPhone.getString(context),
+                              style: TextStyle(color: subColor),
+                            ),
+                            placeholder: Text(
+                              SupplierLocale.supplierPhone.getString(context),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          ShadInputFormField(
+                            id: 'address',
+                            controller: addressController,
+                            enabled: !_isLoading,
+                            maxLines: 3,
+                            label: Text(
+                              SupplierLocale.supplierAddress.getString(context),
+                              style: TextStyle(color: subColor),
+                            ),
+                            placeholder: Text(
+                              SupplierLocale.supplierAddress.getString(context),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
-                    ShadInputFormField(
-                      id: 'email',
-                      controller: emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      label: Text(
-                        SupplierLocale.supplierEmail.getString(context),
-                        style: TextStyle(color: subColor),
-                      ),
-                      placeholder: Text(
-                        SupplierLocale.supplierEmail.getString(context),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    ShadInputFormField(
-                      id: 'phone',
-                      controller: phoneController,
-                      keyboardType: TextInputType.phone,
-                      label: Text(
-                        SupplierLocale.supplierPhone.getString(context),
-                        style: TextStyle(color: subColor),
-                      ),
-                      placeholder: Text(
-                        SupplierLocale.supplierPhone.getString(context),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    ShadInputFormField(
-                      id: 'address',
-                      controller: addressController,
-                      maxLines: 3,
-                      label: Text(
-                        SupplierLocale.supplierAddress.getString(context),
-                        style: TextStyle(color: subColor),
-                      ),
-                      placeholder: Text(
-                        SupplierLocale.supplierAddress.getString(context),
-                      ),
+                    GradientSubmitButton(
+                      isSubmitting: _isLoading,
+                      onPressed: () {
+                        if (!_isLoading) createSupplier();
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        return;
+                      },
+                      text: SupplierLocale.supplierCreate.getString(context),
+                      width: double.infinity,
                     ),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 24),
-
-              GradientSubmitButton(
-                onPressed: createSupplier,
-                text: SupplierLocale.supplierCreate.getString(context),
-                width: double.infinity,
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

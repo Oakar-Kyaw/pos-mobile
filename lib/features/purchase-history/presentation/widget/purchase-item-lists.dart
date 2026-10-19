@@ -187,7 +187,6 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
   @override
   void dispose() {
     _pagingController.dispose();
-
     super.dispose();
   }
 
@@ -218,52 +217,56 @@ class _PurchaseitemListState extends ConsumerState<PurchaseItemLists> {
 
     return PagingListener(
       controller: _pagingController,
-      builder: (context, state, fetchNextPage) => PagedGridView<int, Purchase>(
-        state: state,
-        fetchNextPage: fetchNextPage,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          mainAxisExtent: mainAxisExtent,
-        ),
-        builderDelegate: PagedChildBuilderDelegate<Purchase>(
-          itemBuilder: (context, purchaseItem, index) {
-            final containerDecoration = getContainerBoxDecoration(
-              isDark,
-              dividerColor,
-            );
-            return InkWell(
-              borderRadius: BorderRadius.circular(12),
-              splashColor: kPrimary.withOpacity(0.08),
-              highlightColor: rowHoverColor,
-              child: Container(
-                decoration: containerDecoration,
-                child: PurchaseCard(
-                  onDelete: () => _onDelete(purchaseItem.id),
-                  purchase: purchaseItem,
-                  textColor: textColor,
-                  subColor: subColor,
+      builder: (context, state, fetchNextPage) => RefreshIndicator(
+        onRefresh: () => Future.sync(_pagingController.refresh),
+        child: PagedGridView<int, Purchase>(
+          state: state,
+          fetchNextPage: fetchNextPage,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            mainAxisExtent: mainAxisExtent,
+          ),
+          physics: const AlwaysScrollableScrollPhysics(),
+          builderDelegate: PagedChildBuilderDelegate<Purchase>(
+            itemBuilder: (context, purchaseItem, index) {
+              final containerDecoration = getContainerBoxDecoration(
+                isDark,
+                dividerColor,
+              );
+              return InkWell(
+                borderRadius: BorderRadius.circular(12),
+                splashColor: kPrimary.withOpacity(0.08),
+                highlightColor: rowHoverColor,
+                child: Container(
+                  decoration: containerDecoration,
+                  child: PurchaseCard(
+                    onDelete: () => _onDelete(purchaseItem.id),
+                    purchase: purchaseItem,
+                    textColor: textColor,
+                    subColor: subColor,
 
-                  onSuccess: () => _onSuccess(purchaseItem.id),
+                    onSuccess: () => _onSuccess(purchaseItem.id),
 
-                  onEdit: () => context.pushNamed(
-                    AppRoute.purchaseEdit,
-                    extra: purchaseItem,
-                  ),
-                  onDetail: () => context.pushNamed(
-                    AppRoute.purchaseDetail,
-                    extra: purchaseItem,
+                    onEdit: () => context.pushNamed(
+                      AppRoute.purchaseEdit,
+                      extra: purchaseItem,
+                    ),
+                    onDetail: () => context.pushNamed(
+                      AppRoute.purchaseDetail,
+                      extra: purchaseItem,
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
 
-          firstPageProgressIndicatorBuilder: (_) => LoadingWidget(),
-          newPageProgressIndicatorBuilder: (_) => LoadingWidget(),
-          noItemsFoundIndicatorBuilder: (_) =>
-              NoItemFoundWidget(subColor: subColor),
+            firstPageProgressIndicatorBuilder: (_) => LoadingWidget(),
+            newPageProgressIndicatorBuilder: (_) => LoadingWidget(),
+            noItemsFoundIndicatorBuilder: (_) =>
+                NoItemFoundWidget(subColor: subColor),
+          ),
         ),
       ),
     );

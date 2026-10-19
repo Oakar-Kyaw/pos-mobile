@@ -103,6 +103,13 @@ class VoucherDetailNotifier extends Notifier<VoucherDetailModel?> {
     calculate();
   }
 
+  //change paid status
+  void setPaidStatus(PaidStatus status) {
+    final v = state;
+    if (v == null) return;
+    state = v.copyWith(paidStatus: status);
+  }
+
   void removePaymentByid(String id) {
     print("id $id");
     if (state != null) {

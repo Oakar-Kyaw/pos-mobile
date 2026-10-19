@@ -9,16 +9,18 @@ import 'package:pos/core/utils/date-select.dart';
 import 'package:pos/core/utils/payment-row.dart';
 import 'package:pos/core/utils/payment-select.dart';
 import 'package:pos/core/utils/supplier-select.dart';
-import 'package:pos/features/voucher/presentation/widgets/calculation-search-field.dart';
 import 'package:pos/features/purchase-history/data/model/purchase-item.dart';
 import 'package:pos/features/purchase-history/data/model/purchase-payment.dart';
 import 'package:pos/features/purchase-history/presentation/provider/purchase.api.dart';
 import 'package:pos/features/purchase-history/presentation/widget/purchase-status-select.dart';
+import 'package:pos/features/supplier/presentation/provider/supplier-provider.dart';
+import 'package:pos/localization/home-local.dart';
 import 'package:pos/localization/purchase-local.dart';
 import 'package:pos/models/payment-data.dart';
 import 'package:pos/models/product.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
+import 'package:pos/utils/customer-product-search-field.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -31,12 +33,20 @@ class PurchaseCreatePage extends ConsumerStatefulWidget {
 }
 
 class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
-  final _formKey = GlobalKey<ShadFormState>();
+  // Refresh လုပ်ရင် key အသစ်ပြောင်းပြီး form တစ်ခုလုံးကို rebuild လုပ်မယ်
+  GlobalKey<ShadFormState> _formKey = GlobalKey<ShadFormState>();
   int? supplierId;
   String? status;
   DateTime? orderDate;
+  DateTime? receivedDate;
   Timer? _debounce;
-  bool showAddField = false;
+
+  // ── Product search (Home page နဲ့ တူတူ page 1, limit 40) ──
+  static const int _searchLimit = 40;
+  List<Product> _searchResults = [];
+  bool _isSearchLoading = false;
+  int _searchSeq = 0; // နောက်ဆုံး request ရဲ့ ရလဒ်ကိုပဲ ယူဖို့
+
   final TextEditingController searchController = TextEditingController();
   List<PurchaseItem> purchaseItems = [];
   final TextEditingController discountController = TextEditingController();
@@ -49,9 +59,11 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
 
   late List<TextEditingController> qtyControllers;
   late List<TextEditingController> priceControllers;
+  late List<TextEditingController> sellingPriceControllers;
   late List<TextEditingController> paymentAmountController;
   List<PurchasePayment> purchasePayment = [];
   double totalPaidAmount = 0.0;
+  bool _isSubmitting = false;
   @override
   void initState() {
     super.initState();
@@ -62,6 +74,10 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
 
     priceControllers = purchaseItems
         .map((e) => TextEditingController(text: e.price.toString()))
+        .toList();
+
+    sellingPriceControllers = purchaseItems
+        .map((e) => TextEditingController(text: e.sellingPrice.toString()))
         .toList();
 
     paymentAmountController = purchasePayment
@@ -82,27 +98,247 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
       controller.dispose();
     }
 
+    for (final controller in sellingPriceControllers) {
+      controller.dispose();
+    }
+
     for (final p in paymentAmountController) {
       p.dispose();
     }
 
     discountController.dispose();
+    discountPercentController.dispose();
     taxController.dispose();
     deliveryFeeController.dispose();
+    packagingFeeController.dispose();
     noteController.dispose();
 
     super.dispose();
   }
 
-  void onSearchChanged(String value) {
-    print("value is 👨‍🏭 $value");
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (!mounted) return;
-      ref
-          .read(productProvider.notifier)
-          .getProductLists("10", "10", search: value);
+  // ==========================================================
+  // PULL TO REFRESH — form တစ်ခုလုံး reset + data ပြန်ယူ
+  // ==========================================================
+  Future<void> _onRefresh() async {
+    _debounce?.cancel();
+    _searchSeq++; // ပျံနေတဲ့ search request တွေရဲ့ ရလဒ်ကို ပယ်ပစ်
+
+    // ဟောင်းတဲ့ controller တွေကို frame ပြီးမှ dispose လုပ်မယ်
+    // (လက်ရှိ widget တွေက ဆက်သုံးနေသေးလို့ error မတက်အောင်)
+    final oldControllers = <TextEditingController>[
+      ...qtyControllers,
+      ...priceControllers,
+      ...sellingPriceControllers,
+      ...paymentAmountController,
+    ];
+
+    setState(() {
+      supplierId = null;
+      status = null;
+      orderDate = null;
+      receivedDate = null;
+      totalPaidAmount = 0.0;
+
+      purchaseItems = [];
+      purchasePayment = [];
+      qtyControllers = [];
+      priceControllers = [];
+      sellingPriceControllers = [];
+      paymentAmountController = [];
+
+      _searchResults = [];
+      _isSearchLoading = false;
+
+      searchController.clear();
+      discountController.clear();
+      discountPercentController.clear();
+      taxController.clear();
+      deliveryFeeController.clear();
+      packagingFeeController.clear();
+      noteController.clear();
+
+      // Key အသစ်ပေးလိုက်တော့ SupplierSelect, DateSelect,
+      // PurchaseStatusSelect, PaymentSelect တွေပါ အသစ်ပြန်ဖြစ်မယ်
+      _formKey = GlobalKey<ShadFormState>();
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      for (final c in oldControllers) {
+        c.dispose();
+      }
+    });
+
+    // Supplier list ကို cache ဖျက်ပြီး ပြန်ယူခိုင်းမယ်
+    ref.invalidate(supplierProvider);
+  }
+
+  // ==========================================================
+  // PRODUCT SEARCH
+  // getProductLists က Home မှာလိုပဲ List<Product> ပြန်ပေးတာမို့
+  // ရလာတဲ့ list ကို ဒီ page ရဲ့ state ထဲ ကိုယ်တိုင်ထည့်ပြီး ပြမယ်
+  // ==========================================================
+  void onSearchChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      if (!mounted) return;
+      _searchProducts(value.trim());
+    });
+  }
+
+  Future<void> _searchProducts(String query) async {
+    final seq = ++_searchSeq;
+
+    if (query.isEmpty) {
+      setState(() {
+        _searchResults = [];
+        _isSearchLoading = false;
+      });
+      return;
+    }
+
+    setState(() => _isSearchLoading = true);
+
+    try {
+      final result = await ref
+          .read(productProvider.notifier)
+          .getProductLists("1", _searchLimit.toString(), search: query);
+
+      // နောက် request ရောက်သွားပြီဆိုရင် ဒီရလဒ်ကို မသုံးဘူး
+      if (!mounted || seq != _searchSeq) return;
+
+      setState(() {
+        _searchResults = List<Product>.from(result);
+        _isSearchLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Search products error: $e');
+      if (!mounted || seq != _searchSeq) return;
+      setState(() {
+        _searchResults = [];
+        _isSearchLoading = false;
+      });
+    }
+  }
+
+  void _onSelectSearchResult(Product product) {
+    addProduct(product);
+    _searchSeq++;
+    setState(() {
+      searchController.clear();
+      _searchResults = [];
+      _isSearchLoading = false;
+    });
+    FocusScope.of(context).unfocus();
+  }
+
+  Widget _buildProductSearch(
+    Color surfaceColor,
+    Color textColor,
+    Color subColor,
+  ) {
+    final hasQuery = searchController.text.trim().isNotEmpty;
+
+    return Column(
+      children: [
+        TextField(
+          controller: searchController,
+          onChanged: (v) {
+            setState(() {});
+            onSearchChanged(v);
+          },
+          style: TextStyle(color: textColor),
+          decoration: InputDecoration(
+            hintText: 'Search products...',
+            hintStyle: TextStyle(color: subColor),
+            prefixIcon: Icon(Icons.search, color: subColor),
+            suffixIcon: _isSearchLoading
+                ? const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : (hasQuery
+                      ? IconButton(
+                          icon: Icon(Icons.close, color: subColor),
+                          onPressed: () {
+                            _searchSeq++;
+                            setState(() {
+                              searchController.clear();
+                              _searchResults = [];
+                              _isSearchLoading = false;
+                            });
+                          },
+                        )
+                      : null),
+            filled: true,
+            fillColor: surfaceColor,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 12,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: subColor.withOpacity(0.3)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: subColor.withOpacity(0.3)),
+            ),
+          ),
+        ),
+
+        if (_searchResults.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 8),
+            constraints: const BoxConstraints(maxHeight: 280),
+            decoration: BoxDecoration(
+              color: surfaceColor,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: subColor.withOpacity(0.3)),
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: _searchResults.length,
+              separatorBuilder: (_, __) =>
+                  Divider(height: 1, color: subColor.withOpacity(0.2)),
+              itemBuilder: (context, index) {
+                final product = _searchResults[index];
+                return ListTile(
+                  dense: true,
+                  title: Text(
+                    product.name,
+                    style: TextStyle(color: textColor),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    product.price.toString(),
+                    style: TextStyle(color: subColor),
+                  ),
+                  trailing: Icon(
+                    Icons.add_circle_outline,
+                    color: subColor,
+                    size: 22,
+                  ),
+                  onTap: () => _onSelectSearchResult(product),
+                );
+              },
+            ),
+          )
+        else if (hasQuery && !_isSearchLoading)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Text(
+              HomeScreenLocale.noItemFound.getString(context),
+              style: TextStyle(color: subColor),
+            ),
+          ),
+      ],
+    );
   }
 
   double get totalAmount {
@@ -137,11 +373,13 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
   }
 
   void createPurchase() async {
+    setState(() => _isSubmitting = true);
     try {
       debugPrint("Creating purchase... ${supplierId == null}");
       if (!mounted) return;
       if (supplierId == null) {
         debugPrint("Supplier is required");
+        if (mounted) setState(() => _isSubmitting = false);
         ShowToast(
           context,
           description: Text(
@@ -166,6 +404,7 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
 
       if (status == null) {
         debugPrint("status is required");
+        if (mounted) setState(() => _isSubmitting = false);
         ShowToast(
           context,
           description: Text(
@@ -180,6 +419,7 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
 
       if (orderDate == null) {
         debugPrint("Order Date is required");
+        if (mounted) setState(() => _isSubmitting = false);
         ShowToast(
           context,
           description: Text(
@@ -192,8 +432,26 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
         return;
       }
 
+      if (status == "Success" && receivedDate == null) {
+        debugPrint("Received Date is required");
+        if (mounted) setState(() => _isSubmitting = false);
+        ShowToast(
+          context,
+          description: Text(
+            PurchaseLocale.purchaseReceivedDateRequired.getString(context),
+            style: TextStyle(color: kRed),
+          ),
+          borderColor: kRed,
+          isError: true,
+        );
+        return;
+      }
+
       if (purchaseItems.isEmpty) {
         debugPrint("Purchase Item is required");
+        setState(() {
+          _isSubmitting = false;
+        });
         ShowToast(
           context,
           description: Text(
@@ -213,12 +471,15 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
           "productId": purchaseItems[index].productId,
           "quantity": int.tryParse(qtyControllers[index].text) ?? 0,
           "price": double.tryParse(priceControllers[index].text) ?? 0,
+          "sellingPrice":
+              double.tryParse(sellingPriceControllers[index].text) ?? 0,
         },
       );
 
       final payload = {
         "supplierId": supplierId,
         "orderDate": orderDate?.toIso8601String(),
+        "receivedDate": receivedDate?.toIso8601String(),
         "status": status!.toUpperCase(),
         "note": noteController.text,
         "discount": discountController.text.isEmpty
@@ -239,6 +500,7 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
       };
 
       debugPrint("Payload for purchase: $payload");
+      if (mounted) setState(() => _isSubmitting = true);
 
       // call API here
       final success = await ref
@@ -253,9 +515,11 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
           ),
           borderColor: kGreen,
         );
-        context.pushNamed(AppRoute.purchaseHistory);
+        context.pop();
       }
     } on AddPurchasePaymentError {
+      setState(() => _isSubmitting = false);
+      debugPrint("Pyament 📆 $_isSubmitting");
       ShowToast(
         context,
         isError: true,
@@ -267,7 +531,10 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
       );
     } catch (e, stackTrace) {
       debugPrint("Error creating purchase: $e");
+      setState(() => _isSubmitting = false);
       debugPrintStack(stackTrace: stackTrace);
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
@@ -283,7 +550,8 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
         purchaseId: product.id,
 
         quantity: 1,
-        price: product.price,
+        price: product.costPrice ?? 0,
+        sellingPrice: product.price,
       );
 
       purchaseItems.add(item);
@@ -291,6 +559,11 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
       qtyControllers.add(TextEditingController(text: '1'));
 
       priceControllers.add(
+        TextEditingController(text: product.costPrice.toString()),
+      );
+
+      //selling price controller
+      sellingPriceControllers.add(
         TextEditingController(text: product.price.toString()),
       );
     });
@@ -328,11 +601,12 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
       // Dispose controllers first
       qtyControllers[index].dispose();
       priceControllers[index].dispose();
+      sellingPriceControllers[index].dispose();
 
       // Remove controllers
       qtyControllers.removeAt(index);
       priceControllers.removeAt(index);
-
+      sellingPriceControllers.removeAt(index);
       // Remove purchase item
       purchaseItems.removeAt(index);
     });
@@ -363,6 +637,14 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
           PurchaseLocale.purchaseDetail.getString(context),
           style: TextStyle(color: textColor),
         ),
+        actions: [
+          // ခလုတ်နဲ့လည်း refresh လုပ်လို့ရအောင်
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh',
+            onPressed: _onRefresh,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -387,12 +669,21 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
                       subColor,
                       setState,
                     ),
+
                     _infoRowSelectDate(
                       PurchaseLocale.purchaseOrderDate.getString(context),
                       textColor,
                       subColor,
-                      setState,
+                      (value) => setState(() => orderDate = value),
                     ),
+
+                    if (status == "Success")
+                      _infoRowSelectDate(
+                        PurchaseLocale.purchaseReceivedDate.getString(context),
+                        textColor,
+                        subColor,
+                        (value) => setState(() => receivedDate = value),
+                      ),
                   ],
                 ),
               ),
@@ -411,19 +702,12 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
 
               const SizedBox(height: 12),
 
-              buildSearchField(
-                context,
-                ref,
-                searchController,
-                isDark,
-                textColor,
-                subColor,
-                setState,
-                showAddField,
-                onSearchChanged: onSearchChanged,
-                onAddProduct: addProduct,
+              CustomProductSearchField<Product>(
+                itemBuilder: (product) => product,
+                onProductSelected: (p) => addProduct(p as Product),
               ),
 
+              // _buildProductSearch(surfaceColor, textColor, subColor),
               const SizedBox(height: 12),
 
               ...List.generate(purchaseItems.length, (index) {
@@ -470,6 +754,7 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
                         Row(
                           children: [
                             Expanded(
+                              flex: 2,
                               child: ShadInputFormField(
                                 id: 'qty_$index',
                                 controller: qtyControllers[index],
@@ -486,18 +771,44 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
                               ),
                             ),
 
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 8),
 
+                            ///buyprice
                             Expanded(
+                              flex: 5,
                               child: ShadInputFormField(
-                                id: 'price_$index',
+                                id: 'buying_price_$index',
                                 controller: priceControllers[index],
                                 keyboardType:
                                     const TextInputType.numberWithOptions(
                                       decimal: true,
                                     ),
                                 label: Text(
-                                  PurchaseLocale.purchasePrice.getString(
+                                  PurchaseLocale.purchaseBuyPrice.getString(
+                                    context,
+                                  ),
+                                  style: TextStyle(color: subColor),
+                                ),
+                                onChanged: (_) {
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+
+                            const SizedBox(width: 8),
+
+                            ///selling price
+                            Expanded(
+                              flex: 5,
+                              child: ShadInputFormField(
+                                id: 'selling_price_$index',
+                                controller: sellingPriceControllers[index],
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                                label: Text(
+                                  PurchaseLocale.purchaseSellingPrice.getString(
                                     context,
                                   ),
                                   style: TextStyle(color: subColor),
@@ -659,6 +970,7 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
               const SizedBox(height: 24),
 
               GradientSubmitButton(
+                isSubmitting: _isSubmitting,
                 onPressed: createPurchase,
                 text: PurchaseLocale.purchaseCreate.getString(context),
                 width: double.infinity,
@@ -707,7 +1019,7 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
     String title,
     Color textColor,
     Color subColor,
-    setState,
+    ValueChanged<DateTime> onPicked,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -717,15 +1029,12 @@ class _PurchaseCreatePageState extends ConsumerState<PurchaseCreatePage> {
             flex: 3,
             child: Text(title, style: TextStyle(color: subColor)),
           ),
-
           Expanded(
             flex: 5,
             child: DateSelect(
               onChanged: (value) {
                 if (value == null) return;
-                setState(() {
-                  orderDate = value;
-                });
+                onPicked(value);
               },
             ),
           ),

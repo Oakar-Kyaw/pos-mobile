@@ -7,6 +7,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/core/service/firebase-service.dart';
 import 'package:pos/core/widgets/app-local-notification.dart';
+import 'package:pos/core/widgets/no-internet.dart';
 import 'package:pos/localization/localization.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';
@@ -14,6 +15,7 @@ import 'package:pos/utils/go-router.dart';
 import 'package:pos/utils/secure-storage.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:shorebird_code_push/shorebird_code_push.dart';
+import 'package:restart_app/restart_app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,31 +71,6 @@ class _MyAppState extends ConsumerState<MyApp> {
     });
   }
 
-  // Future<void> _checkTheme() async {
-  //   final isDark = await _secureStorage.getTheme();
-  //   ref
-  //       .read(themeModeProvider.notifier)
-  //       .setTheme(isDark ? ThemeMode.dark : ThemeMode.light);
-  // }
-
-  // Future<void> _checkLogin() async {
-  //   final isLogin = await _secureStorage.getLogin();
-
-  //   if (!mounted) return; // VERY IMPORTANT
-
-  //   if (isLogin) {
-  //     ref.read(checkLoginProvider.notifier).login();
-  //     await addToUserLocalStateWidget(ref);
-  //   } else {
-  //     ref.read(checkLoginProvider.notifier).logout();
-  //   }
-  // }
-
-  // Future<void> _checkLanguage() async {
-  //   final languageCode = await _secureStorage.getLanguageSetting();
-  //   localization.translate(languageCode);
-  // }
-
   Future<void> _checkForShorebirdUpdate() async {
     final updater = ShorebirdUpdater();
     final notifier = AppLocalNotification();
@@ -118,9 +95,9 @@ class _MyAppState extends ConsumerState<MyApp> {
         );
 
         await updater.update();
-
-        print('Patch downloaded successfully.');
-        print('Restart the app to apply the patch.');
+        await _showRestartDialog(context);
+        // print('Patch downloaded successfully.');
+        // print('Restart the app to apply the patch.');
 
         await notifier.showShorebirdUpdateReady(
           notiId: shorebirdNotiId,
@@ -173,6 +150,36 @@ class _MyAppState extends ConsumerState<MyApp> {
     });
   }
 
+  //Restart app if update
+  Future<void> _showRestartDialog(BuildContext context) async {
+    final ctx = rootNavigatorKey.currentContext;
+    if (ctx == null) return;
+    final notifier = AppLocalNotification();
+    final restart = await showDialog<bool>(
+      context: ctx,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Update ready'),
+        content: const Text('Restart the app to apply the latest update.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Later'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Restart now'),
+          ),
+        ],
+      ),
+    );
+
+    if (restart == true) {
+      await notifier.cancelShorebirdNotification(notiId: 2001);
+      Restart.restartApp();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
@@ -187,6 +194,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       ),
       appBuilder: (context) {
         return MaterialApp.router(
+          scaffoldMessengerKey: scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
           supportedLocales: localization.supportedLocales,
           localizationsDelegates: localization.localizationsDelegates,
@@ -205,23 +213,37 @@ class _MyAppState extends ConsumerState<MyApp> {
           routerConfig: router,
           builder: (context, child) {
             final baseTheme = Theme.of(context);
+
             final responsiveTextTheme = baseTheme.textTheme.copyWith(
+              // Title
               titleLarge: baseTheme.textTheme.titleLarge?.copyWith(
-                fontSize: FontSizeConfig.title(context),
+                fontSize: FontSizeConfig.title1(context),
               ),
               titleMedium: baseTheme.textTheme.titleMedium?.copyWith(
-                fontSize: FontSizeConfig.title(context),
+                fontSize: FontSizeConfig.title2(context),
               ),
+
+              // Body
               bodyLarge: baseTheme.textTheme.bodyLarge?.copyWith(
-                fontSize: FontSizeConfig.body(context),
+                fontSize: FontSizeConfig.body1(context),
               ),
               bodyMedium: baseTheme.textTheme.bodyMedium?.copyWith(
-                fontSize: FontSizeConfig.body(context),
+                fontSize: FontSizeConfig.body1(context),
+              ),
+              bodySmall: baseTheme.textTheme.bodySmall?.copyWith(
+                fontSize: FontSizeConfig.body2(context),
               ),
             );
+
             return Theme(
-              data: baseTheme.copyWith(textTheme: responsiveTextTheme),
-              child: ShadToaster(child: child!),
+              data: baseTheme.copyWith(
+                textTheme: responsiveTextTheme,
+                // Icon default size
+                iconTheme: baseTheme.iconTheme.copyWith(
+                  size: FontSizeConfig.iconSize1(context),
+                ),
+              ),
+              child: ShadToaster(child: NoInternetBanner(child: child!)),
             );
           },
         );

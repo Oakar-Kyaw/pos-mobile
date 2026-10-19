@@ -5,10 +5,10 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/product.api.dart';
+import 'package:pos/core/utils/date-select.dart';
 import 'package:pos/core/utils/payment-row.dart';
 import 'package:pos/core/utils/payment-select.dart';
 import 'package:pos/core/widgets/info-row.dart';
-import 'package:pos/features/voucher/presentation/widgets/calculation-search-field.dart';
 import 'package:pos/features/purchase-history/data/model/purchase-item.dart';
 import 'package:pos/features/purchase-history/data/model/purchase-payment.dart';
 import 'package:pos/features/purchase-history/data/model/purchase.dart';
@@ -18,9 +18,12 @@ import 'package:pos/localization/purchase-local.dart';
 import 'package:pos/models/payment-data.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/button.dart';
+import 'package:pos/utils/customer-product-search-field.dart';
 import 'package:pos/utils/route-constant.dart';
 import 'package:pos/utils/shad-toaster.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:pos/localization/home-local.dart';
+import 'package:pos/models/product.dart';
 
 class PurchaseEditPage extends ConsumerStatefulWidget {
   const PurchaseEditPage({super.key, required this.purchase});
@@ -36,16 +39,21 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
   Timer? _debounce;
 
-  bool showAddField = false;
+  static const int _searchLimit = 40;
+  List<Product> _searchResults = [];
+  bool _isSearchLoading = false;
+  int _searchSeq = 0;
 
   int? supplierId;
   String? status;
   DateTime? orderDate;
+  DateTime? receivedDate;
 
   final TextEditingController searchController = TextEditingController();
 
   late List<TextEditingController> qtyControllers;
   late List<TextEditingController> priceControllers;
+  late List<TextEditingController> sellingPriceControllers;
 
   late TextEditingController discountController;
   late TextEditingController discountPercentController;
@@ -58,6 +66,7 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
   late List<TextEditingController> paymentAmountController;
   List<PurchasePayment> purchasePayment = [];
   double totalPaidAmount = 0.0;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -75,6 +84,12 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
     priceControllers = purchaseData.purchaseItems
         .map((item) => TextEditingController(text: item.price.toString()))
+        .toList();
+
+    sellingPriceControllers = purchaseData.purchaseItems
+        .map(
+          (item) => TextEditingController(text: item.sellingPrice.toString()),
+        )
         .toList();
 
     discountController = TextEditingController(
@@ -122,6 +137,10 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
       controller.dispose();
     }
 
+    for (final controller in sellingPriceControllers) {
+      controller.dispose();
+    }
+
     for (final p in paymentAmountController) {
       p.dispose();
     }
@@ -137,17 +156,56 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
   }
 
   void onSearchChanged(String value) {
-    if (_debounce?.isActive ?? false) {
-      _debounce!.cancel();
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      if (!mounted) return;
+      _searchProducts(value.trim());
+    });
+  }
+
+  Future<void> _searchProducts(String query) async {
+    final seq = ++_searchSeq;
+
+    if (query.isEmpty) {
+      setState(() {
+        _searchResults = [];
+        _isSearchLoading = false;
+      });
+      return;
     }
 
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (!mounted) return;
+    setState(() => _isSearchLoading = true);
 
-      ref
+    try {
+      final result = await ref
           .read(productProvider.notifier)
-          .getProductLists("10", "10", search: value);
+          .getProductLists("1", _searchLimit.toString(), search: query);
+
+      if (!mounted || seq != _searchSeq) return;
+
+      setState(() {
+        _searchResults = List<Product>.from(result);
+        _isSearchLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Search products error: $e');
+      if (!mounted || seq != _searchSeq) return;
+      setState(() {
+        _searchResults = [];
+        _isSearchLoading = false;
+      });
+    }
+  }
+
+  void _onSelectSearchResult(Product product) {
+    addProduct(product);
+    _searchSeq++;
+    setState(() {
+      searchController.clear();
+      _searchResults = [];
+      _isSearchLoading = false;
     });
+    FocusScope.of(context).unfocus();
   }
 
   double get totalAmount {
@@ -195,7 +253,8 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
         purchaseId: purchaseData.id,
 
         quantity: 1,
-        price: product.price,
+        price: product.costPrice ?? 0,
+        sellingPrice: product.price,
       );
 
       purchaseData.purchaseItems.add(item);
@@ -203,6 +262,11 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
       qtyControllers.add(TextEditingController(text: '1'));
 
       priceControllers.add(
+        TextEditingController(text: product.costPrice.toString()),
+      );
+
+      ///selling price
+      sellingPriceControllers.add(
         TextEditingController(text: product.price.toString()),
       );
     });
@@ -228,6 +292,7 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
   }
 
   void updatePurchase() async {
+    if (_isSubmitting) return;
     try {
       if (purchasePayment.isEmpty) throw AddPurchasePaymentError();
 
@@ -247,12 +312,15 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
           "productId": item.productId,
           "quantity": int.tryParse(qtyControllers[index].text) ?? 0,
           "price": double.tryParse(priceControllers[index].text) ?? 0,
+          "sellingPrice":
+              double.tryParse(sellingPriceControllers[index].text) ?? 0,
         };
       });
 
       final payload = {
         "supplierId": supplierId,
         "orderDate": orderDate!.toIso8601String(),
+        "receivedDate": receivedDate?.toIso8601String(),
         "status": status!.toUpperCase(),
         "note": noteController.text,
 
@@ -273,7 +341,7 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
       debugPrint("payload for purchase is $payload");
       if (!mounted) return;
-
+      setState(() => _isSubmitting = true);
       // API call
       //
       final success = await ref
@@ -324,11 +392,11 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
       // Dispose controllers first
       qtyControllers[index].dispose();
       priceControllers[index].dispose();
-
+      sellingPriceControllers[index].dispose();
       // Remove controllers
       qtyControllers.removeAt(index);
       priceControllers.removeAt(index);
-
+      sellingPriceControllers.removeAt(index);
       // Remove purchase item
       purchaseData.purchaseItems.removeAt(index);
     });
@@ -423,22 +491,20 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
                       },
                     ),
 
-                    infoRowSelectDate(
+                    _infoRowSelectDate(
                       PurchaseLocale.purchaseOrderDate.getString(context),
-
                       textColor,
                       subColor,
-
-                      selectedDate: orderDate,
-
-                      onChanged: (value) {
-                        if (value == null) return;
-
-                        setState(() {
-                          orderDate = value;
-                        });
-                      },
+                      (value) => setState(() => orderDate = value),
                     ),
+
+                    if (status == "Success")
+                      _infoRowSelectDate(
+                        PurchaseLocale.purchaseReceivedDate.getString(context),
+                        textColor,
+                        subColor,
+                        (value) => setState(() => receivedDate = value),
+                      ),
                   ],
                 ),
               ),
@@ -462,19 +528,9 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
 
               const SizedBox(height: 12),
 
-              buildSearchField(
-                context,
-                ref,
-                searchController,
-                isDark,
-                textColor,
-                subColor,
-                setState,
-                showAddField,
-
-                onSearchChanged: onSearchChanged,
-
-                onAddProduct: addProduct,
+              CustomProductSearchField<Product>(
+                itemBuilder: (product) => product,
+                onProductSelected: (p) => addProduct(p as Product),
               ),
 
               const SizedBox(height: 12),
@@ -526,6 +582,7 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
                         Row(
                           children: [
                             Expanded(
+                              flex: 2,
                               child: ShadInputFormField(
                                 id: 'qty_$index',
                                 controller: qtyControllers[index],
@@ -545,6 +602,7 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
                             const SizedBox(width: 12),
 
                             Expanded(
+                              flex: 5,
                               child: ShadInputFormField(
                                 id: 'price_$index',
                                 controller: priceControllers[index],
@@ -553,7 +611,30 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
                                       decimal: true,
                                     ),
                                 label: Text(
-                                  PurchaseLocale.purchasePrice.getString(
+                                  PurchaseLocale.purchaseBuyPrice.getString(
+                                    context,
+                                  ),
+                                  style: TextStyle(color: subColor),
+                                ),
+                                onChanged: (_) {
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            Expanded(
+                              flex: 5,
+                              child: ShadInputFormField(
+                                id: 'selling_price_$index',
+                                controller: sellingPriceControllers[index],
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                                label: Text(
+                                  PurchaseLocale.purchaseSellingPrice.getString(
                                     context,
                                   ),
                                   style: TextStyle(color: subColor),
@@ -788,15 +869,42 @@ class _PurchaseEditPageState extends ConsumerState<PurchaseEditPage> {
               // UPDATE
               // ============================
               GradientSubmitButton(
+                isSubmitting: _isSubmitting,
                 onPressed: updatePurchase,
-
                 text: PurchaseLocale.purchaseUpdate.getString(context),
-
                 width: double.infinity,
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _infoRowSelectDate(
+    String title,
+    Color textColor,
+    Color subColor,
+    ValueChanged<DateTime> onPicked,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Text(title, style: TextStyle(color: subColor)),
+          ),
+          Expanded(
+            flex: 5,
+            child: DateSelect(
+              onChanged: (value) {
+                if (value == null) return;
+                onPicked(value);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

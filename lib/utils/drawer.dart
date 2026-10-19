@@ -115,7 +115,7 @@ class CustomerDrawer {
                           DrawerScreenLocale.drawerPosSystem.getString(context),
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 18,
+                            fontSize: FontSizeConfig.title(context),
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.3,
                           ),
@@ -127,7 +127,7 @@ class CustomerDrawer {
                           ),
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.7),
-                            fontSize: 12,
+                            fontSize: FontSizeConfig.body2(context),
                           ),
                         ),
                       ],
@@ -246,7 +246,7 @@ class CustomerDrawer {
                                         .getString(context),
                                     style: TextStyle(
                                       color: subColor,
-                                      fontSize: 13,
+                                      fontSize: FontSizeConfig.body2(context),
                                     ),
                                   ),
                                   selectedOptionBuilder: (context, value) =>
@@ -303,7 +303,7 @@ class CustomerDrawer {
                                   context,
                                 ),
                                 style: TextStyle(
-                                  fontSize: FontSizeConfig.body(context),
+                                  fontSize: FontSizeConfig.body2(context),
                                   color: textColor,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -352,7 +352,7 @@ class CustomerDrawer {
                               )
                             : DrawerScreenLocale.drawerLogin.getString(context),
                         style: TextStyle(
-                          fontSize: FontSizeConfig.body(context),
+                          fontSize: FontSizeConfig.body2(context),
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
@@ -394,7 +394,7 @@ class CustomerDrawer {
           child: Text(
             section.title!.toUpperCase(),
             style: TextStyle(
-              fontSize: 10,
+              fontSize: FontSizeConfig.body2(context),
               fontWeight: FontWeight.w700,
               letterSpacing: 0.6,
               color: subColor,
@@ -439,7 +439,7 @@ class CustomerDrawer {
         title: Text(
           item.label,
           style: TextStyle(
-            fontSize: FontSizeConfig.body(context),
+            fontSize: FontSizeConfig.body2(context),
             color: textColor,
             fontWeight: FontWeight.w500,
           ),

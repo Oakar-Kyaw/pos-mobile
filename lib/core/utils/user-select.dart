@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pos/api/user.api.dart';
+import 'package:pos/component/loading-component.dart';
 import 'package:pos/features/company/presentation/provider/company.riverpod.dart';
 import 'package:pos/localization/general-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
@@ -81,10 +82,8 @@ class _UserSelectState extends ConsumerState<UserSelect> {
           ),
         );
       },
-      loading: () => const SizedBox(
-        width: 200,
-        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-      ),
+      loading: () =>
+          const SizedBox(width: 200, child: Center(child: LoadingWidget())),
       error: (err, stack) {
         return SizedBox(width: 200, child: Text('Error: $err'));
       },

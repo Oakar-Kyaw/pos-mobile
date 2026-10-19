@@ -19,6 +19,7 @@ import flutter_timezone
 import mobile_scanner
 import print_bluetooth_thermal
 import printing
+import restart_app
 import shared_preferences_foundation
 import sqflite_darwin
 import universal_ble
@@ -40,6 +41,7 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   MobileScannerPlugin.register(with: registry.registrar(forPlugin: "MobileScannerPlugin"))
   PrintBluetoothThermalPlugin.register(with: registry.registrar(forPlugin: "PrintBluetoothThermalPlugin"))
   PrintingPlugin.register(with: registry.registrar(forPlugin: "PrintingPlugin"))
+  RestartAppPlugin.register(with: registry.registrar(forPlugin: "RestartAppPlugin"))
   SharedPreferencesPlugin.register(with: registry.registrar(forPlugin: "SharedPreferencesPlugin"))
   SqflitePlugin.register(with: registry.registrar(forPlugin: "SqflitePlugin"))
   UniversalBlePlugin.register(with: registry.registrar(forPlugin: "UniversalBlePlugin"))

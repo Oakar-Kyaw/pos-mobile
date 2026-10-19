@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/api/voucher.api.dart';
 import 'package:pos/features/customer/data/model/customer-model.dart';
+import 'package:pos/features/voucher/data/model/voucher-detail.dart';
 import 'package:pos/features/voucher/presentation/widgets/calculation-row-discount.dart';
 import 'package:pos/features/voucher/presentation/widgets/calculation-row-note.dart';
 import 'package:pos/features/voucher/presentation/widgets/calculation-row-packagin-fee.dart';
@@ -280,7 +281,122 @@ class _VoucherCalculationDialogState
                 ),
               ),
               const SizedBox(height: 10),
+
+              // ── Paid Status ──
               sectionLabel(
+                context,
+                VoucherScreenLocale.paidStatus.getString(context),
+                textColor,
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: surfaceColor,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark
+                          ? kPrimary.withOpacity(0.08)
+                          : Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: PaidStatus.values.map((status) {
+                    final selected = voucher.paidStatus == status;
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: isLoading
+                              ? null
+                              : () => notifier.setPaidStatus(status),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? kPrimary.withOpacity(0.10)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: selected
+                                    ? kPrimary
+                                    : (isDark
+                                          ? Colors.white.withOpacity(0.10)
+                                          : const Color(0xFFE5E7EB)),
+                                width: selected ? 1.5 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // radio circle
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  width: 18,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: selected
+                                          ? kPrimary
+                                          : (isDark
+                                                ? Colors.white54
+                                                : Colors.black38),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 200,
+                                      ),
+                                      width: selected ? 8 : 0,
+                                      height: selected ? 8 : 0,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: kPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    _paidStatusLabel(status),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: FontSizeConfig.body2(context),
+                                      fontWeight: selected
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
+                                      color: selected ? kPrimary : textColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 10),
+              //payment section
+              sectionLabel(
+                context,
                 PaymentScreenLocale.paymentTitle.getString(context),
                 textColor,
               ),
@@ -480,5 +596,19 @@ class _VoucherCalculationDialogState
         ],
       ),
     );
+  }
+
+  //paid status label
+  String _paidStatusLabel(PaidStatus s) {
+    switch (s.name) {
+      case 'paid':
+        return 'Paid';
+      case 'unpaid':
+        return 'Unpaid';
+      case 'partial':
+        return 'Partial';
+      default:
+        return s.name;
+    }
   }
 }

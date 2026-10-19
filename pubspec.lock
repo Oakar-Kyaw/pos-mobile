@@ -1013,6 +1013,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.1"
+  internet_connection_checker_plus:
+    dependency: "direct main"
+    description:
+      name: internet_connection_checker_plus
+      sha256: "43edc904d8b8a9f5a2f871e9317a352ca005641b2f158a8b22732447c9f3994e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.2"
   intl:
     dependency: transitive
     description:
@@ -1413,6 +1421,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0"
+  restart_app:
+    dependency: "direct main"
+    description:
+      name: restart_app
+      sha256: b7ab4ec8e35ac5a716939bb3aee10c56d24e8b5c4798682b7aacb523f67c9367
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.10.1"
   riverpod:
     dependency: transitive
     description:

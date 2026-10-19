@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pos/component/app-bar.dart';
 import 'package:pos/features/account-upgrade/domain/entites/plan.dart';
-import 'package:pos/features/account-upgrade/presentation/widgets/upgrade-pay-dialog.dart';
 import 'package:pos/localization/account-upgrade.dart';
 import 'package:pos/utils/app-theme.dart';
 import 'package:pos/utils/font-size.dart';

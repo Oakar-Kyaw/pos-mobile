@@ -1,8 +1,9 @@
 // ── Section label ──────────────────────────────
 import 'package:flutter/widgets.dart';
 import 'package:pos/utils/app-theme.dart';
+import 'package:pos/utils/font-size.dart';
 
-Widget sectionLabel(String title, Color textColor) {
+Widget sectionLabel(BuildContext context, String title, Color textColor) {
   return Row(
     children: [
       Container(
@@ -21,7 +22,7 @@ Widget sectionLabel(String title, Color textColor) {
       Text(
         title,
         style: TextStyle(
-          fontSize: 14,
+          fontSize: FontSizeConfig.body1(context),
           fontWeight: FontWeight.w700,
           color: textColor,
           letterSpacing: -0.2,

@@ -110,10 +110,13 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
         );
       }
     }
-
+    // debugPrint(
+    //   "voucher is ${voucher.toJson()} and paid status is ${voucher.paidStatus?.name.toUpperCase()}",
+    // );
     FormData formData = FormData.fromMap({
       "type": 'SAVE',
       "note": voucher.note ?? "",
+      "paidStatus": voucher.paidStatus?.name.toUpperCase(),
       "subTotal": voucher.subTotal,
       "tax": voucher.tax,
       "deliveryFee": voucher.deliveryFee,
@@ -184,6 +187,8 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
       if (file != null) 'file': await MultipartFile.fromFile(file.path),
     });
 
+    debugPrint("form data is  ${formData.fields}");
+
     final response = await _dio.post(url, data: formData);
     final Map<String, dynamic> data = response.data;
 
@@ -228,6 +233,18 @@ class VoucherAsyncNotifier extends AsyncNotifier<List<VoucherDetailModel>> {
     }
 
     throw Exception("Failed to get repayment");
+  }
+
+  //update paid status
+  Future<bool> updatePaidStatus(int id) async {
+    final url = "v1/vouchers/$id/status/change";
+    final response = await _dio.patch(url);
+    final data = response.data;
+
+    if (data["success"] == true) {
+      return true;
+    }
+    throw Exception(data["message"] ?? "Failed to update paid status");
   }
 
   /// -------- Delete repayment --------

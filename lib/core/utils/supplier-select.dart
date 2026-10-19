@@ -119,7 +119,7 @@ class _SupplierSelectState extends ConsumerState<SupplierSelect> {
           },
         );
       },
-      loading: () => const SizedBox(width: 100, child: LoadingWidget()),
+      loading: () => const SizedBox(child: LoadingWidget()),
       error: (err, stack) {
         return SizedBox(width: 200, child: Text('Error: $err'));
       },

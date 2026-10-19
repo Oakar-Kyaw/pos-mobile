@@ -162,7 +162,7 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
                               title: Text(
                                 item.name,
                                 style: TextStyle(
-                                  fontSize: FontSizeConfig.body(context),
+                                  fontSize: FontSizeConfig.body2(context),
                                   color: textColor,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -170,7 +170,7 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
                               subtitle: Text(
                                 "${VoucherScreenLocale.price.getString(context)}: ${item.price} x ${item.quantity}",
                                 style: TextStyle(
-                                  fontSize: FontSizeConfig.body(context),
+                                  fontSize: FontSizeConfig.body1(context),
                                   color: subColor,
                                 ),
                               ),
@@ -323,7 +323,8 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
                                       VoucherScreenLocale.addItem.getString(
                                         context,
                                       ),
-                                      style: const TextStyle(
+                                      style: TextStyle(
+                                        fontSize: FontSizeConfig.body1(context),
                                         color: Colors.white,
                                       ),
                                     ),
@@ -354,7 +355,10 @@ class _CreateVoucherPageState extends ConsumerState<CreateVoucherPage> {
                               VoucherScreenLocale.voucherCalculate.getString(
                                 context,
                               ),
-                              style: const TextStyle(color: Colors.white),
+                              style: TextStyle(
+                                fontSize: FontSizeConfig.body1(context),
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),

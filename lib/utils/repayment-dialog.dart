@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pos/component/loading-component.dart';
 import 'package:pos/component/voucher-body.dart';
 import 'package:pos/localization/payment-data-local.dart';
 import 'package:pos/localization/payment-local.dart';
@@ -27,7 +28,6 @@ void showPaymentDialog(
   amountController.text = remainingPaymentAmount.toString();
 
   final subColor = isDark ? kTextSubDark : kTextSubLight;
-  final progressIndicatorColor = isDark ? kPrimary : kPrimary.withOpacity(0.8);
 
   showDialog(
     context: context,
@@ -204,15 +204,7 @@ void showPaymentDialog(
                       )
                       .toList(),
                 ),
-                loading: () => Center(
-                  child: SizedBox(
-                    height: 30,
-                    width: 30,
-                    child: CircularProgressIndicator(
-                      color: progressIndicatorColor,
-                    ),
-                  ),
-                ),
+                loading: () => Center(child: LoadingWidget()),
                 error: (error, stack) =>
                     Text("Error loading payment list: $error"),
               ),

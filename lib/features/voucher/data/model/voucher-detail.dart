@@ -190,13 +190,14 @@ class VoucherDetailModel {
   bool? isRefund;
   final String? note;
   final String type;
-
+  final PaidStatus? paidStatus;
   VoucherDetailModel({
     required this.id,
     this.voucherCode,
     this.createdAt,
     required this.items,
     required this.payments,
+    required this.paidStatus,
     this.customer,
     this.company,
     this.user, // ← Added to constructor
@@ -221,6 +222,7 @@ class VoucherDetailModel {
     int? id,
     List<ItemModel>? items,
     List<VoucherPayment>? payments,
+    PaidStatus? paidStatus,
     Customer? customer,
     Company? company,
     VoucherUser? user,
@@ -245,6 +247,7 @@ class VoucherDetailModel {
       payments: payments ?? this.payments,
       customer: customer ?? this.customer,
       company: company ?? this.company,
+      paidStatus: paidStatus ?? this.paidStatus,
       user: user ?? this.user,
       subTotal: subTotal ?? this.subTotal,
       total: total ?? this.total,
@@ -272,6 +275,13 @@ class VoucherDetailModel {
       voucherCode: json['voucherCode'] ?? "",
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
+          : null,
+      paidStatus: json['paidStatus'] != null
+          ? PaidStatus.values.firstWhere(
+              (e) =>
+                  e.name.toUpperCase() ==
+                  json['paidStatus'].toString().toUpperCase(),
+            )
           : null,
       items: (json['items'] as List<dynamic>)
           .map((item) => ItemModel.fromJson(item))
@@ -325,6 +335,9 @@ class VoucherDetailModel {
       'tax': tax,
       'note': note,
       'type': type,
+      'paidStatus': paidStatus?.name.toUpperCase(),
     };
   }
 }
+
+enum PaidStatus { paid, unpaid, partial }

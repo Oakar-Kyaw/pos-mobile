@@ -59,6 +59,7 @@ class _ProductBarcodeScanPageState
       payments: [],
       total: 0,
       type: "draft",
+      paidStatus: PaidStatus.paid,
     );
     ref.read(voucherDetailProvider.notifier).setVoucher(voucherDetailModel);
   }

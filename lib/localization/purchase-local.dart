@@ -15,6 +15,8 @@ mixin PurchaseLocale {
   static const purchaseStatus = 'purchase_status';
   static const purchaseQuantity = 'purchase_quantity';
   static const purchasePrice = 'purchase_price';
+  static const purchaseBuyPrice = 'purchase_buy_price';
+  static const purchaseSellingPrice = 'purchase_selling_price';
   static const purchaseUnitPrice = 'purchase_unit_price';
   static const purchaseSubtotal = 'purchase_subtotal';
   static const purchaseItemTotal = 'purchase_item_total';
@@ -62,6 +64,7 @@ mixin PurchaseLocale {
   static const purchaseSupplierRequired = 'purchase_supplier_required';
   static const purchaseStatusRequired = 'purchase_status_required';
   static const purchaseOrderDateRequired = 'purchase_order_date_required';
+  static const purchaseReceivedDateRequired = 'purchase_received_date_required';
   static const purchaseItemRequired = 'purchase_item_required';
 
   static const EN = {
@@ -81,6 +84,8 @@ mixin PurchaseLocale {
     purchaseStatus: 'Purchase Status',
     purchaseQuantity: 'Quantity',
     purchasePrice: 'Price',
+    purchaseBuyPrice: 'Buy Price',
+    purchaseSellingPrice: 'Selling Price',
     purchaseUnitPrice: 'Unit Price',
     purchaseSubtotal: 'Subtotal',
     purchaseItemTotal: 'Item Total',
@@ -126,6 +131,7 @@ mixin PurchaseLocale {
     purchaseSupplierRequired: 'Please select a supplier',
     purchaseStatusRequired: 'Please select a purchase status',
     purchaseOrderDateRequired: 'Please select an order date',
+    purchaseReceivedDateRequired: 'Please select a received date',
     purchaseItemRequired: 'Please add at least one item',
   };
 
@@ -133,8 +139,8 @@ mixin PurchaseLocale {
     purchaseManagementTitle: 'အဝယ်စီမံခန့်ခွဲမှု',
     purchaseList: 'အဝယ်မှတ်တမ်းများ',
     purchaseCreate: 'ဖန်တီးရန်',
-    purchaseEdit: 'ပြင်ဆင်ရန်',
-    purchaseUpdate: 'ပြင်ဆင်ရန်',
+    purchaseEdit: 'ပြင်ဆင်',
+    purchaseUpdate: 'ပြင်ဆင်',
     purchaseDelete: 'ဖျက်ရန်',
     purchaseCancel: 'ပယ်ဖျက်ရန်',
     purchaseDetail: 'အသေးစိတ်',
@@ -144,8 +150,10 @@ mixin PurchaseLocale {
     purchaseOrderDate: 'မှာယူသည့်ရက်',
     purchaseReceivedDate: 'လက်ခံရရှိသည့်ရက်',
     purchaseStatus: 'အဝယ်အခြေအနေ',
-    purchaseQuantity: 'အရေအတွက်',
+    purchaseQuantity: 'ခုရေ',
     purchasePrice: 'ဈေးနှုန်း',
+    purchaseBuyPrice: 'ဝယ်ဈေး',
+    purchaseSellingPrice: 'ရောင်းဈေး',
     purchaseUnitPrice: 'တစ်ခုချင်းဈေးနှုန်း',
     purchaseSubtotal: 'စုစုပေါင်းတန်ဖိုး',
     purchaseItemTotal: 'ပစ္စည်းစုစုပေါင်း',
@@ -192,6 +200,7 @@ mixin PurchaseLocale {
     purchaseSupplierRequired: 'ကျေးဇူးပြု၍ ပေးသွင်းသူကို ရွေးချယ်ပါ',
     purchaseStatusRequired: 'ကျေးဇူးပြု၍ အဝယ်အခြေအနေကို ရွေးချယ်ပါ',
     purchaseOrderDateRequired: 'ကျေးဇူးပြု၍ မှာယူသည့်ရက်ကို ရွေးချယ်ပါ',
+    purchaseReceivedDateRequired: 'ကျေးဇူးပြု၍ လက်ခံရရှိသည့်ရက်ကို ရွေးချယ်ပါ',
     purchaseItemRequired: 'အနည်းဆုံး ပစ္စည်းတစ်ခု ထည့်ပါ',
   };
 }

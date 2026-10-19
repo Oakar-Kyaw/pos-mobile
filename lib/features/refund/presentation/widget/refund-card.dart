@@ -1,3 +1,448 @@
+// import 'package:flutter/material.dart';
+// import 'package:flutter_localization/flutter_localization.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:go_router/go_router.dart';
+// import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+// import 'package:pos/core/utils/confirm-dialog.dart';
+// import 'package:pos/core/widgets/delete-icon.dart';
+// import 'package:pos/features/refund/data/model/refund.dart';
+// import 'package:pos/features/refund/presentation/provider/refund.api.dart';
+// import 'package:pos/localization/refund-local.dart';
+// import 'package:pos/riverpod/selected-user.riverpod.dart';
+// import 'package:pos/riverpod/user.riverpod.dart';
+// import 'package:pos/utils/app-theme.dart';
+// import 'package:pos/utils/button.dart';
+// import 'package:pos/utils/check-role.dart';
+// import 'package:pos/utils/formatAmount.dart';
+// import 'package:pos/utils/font-size.dart';
+// import 'package:pos/utils/responsive.dart';
+// import 'package:pos/utils/route-constant.dart';
+// import 'package:pos/utils/shad-toaster.dart';
+// import 'package:shadcn_ui/shadcn_ui.dart';
+
+// class RefundCard extends ConsumerStatefulWidget {
+//   final SelectedData? selectedData;
+//   const RefundCard({super.key, this.selectedData});
+
+//   @override
+//   ConsumerState<RefundCard> createState() => _RefundCardState();
+// }
+
+// class _RefundCardState extends ConsumerState<RefundCard> {
+//   late final PagingController<int, Refund> _pagingController;
+
+//   final int limit = 20;
+
+//   @override
+//   void initState() {
+//     super.initState();
+
+//     _pagingController = PagingController<int, Refund>(
+//       getNextPageKey: (state) =>
+//           state.lastPageIsEmpty ? null : state.nextIntPageKey,
+//       fetchPage: (pageKey) => ref
+//           .read(refundProvider.notifier)
+//           .fetchRefunds(
+//             page: pageKey,
+//             limit: limit,
+//             userId: widget.selectedData?.userId,
+//             startDate: widget.selectedData?.startDate,
+//             endDate: widget.selectedData?.endDate,
+//           ),
+//     );
+//   }
+
+//   void _delete(Refund refund, bool isDark) async {
+//     if (!mounted) return;
+//     final confirmed = await showConfirmDialog(
+//       context,
+//       title: RefundLocale.refundDelete.getString(context),
+//       content: RefundLocale.refundDeleteConfirm.getString(context),
+//       confirmLabel: RefundLocale.confirm.getString(context),
+//       cancelLabel: RefundLocale.cancel.getString(context),
+//     );
+//     if (confirmed != true) return;
+//     await ref
+//         .read(refundProvider.notifier)
+//         .deleteRefund(refund.id)
+//         .then((data) {
+//           if (data) {
+//             ShowToast(
+//               context,
+//               description: Text(
+//                 RefundLocale.refundDeleteSuccess.getString(context),
+//                 style: TextStyle(color: kGreenSecondary),
+//               ),
+//             );
+//             _pagingController.refresh();
+//           }
+//         })
+//         .catchError((err) {
+//           ShowToast(
+//             context,
+//             description: Text(RefundLocale.refundDeleteFail.getString(context)),
+//             isError: true,
+//           );
+//         });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+//     final textColor = isDark ? kTextDark : kTextLight;
+//     final subColor = isDark ? kTextSubDark : kTextSubLight;
+
+//     ref.listen<SelectedData?>(selectedDataStateProvider, (prev, nex) {
+//       _pagingController.refresh();
+//     });
+
+//     final crossAxisCount = Responsive.isDesktop(context)
+//         ? 3
+//         : Responsive.isTablet(context)
+//         ? 2
+//         : 1;
+
+//     final mainAxisExtent = Responsive.isDesktop(context)
+//         ? 490.0
+//         : Responsive.isTablet(context)
+//         ? 490.0
+//         : 460.0;
+
+//     return RefreshIndicator(
+//       onRefresh: () async {
+//         _pagingController.refresh();
+//       },
+//       child: PagingListener(
+//         controller: _pagingController,
+//         builder: (context, state, fetchNextPage) => PagedGridView<int, Refund>(
+//           state: state,
+//           fetchNextPage: fetchNextPage,
+//           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//             crossAxisCount: crossAxisCount,
+//             crossAxisSpacing: 10,
+//             mainAxisSpacing: 10,
+//             mainAxisExtent: mainAxisExtent,
+//           ),
+//           builderDelegate: PagedChildBuilderDelegate<Refund>(
+//             itemBuilder: (context, refund, index) {
+//               return _RefundCard(
+//                 refund: refund,
+//                 textColor: textColor,
+//                 subColor: subColor,
+//                 isDark: isDark,
+//                 onDelete: () => _delete(refund, isDark),
+//               );
+//             },
+//             firstPageProgressIndicatorBuilder: (_) =>
+//                 Center(child: CircularProgressIndicator(color: kPrimary)),
+//             newPageProgressIndicatorBuilder: (_) => Padding(
+//               padding: const EdgeInsets.all(16),
+//               child: Center(child: CircularProgressIndicator(color: kPrimary)),
+//             ),
+//             noItemsFoundIndicatorBuilder: (_) => Center(
+//               child: Text(
+//                 RefundLocale.refundNoItems.getString(context),
+//                 style: TextStyle(color: subColor, fontSize: 14),
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class _RefundCard extends ConsumerWidget {
+//   const _RefundCard({
+//     required this.refund,
+//     required this.textColor,
+//     required this.subColor,
+//     required this.isDark,
+//     this.onDelete,
+//   });
+
+//   final Refund refund;
+//   final Color textColor;
+//   final Color subColor;
+//   final bool isDark;
+//   final VoidCallback? onDelete;
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final user = ref.watch(userStateProvider);
+//     return Container(
+//       padding: const EdgeInsets.all(16),
+//       decoration: BoxDecoration(
+//         color: isDark ? kSurfaceDark : kSurfaceLight,
+//         borderRadius: BorderRadius.circular(16),
+//         border: Border.all(
+//           color: isDark
+//               ? Colors.white.withOpacity(0.06)
+//               : Colors.black.withOpacity(0.06),
+//         ),
+//         boxShadow: [
+//           BoxShadow(
+//             color: isDark
+//                 ? kPrimary.withOpacity(0.1)
+//                 : Colors.black.withOpacity(0.06),
+//             blurRadius: 12,
+//             offset: const Offset(0, 4),
+//           ),
+//         ],
+//       ),
+//       child: Stack(
+//         children: [
+//           RefundData(
+//             isDark: isDark,
+//             refund: refund,
+//             textColor: textColor,
+//             subColor: subColor,
+//           ),
+//           if (onDelete != null && (isAdmin(user!.role)))
+//             Positioned(
+//               top: -10,
+//               right: 0,
+//               child: DeleteIcon(onDelete: onDelete),
+//             ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// class RefundData extends StatelessWidget {
+//   const RefundData({
+//     super.key,
+//     required this.isDark,
+//     required this.refund,
+//     required this.textColor,
+//     required this.subColor,
+//   });
+
+//   final bool isDark;
+//   final Refund refund;
+//   final Color textColor;
+//   final Color subColor;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         RefundTitle(isDark: isDark, refund: refund, textColor: textColor),
+//         const SizedBox(height: 10),
+//         RefundDateRow(subColor: subColor, refund: refund, textColor: textColor),
+//         const SizedBox(height: 8),
+//         Text(
+//           RefundLocale.refundReason.getString(context),
+//           style: TextStyle(fontSize: 12, color: subColor),
+//         ),
+//         const SizedBox(height: 4),
+//         Text(
+//           refund.reason ?? '-',
+//           style: TextStyle(
+//             fontSize: FontSizeConfig.body(context),
+//             color: textColor,
+//           ),
+//         ),
+//         const Divider(),
+
+//         /// ---- Refund Items ----
+//         Text(
+//           RefundLocale.refundItems.getString(context),
+//           style: TextStyle(
+//             fontSize: 12,
+//             fontWeight: FontWeight.bold,
+//             color: subColor,
+//           ),
+//         ),
+//         const SizedBox(height: 6),
+//         ...refund.refundItems
+//             .take(3)
+//             .map(
+//               (item) => Padding(
+//                 padding: const EdgeInsets.only(bottom: 6),
+//                 child: Row(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Expanded(
+//                       flex: 3,
+//                       child: Text(
+//                         item.product?.name ?? '-',
+//                         style: TextStyle(
+//                           fontSize: FontSizeConfig.body(context),
+//                           color: textColor,
+//                         ),
+//                       ),
+//                     ),
+//                     Expanded(
+//                       flex: 1,
+//                       child: Text(
+//                         'x ${item.quantity}',
+//                         textAlign: TextAlign.center,
+//                         style: TextStyle(
+//                           fontSize: FontSizeConfig.body(context),
+//                           color: subColor,
+//                         ),
+//                       ),
+//                     ),
+//                     Expanded(
+//                       flex: 2,
+//                       child: Text(
+//                         (item.price * item.quantity).toStringAsFixed(0),
+//                         textAlign: TextAlign.right,
+//                         style: TextStyle(
+//                           fontSize: FontSizeConfig.body(context),
+//                           color: textColor,
+//                           fontWeight: FontWeight.w600,
+//                         ),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//         //if items are more than 3,
+//         if (refund.refundItems.length > 3)
+//           Padding(
+//             padding: const EdgeInsets.only(top: 2, bottom: 4),
+//             child: Text(
+//               '+${refund.refundItems.length - 3} more',
+//               style: TextStyle(
+//                 fontSize: FontSizeConfig.body(context),
+//                 color: subColor,
+//                 fontStyle: FontStyle.italic,
+//               ),
+//             ),
+//           ),
+//         const Divider(),
+
+//         /// ---- Payments ----
+//         Text(
+//           RefundLocale.payment.getString(context),
+//           style: TextStyle(
+//             fontSize: 12,
+//             fontWeight: FontWeight.bold,
+//             color: subColor,
+//           ),
+//         ),
+//         const SizedBox(height: 6),
+//         ...refund.refundPayments.map(
+//           (payment) => Padding(
+//             padding: const EdgeInsets.only(bottom: 6),
+//             child: Row(
+//               children: [
+//                 Expanded(
+//                   child: Text(
+//                     payment.paymentData?.accountName ?? payment.type,
+//                     style: TextStyle(
+//                       fontSize: FontSizeConfig.body(context),
+//                       color: textColor,
+//                     ),
+//                   ),
+//                 ),
+//                 Text(
+//                   payment.amount.toStringAsFixed(0),
+//                   style: TextStyle(
+//                     fontSize: FontSizeConfig.body(context),
+//                     color: textColor,
+//                     fontWeight: FontWeight.w600,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//         const Spacer(),
+//         GradientSubmitButton(
+//           onPressed: () =>
+//               context.pushNamed(AppRoute.refundUpdate, extra: refund),
+//           text: RefundLocale.edit.getString(context),
+//           width: 150,
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+// class RefundDateRow extends StatelessWidget {
+//   const RefundDateRow({
+//     super.key,
+//     required this.subColor,
+//     required this.refund,
+//     required this.textColor,
+//   });
+
+//   final Color subColor;
+//   final Refund refund;
+//   final Color textColor;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: [
+//         Icon(LucideIcons.calendar, size: 12, color: subColor),
+//         const SizedBox(width: 6),
+//         Text(
+//           DateFormat('yyyy-MM-dd').format(refund.date),
+//           style: TextStyle(
+//             fontSize: FontSizeConfig.body(context),
+//             color: subColor,
+//           ),
+//         ),
+//         Spacer(),
+//         Text(
+//           formatAmount(refund.amount),
+//           style: TextStyle(
+//             fontSize: FontSizeConfig.title(context),
+//             fontWeight: FontWeight.w800,
+//             color: textColor,
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+// class RefundTitle extends StatelessWidget {
+//   const RefundTitle({
+//     super.key,
+//     required this.isDark,
+//     required this.refund,
+//     required this.textColor,
+//   });
+
+//   final bool isDark;
+//   final Refund refund;
+//   final Color textColor;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: [
+//         Container(
+//           padding: const EdgeInsets.all(8),
+//           decoration: BoxDecoration(
+//             color: kPrimary.withOpacity(isDark ? 0.2 : 0.1),
+//             borderRadius: BorderRadius.circular(10),
+//           ),
+//           child: const Icon(LucideIcons.dollarSign, color: kPrimary, size: 18),
+//         ),
+//         const SizedBox(width: 12),
+//         Expanded(
+//           child: Text(
+//             refund.voucher?.voucherCode ?? '-',
+//             style: TextStyle(
+//               fontSize: FontSizeConfig.title(context),
+//               fontWeight: FontWeight.w700,
+//               color: textColor,
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
 import 'package:flutter/material.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +456,6 @@ import 'package:pos/localization/refund-local.dart';
 import 'package:pos/riverpod/selected-user.riverpod.dart';
 import 'package:pos/riverpod/user.riverpod.dart';
 import 'package:pos/utils/app-theme.dart';
-import 'package:pos/utils/button.dart';
 import 'package:pos/utils/check-role.dart';
 import 'package:pos/utils/formatAmount.dart';
 import 'package:pos/utils/font-size.dart';
@@ -52,6 +496,12 @@ class _RefundCardState extends ConsumerState<RefundCard> {
     );
   }
 
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
+
   void _delete(Refund refund, bool isDark) async {
     if (!mounted) return;
     final confirmed = await showConfirmDialog(
@@ -62,10 +512,12 @@ class _RefundCardState extends ConsumerState<RefundCard> {
       cancelLabel: RefundLocale.cancel.getString(context),
     );
     if (confirmed != true) return;
+    if (!mounted) return;
     await ref
         .read(refundProvider.notifier)
         .deleteRefund(refund.id)
         .then((data) {
+          if (!mounted) return;
           if (data) {
             ShowToast(
               context,
@@ -78,6 +530,7 @@ class _RefundCardState extends ConsumerState<RefundCard> {
           }
         })
         .catchError((err) {
+          if (!mounted) return;
           ShowToast(
             context,
             description: Text(RefundLocale.refundDeleteFail.getString(context)),
@@ -102,51 +555,67 @@ class _RefundCardState extends ConsumerState<RefundCard> {
         ? 2
         : 1;
 
-    final mainAxisExtent = Responsive.isDesktop(context)
-        ? 490.0
-        : Responsive.isTablet(context)
-        ? 490.0
-        : 460.0;
+    // Tablet / Desktop မှာ grid ကို အမြင့်သတ်မှတ်ရလို့ ပိုနိမ့်အောင် လျှော့ထားတယ်
+    const double mainAxisExtent = 340;
+
+    Widget itemBuilder(BuildContext context, Refund refund, int index) {
+      return _RefundCard(
+        refund: refund,
+        textColor: textColor,
+        subColor: subColor,
+        isDark: isDark,
+        onDelete: () => _delete(refund, isDark),
+      );
+    }
+
+    final builderDelegate = PagedChildBuilderDelegate<Refund>(
+      itemBuilder: itemBuilder,
+      firstPageProgressIndicatorBuilder: (_) =>
+          Center(child: CircularProgressIndicator(color: kPrimary)),
+      newPageProgressIndicatorBuilder: (_) =>
+          Center(child: CircularProgressIndicator(color: kPrimary)),
+      noItemsFoundIndicatorBuilder: (_) => Center(
+        child: Text(
+          RefundLocale.refundNoItems.getString(context),
+          style: TextStyle(color: subColor, fontSize: 14),
+        ),
+      ),
+    );
 
     return RefreshIndicator(
+      color: kPrimary,
       onRefresh: () async {
         _pagingController.refresh();
       },
       child: PagingListener(
         controller: _pagingController,
-        builder: (context, state, fetchNextPage) => PagedGridView<int, Refund>(
-          state: state,
-          fetchNextPage: fetchNextPage,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            mainAxisExtent: mainAxisExtent,
-          ),
-          builderDelegate: PagedChildBuilderDelegate<Refund>(
-            itemBuilder: (context, refund, index) {
-              return _RefundCard(
-                refund: refund,
-                textColor: textColor,
-                subColor: subColor,
-                isDark: isDark,
-                onDelete: () => _delete(refund, isDark),
-              );
-            },
-            firstPageProgressIndicatorBuilder: (_) =>
-                Center(child: CircularProgressIndicator(color: kPrimary)),
-            newPageProgressIndicatorBuilder: (_) => Padding(
-              padding: const EdgeInsets.all(16),
-              child: Center(child: CircularProgressIndicator(color: kPrimary)),
+        builder: (context, state, fetchNextPage) {
+          // ဖုန်း: အမြင့်ကို card အလိုက် အလိုအလျောက် ညှိတဲ့ list
+          if (crossAxisCount == 1) {
+            return PagedListView<int, Refund>(
+              state: state,
+              fetchNextPage: fetchNextPage,
+              // padding: const EdgeInsets.fromLTRB(8, 4, 8, 80),
+              physics: const AlwaysScrollableScrollPhysics(),
+              builderDelegate: builderDelegate,
+            );
+          }
+
+          // Tablet / Desktop: grid
+          return PagedGridView<int, Refund>(
+            state: state,
+            fetchNextPage: fetchNextPage,
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 80),
+            physics: const AlwaysScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              mainAxisExtent: mainAxisExtent,
             ),
-            noItemsFoundIndicatorBuilder: (_) => Center(
-              child: Text(
-                RefundLocale.refundNoItems.getString(context),
-                style: TextStyle(color: subColor, fontSize: 14),
-              ),
-            ),
-          ),
-        ),
+            builderDelegate: builderDelegate,
+          );
+        },
       ),
     );
   }
@@ -170,16 +639,15 @@ class _RefundCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userStateProvider);
+    final bool canDelete =
+        onDelete != null && user != null && isAdmin(user.role);
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
       decoration: BoxDecoration(
         color: isDark ? kSurfaceDark : kSurfaceLight,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withOpacity(0.06)
-              : Colors.black.withOpacity(0.06),
-        ),
+        borderRadius: BorderRadius.circular(5),
         boxShadow: [
           BoxShadow(
             color: isDark
@@ -190,21 +658,12 @@ class _RefundCard extends ConsumerWidget {
           ),
         ],
       ),
-      child: Stack(
-        children: [
-          RefundData(
-            isDark: isDark,
-            refund: refund,
-            textColor: textColor,
-            subColor: subColor,
-          ),
-          if (onDelete != null && (isAdmin(user!.role)))
-            Positioned(
-              top: -10,
-              right: 0,
-              child: DeleteIcon(onDelete: onDelete),
-            ),
-        ],
+      child: RefundData(
+        isDark: isDark,
+        refund: refund,
+        textColor: textColor,
+        subColor: subColor,
+        onDelete: canDelete ? onDelete : null,
       ),
     );
   }
@@ -217,51 +676,81 @@ class RefundData extends StatelessWidget {
     required this.refund,
     required this.textColor,
     required this.subColor,
+    this.onDelete,
   });
 
   final bool isDark;
   final Refund refund;
   final Color textColor;
   final Color subColor;
+  final VoidCallback? onDelete;
+
+  Widget _sectionLabel(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.bold,
+        color: subColor,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final divider = Divider(height: 1, color: subColor.withOpacity(0.2));
+
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RefundTitle(isDark: isDark, refund: refund, textColor: textColor),
-        const SizedBox(height: 10),
-        RefundDateRow(subColor: subColor, refund: refund, textColor: textColor),
-        const SizedBox(height: 8),
-        Text(
-          RefundLocale.refundReason.getString(context),
-          style: TextStyle(fontSize: 12, color: subColor),
+        // ---------- Header: icon + code + date + amount + delete ----------
+        RefundTitle(
+          isDark: isDark,
+          refund: refund,
+          textColor: textColor,
+          subColor: subColor,
+          onDelete: onDelete,
         ),
-        const SizedBox(height: 4),
-        Text(
-          refund.reason ?? '-',
-          style: TextStyle(
-            fontSize: FontSizeConfig.body(context),
-            color: textColor,
-          ),
-        ),
-        const Divider(),
 
-        /// ---- Refund Items ----
-        Text(
-          RefundLocale.refundItems.getString(context),
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: subColor,
+        const SizedBox(height: 8),
+
+        // ---------- Reason (label + text တစ်ကြောင်းထဲ) ----------
+        Padding(
+          padding: const EdgeInsets.only(right: 6),
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '${RefundLocale.refundReason.getString(context)}: ',
+                  style: TextStyle(fontSize: 11, color: subColor),
+                ),
+                TextSpan(
+                  text: refund.reason ?? '-',
+                  style: TextStyle(
+                    fontSize: FontSizeConfig.body3(context),
+                    color: textColor,
+                  ),
+                ),
+              ],
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(height: 6),
+
+        const SizedBox(height: 8),
+        divider,
+        const SizedBox(height: 8),
+
+        // ---------- Refund Items ----------
+        _sectionLabel(RefundLocale.refundItems.getString(context)),
+        const SizedBox(height: 4),
         ...refund.refundItems
             .take(3)
             .map(
               (item) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.only(bottom: 3, right: 6),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -269,8 +758,10 @@ class RefundData extends StatelessWidget {
                       flex: 3,
                       child: Text(
                         item.product?.name ?? '-',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: FontSizeConfig.body(context),
+                          fontSize: FontSizeConfig.body3(context),
                           color: textColor,
                         ),
                       ),
@@ -281,7 +772,7 @@ class RefundData extends StatelessWidget {
                         'x ${item.quantity}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: FontSizeConfig.body(context),
+                          fontSize: FontSizeConfig.body3(context),
                           color: subColor,
                         ),
                       ),
@@ -292,7 +783,7 @@ class RefundData extends StatelessWidget {
                         (item.price * item.quantity).toStringAsFixed(0),
                         textAlign: TextAlign.right,
                         style: TextStyle(
-                          fontSize: FontSizeConfig.body(context),
+                          fontSize: FontSizeConfig.body3(context),
                           color: textColor,
                           fontWeight: FontWeight.w600,
                         ),
@@ -302,41 +793,35 @@ class RefundData extends StatelessWidget {
                 ),
               ),
             ),
-        //if items are more than 3,
         if (refund.refundItems.length > 3)
-          Padding(
-            padding: const EdgeInsets.only(top: 2, bottom: 4),
-            child: Text(
-              '+${refund.refundItems.length - 3} more',
-              style: TextStyle(
-                fontSize: FontSizeConfig.body(context),
-                color: subColor,
-                fontStyle: FontStyle.italic,
-              ),
+          Text(
+            '+${refund.refundItems.length - 3} more',
+            style: TextStyle(
+              fontSize: FontSizeConfig.body3(context),
+              color: subColor,
+              fontStyle: FontStyle.italic,
             ),
           ),
-        const Divider(),
 
-        /// ---- Payments ----
-        Text(
-          RefundLocale.payment.getString(context),
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: subColor,
-          ),
-        ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
+        divider,
+        const SizedBox(height: 8),
+
+        // ---------- Payments ----------
+        _sectionLabel(RefundLocale.payment.getString(context)),
+        const SizedBox(height: 4),
         ...refund.refundPayments.map(
           (payment) => Padding(
-            padding: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.only(bottom: 3, right: 6),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     payment.paymentData?.accountName ?? payment.type,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: FontSizeConfig.body(context),
+                      fontSize: FontSizeConfig.body3(context),
                       color: textColor,
                     ),
                   ),
@@ -344,7 +829,7 @@ class RefundData extends StatelessWidget {
                 Text(
                   payment.amount.toStringAsFixed(0),
                   style: TextStyle(
-                    fontSize: FontSizeConfig.body(context),
+                    fontSize: FontSizeConfig.body3(context),
                     color: textColor,
                     fontWeight: FontWeight.w600,
                   ),
@@ -353,14 +838,71 @@ class RefundData extends StatelessWidget {
             ),
           ),
         ),
-        const Spacer(),
-        GradientSubmitButton(
-          onPressed: () =>
-              context.pushNamed(AppRoute.refundUpdate, extra: refund),
-          text: RefundLocale.edit.getString(context),
-          width: 150,
+
+        const SizedBox(height: 8),
+
+        // ---------- Edit button (ညာဘက်၊ အသေးစား) ----------
+        Align(
+          alignment: Alignment.centerRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: _EditButton(
+              label: RefundLocale.edit.getString(context),
+              onPressed: () =>
+                  context.pushNamed(AppRoute.refundUpdate, extra: refund),
+            ),
+          ),
         ),
       ],
+    );
+  }
+}
+
+class _EditButton extends StatelessWidget {
+  const _EditButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [kPrimary, kSecondary]),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: kPrimary.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(LucideIcons.pencil, size: 14, color: Colors.white),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: FontSizeConfig.body3(context),
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -382,21 +924,12 @@ class RefundDateRow extends StatelessWidget {
     return Row(
       children: [
         Icon(LucideIcons.calendar, size: 12, color: subColor),
-        const SizedBox(width: 6),
+        const SizedBox(width: 4),
         Text(
           DateFormat('yyyy-MM-dd').format(refund.date),
           style: TextStyle(
-            fontSize: FontSizeConfig.body(context),
+            fontSize: FontSizeConfig.body3(context),
             color: subColor,
-          ),
-        ),
-        Spacer(),
-        Text(
-          formatAmount(refund.amount),
-          style: TextStyle(
-            fontSize: FontSizeConfig.title(context),
-            fontWeight: FontWeight.w800,
-            color: textColor,
           ),
         ),
       ],
@@ -410,11 +943,15 @@ class RefundTitle extends StatelessWidget {
     required this.isDark,
     required this.refund,
     required this.textColor,
+    required this.subColor,
+    this.onDelete,
   });
 
   final bool isDark;
   final Refund refund;
   final Color textColor;
+  final Color subColor;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -424,21 +961,43 @@ class RefundTitle extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: kPrimary.withOpacity(isDark ? 0.2 : 0.1),
-            borderRadius: BorderRadius.circular(10),
+            shape: BoxShape.circle,
           ),
-          child: const Icon(LucideIcons.dollarSign, color: kPrimary, size: 18),
+          child: const Icon(LucideIcons.dollarSign, color: kPrimary, size: 16),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 10),
         Expanded(
-          child: Text(
-            refund.voucher?.voucherCode ?? '-',
-            style: TextStyle(
-              fontSize: FontSizeConfig.title(context),
-              fontWeight: FontWeight.w700,
-              color: textColor,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                refund.voucher?.voucherCode ?? '-',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: FontSizeConfig.body2(context),
+                  fontWeight: FontWeight.w700,
+                  color: textColor,
+                ),
+              ),
+              const SizedBox(height: 3),
+              RefundDateRow(
+                subColor: subColor,
+                refund: refund,
+                textColor: textColor,
+              ),
+            ],
           ),
         ),
+        Text(
+          formatAmount(refund.amount),
+          style: TextStyle(
+            fontSize: FontSizeConfig.title3(context),
+            fontWeight: FontWeight.w800,
+            color: textColor,
+          ),
+        ),
+        if (onDelete != null) DeleteIcon(onDelete: onDelete),
       ],
     );
   }

@@ -38,7 +38,7 @@ class _PurchaseItemPageState extends ConsumerState<PurchaseItemPage> {
   void dispose() {
     debugPrint("PurchaseItemPage disposed 🤩");
 
-    _selectedDataNotifier.clear();
+    Future(() => _selectedDataNotifier.clear());
 
     super.dispose();
   }
